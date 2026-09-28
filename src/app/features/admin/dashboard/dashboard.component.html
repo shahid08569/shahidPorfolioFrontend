@@ -1,0 +1,397 @@
+<div class="dashboard-wrapper">
+  <!-- Top Admin Bar -->
+  <header class="admin-topbar">
+    <div class="topbar-left">
+      <div class="cms-logo">
+        <span class="logo-pill">CMS</span>
+        <span class="brand-text">Portfolio Control Center</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <span class="user-greeting" *ngIf="authService.currentUser()">
+        {{ authService.currentUser()?.email }}
+      </span>
+      <a routerLink="/" target="_blank" class="btn btn-outline btn-sm">
+        <app-icon name="external-link" [size]="14"></app-icon>
+        View Public Site
+      </a>
+      <button (click)="authService.logout()" class="btn btn-secondary btn-sm logout-btn">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Notice Banner -->
+  <div class="notice-banner" *ngIf="actionMessage()">
+    <app-icon name="check" [size]="18"></app-icon>
+    <span>{{ actionMessage() }}</span>
+  </div>
+
+  <div class="admin-body">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <nav class="sidebar-nav">
+        <button (click)="setTab('overview')" [class.active]="activeTab() === 'overview'" class="nav-item-btn">
+          <app-icon name="terminal" [size]="18"></app-icon>
+          <span>Overview</span>
+        </button>
+
+        <button (click)="setTab('messages')" [class.active]="activeTab() === 'messages'" class="nav-item-btn">
+          <app-icon name="email" [size]="18"></app-icon>
+          <span>Messages ({{ messages().length }})</span>
+        </button>
+
+        <button (click)="setTab('projects')" [class.active]="activeTab() === 'projects'" class="nav-item-btn">
+          <app-icon name="code" [size]="18"></app-icon>
+          <span>Projects ({{ projects().length }})</span>
+        </button>
+
+        <button (click)="setTab('skills')" [class.active]="activeTab() === 'skills'" class="nav-item-btn">
+          <app-icon name="server" [size]="18"></app-icon>
+          <span>Skills Matrix</span>
+        </button>
+
+        <button (click)="setTab('settings')" [class.active]="activeTab() === 'settings'" class="nav-item-btn">
+          <app-icon name="sparkles" [size]="18"></app-icon>
+          <span>Site Settings</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- 1. OVERVIEW TAB -->
+      <section *ngIf="activeTab() === 'overview'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Portfolio Telemetry &amp; Overview</h2>
+          <p>Real-time statistics of published portfolio content and recruiter inquiries.</p>
+        </div>
+
+        <div class="stats-cards-grid">
+          <div class="stat-card card">
+            <span class="stat-num gradient-text">{{ projects().length }}</span>
+            <span class="stat-label">Published Projects</span>
+          </div>
+
+          <div class="stat-card card">
+            <span class="stat-num gradient-text">{{ messages().length }}</span>
+            <span class="stat-label">Contact Messages</span>
+          </div>
+
+          <div class="stat-card card">
+            <span class="stat-num gradient-text">{{ skillGroups().length }}</span>
+            <span class="stat-label">Skill Categories</span>
+          </div>
+
+          <div class="stat-card card">
+            <span class="stat-num gradient-text">.NET 10</span>
+            <span class="stat-label">Clean Architecture API</span>
+          </div>
+        </div>
+
+        <div class="quick-actions-card card">
+          <h3>Quick Administration Actions</h3>
+          <div class="quick-btns">
+            <button (click)="setTab('projects'); openNewProjectModal()" class="btn btn-primary">
+              + New Case Study Project
+            </button>
+            <button (click)="setTab('skills'); openNewSkillModal()" class="btn btn-outline">
+              + Add Technical Skill
+            </button>
+            <button (click)="setTab('messages')" class="btn btn-secondary">
+              Review Messages Inbox
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. MESSAGES TAB -->
+      <section *ngIf="activeTab() === 'messages'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Contact Inquiries Inbox</h2>
+          <p>Messages submitted through the portfolio contact form.</p>
+        </div>
+
+        <div class="messages-list" *ngIf="messages().length > 0; else noMessages">
+          <div class="message-card card" *ngFor="let msg of messages()" [class.unread]="!msg.isRead">
+            <div class="msg-header">
+              <div class="sender-info">
+                <h4>{{ msg.name }} <span class="sender-email">&lt;{{ msg.email }}&gt;</span></h4>
+                <span class="msg-date">{{ msg.receivedAtUtc | date: 'medium' }}</span>
+              </div>
+              <div class="msg-status-actions">
+                <span class="status-pill" [class.read]="msg.isRead">
+                  {{ msg.isRead ? 'Read' : 'New' }}
+                </span>
+                <button *ngIf="!msg.isRead" (click)="markAsRead(msg.id)" class="btn btn-outline btn-sm">
+                  Mark as Read
+                </button>
+                <button (click)="deleteMessage(msg.id)" class="btn btn-secondary btn-sm">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="msg-subject"><strong>Subject:</strong> {{ msg.subject }}</div>
+            <p class="msg-body">{{ msg.message }}</p>
+          </div>
+        </div>
+
+        <ng-template #noMessages>
+          <div class="empty-state card">
+            <app-icon name="email" [size]="36"></app-icon>
+            <p>No contact messages in the inbox yet.</p>
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- 3. PROJECTS TAB -->
+      <section *ngIf="activeTab() === 'projects'" class="tab-pane">
+        <div class="pane-header flex-between">
+          <div>
+            <h2>Manage Projects &amp; Case Studies</h2>
+            <p>Add, edit, and organize project architectures displayed to recruiters.</p>
+          </div>
+          <button (click)="openNewProjectModal()" class="btn btn-primary">
+            + New Project
+          </button>
+        </div>
+
+        <div class="admin-table-wrapper card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Slug</th>
+                <th>Case Study</th>
+                <th>Featured</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of projects()">
+                <td><strong>{{ p.title }}</strong></td>
+                <td><code>{{ p.slug }}</code></td>
+                <td>
+                  <span class="badge badge-primary" *ngIf="p.isCaseStudy">Case Study</span>
+                </td>
+                <td>
+                  <span class="badge badge-accent" *ngIf="p.isFeatured">Featured</span>
+                </td>
+                <td class="table-actions">
+                  <a [routerLink]="['/projects', p.slug]" target="_blank" class="action-link">View</a>
+                  <button (click)="deleteProject(p.id)" class="action-btn-danger">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. SKILLS TAB -->
+      <section *ngIf="activeTab() === 'skills'" class="tab-pane">
+        <div class="pane-header flex-between">
+          <div>
+            <h2>Technical Skills Matrix</h2>
+            <p>Configure technologies and competencies shown on the skills matrix.</p>
+          </div>
+          <button (click)="openNewSkillModal()" class="btn btn-primary">
+            + Add Skill
+          </button>
+        </div>
+
+        <div class="skills-admin-groups" *ngFor="let group of skillGroups()">
+          <h3 class="group-title">{{ group.categoryName }}</h3>
+          <div class="skills-admin-list">
+            <div class="skill-admin-item card" *ngFor="let skill of group.skills">
+              <span class="skill-name">{{ skill.name }}</span>
+              <div class="skill-right">
+                <span class="badge" *ngIf="skill.isTopSkill">Top Skill</span>
+                <button (click)="deleteSkill(skill.id)" class="action-btn-danger">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SETTINGS TAB -->
+      <section *ngIf="activeTab() === 'settings'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Site Settings &amp; Profile</h2>
+          <p>Update your public bio, availability, location, and CV document.</p>
+        </div>
+
+        <div class="settings-form-wrapper card">
+          <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" formControlName="fullName" class="form-control" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Professional Title</label>
+                <input type="text" formControlName="professionalTitle" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">One-Line Bio</label>
+              <input type="text" formControlName="oneLineBio" class="form-control" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">About Summary</label>
+              <textarea rows="4" formControlName="aboutSummary" class="form-control"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Availability Status</label>
+                <input type="text" formControlName="availabilityStatus" class="form-control" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Current Location</label>
+                <input type="text" formControlName="currentLocation" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group cv-upload-group">
+              <label class="form-label">Upload New CV (.pdf)</label>
+              <input type="file" accept=".pdf" (change)="onCvSelected($event)" class="file-input" />
+              <span class="current-cv-path" *ngIf="settingsForm.get('cvUrl')?.value">
+                Current CV: <code>{{ settingsForm.get('cvUrl')?.value }}</code>
+              </span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+                {{ isSaving() ? 'Saving Changes...' : 'Save Settings' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PROJECT MODAL -->
+  <div class="modal-backdrop" *ngIf="isProjectModalOpen()">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3>Create New Project / Case Study</h3>
+        <button (click)="isProjectModalOpen.set(false)" class="close-modal-btn">✕</button>
+      </div>
+
+      <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title *</label>
+            <input type="text" formControlName="title" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Slug *</label>
+            <input type="text" formControlName="slug" class="form-control" placeholder="e.g. enterprise-microservices" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Summary *</label>
+          <textarea rows="2" formControlName="summary" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Problem Statement</label>
+          <textarea rows="2" formControlName="problemStatement" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Engineering Solution</label>
+          <textarea rows="2" formControlName="solutionStatement" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Architecture Overview</label>
+          <textarea rows="2" formControlName="architectureOverview" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Key Metrics</label>
+          <input type="text" formControlName="keyMetrics" class="form-control" placeholder="e.g. 70% latency reduction" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tech Stack (comma-separated)</label>
+          <input type="text" formControlName="techStack" class="form-control" placeholder=".NET 10, Angular 22, Docker, SQL Server" />
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isCaseStudy" />
+            Is Architecture Case Study
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isFeatured" />
+            Is Featured on Home Page
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="isProjectModalOpen.set(false)" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            {{ isSaving() ? 'Saving...' : 'Save Project' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SKILL MODAL -->
+  <div class="modal-backdrop" *ngIf="isSkillModalOpen()">
+    <div class="modal-content card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>Add Technical Skill</h3>
+        <button (click)="isSkillModalOpen.set(false)" class="close-modal-btn">✕</button>
+      </div>
+
+      <form [formGroup]="skillForm" (ngSubmit)="saveSkill()">
+        <div class="form-group">
+          <label class="form-label">Skill Name *</label>
+          <input type="text" formControlName="name" class="form-control" placeholder="e.g. RabbitMQ" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select formControlName="category" class="form-control">
+            <option [value]="0">Frontend</option>
+            <option [value]="1">Backend</option>
+            <option [value]="2">Database</option>
+            <option [value]="3">DevOps</option>
+            <option [value]="4">Tools</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Proficiency (1-100)</label>
+          <input type="number" formControlName="proficiency" class="form-control" />
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isTopSkill" />
+            Mark as Top Skill (Highlighted)
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="isSkillModalOpen.set(false)" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            {{ isSaving() ? 'Saving...' : 'Add Skill' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
+  // Public Shell Routes
   {
     path: '',
     component: MainLayoutComponent,
@@ -56,6 +58,23 @@ export const routes: Routes = [
       },
     ],
   },
+
+  // Admin CMS Routes
+  {
+    path: 'admin/login',
+    loadComponent: () =>
+      import('./features/admin/login/login.component').then((m) => m.AdminLoginComponent),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/admin/dashboard/dashboard.component').then(
+        (m) => m.AdminDashboardComponent
+      ),
+  },
+
+  // Fallback
   {
     path: '**',
     redirectTo: '',
