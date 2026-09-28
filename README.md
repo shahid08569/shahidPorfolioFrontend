@@ -1,59 +1,96 @@
-# ShahidPortfolioUi
+# Shahid Hussain - Developer Portfolio (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
+[![Frontend CI](https://github.com/shahid08569/shahidPorfolioFrontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/shahid08569/shahidPorfolioFrontend/actions/workflows/frontend-ci.yml)
+[![Angular](https://img.shields.io/badge/Angular-22-DD0031?style=flat&logo=angular&logoColor=white)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## Development server
+> High-performance, SEO-friendly personal developer portfolio and content management system for a Senior Full-Stack .NET & Angular engineer.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## 🌟 Key Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **⚡ Angular 22 & Standalone Components:** Zero NgModules, tree-shakable modern component architecture.
+- **🚀 Server-Side Rendering (SSR) & Hydration:** Instant time-to-first-byte (TTFB), full OpenGraph/Twitter card social previews, dynamic `Title` and `Meta` tagging via `SeoService`.
+- **🎯 10-Second Recruiter Hook:** Hero section showcasing core strengths, availability status, quantified impact metrics, and immediate download CV / contact CTAs.
+- **🎨 CSS-Variable Theme Engine:** Dark / Light theme switching powered by Angular Signals (`ThemeService`) with SSR guard and local storage persistence.
+- **📐 Filterable Architecture Showcase:** Deep-dive case studies with problem statement, technical approach, clean architecture diagrams, and quantified metrics.
+- **🛡️ Bot-Suppressed Contact Form:** Reactive form with instant client-side validation and invisible honeypot field.
+- **🔒 Secured CMS Admin Portal:** JWT-authenticated control center (`/admin`) for managing portfolio projects, skills, articles, contact messages, and site configuration.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🛠️ Tech Stack
 
-```bash
-ng generate component component-name
-```
+- **Framework:** Angular 22 (`@angular/core`, `@angular/ssr`)
+- **Language:** TypeScript 5.x
+- **Styles:** SCSS with custom design token system (`_variables.scss`, `_themes.scss`, `_mixins.scss`)
+- **State Management:** Native Angular Signals (`signal`, `computed`)
+- **HTTP Client:** Angular `HttpClient` with `withFetch()` and `authInterceptor`
+- **Containerization:** Multi-stage Docker container (`node:22-alpine`)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🚀 Getting Started
 
-## Building
+### Prerequisites
 
-To build the project run:
+- [Node.js](https://nodejs.org/) (v20+ or v22 LTS recommended)
+- [npm](https://www.npmjs.com/) (v10+ or v12)
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Installation
 
 ```bash
-ng e2e
+# Clone the repository
+git clone https://github.com/shahid08569/shahidPorfolioFrontend.git
+cd shahidPorfolioFrontend
+
+# Install dependencies
+npm install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Local Development
 
-## Additional Resources
+```bash
+# Start development server with hot-reload
+npm start
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# Application will be accessible at http://localhost:4200
+```
+
+### Production Build & SSR
+
+```bash
+# Build production client and server bundles
+npm run build
+
+# Run SSR Node server locally
+npm run serve:ssr:shahid-portfolio-ui
+```
+
+---
+
+## 🐳 Docker Deployment
+
+```bash
+# Build docker image
+docker build -t shahid-portfolio-ui .
+
+# Run container on port 4000
+docker run -p 4000:4000 shahid-portfolio-ui
+```
+
+---
+
+## 🔐 Admin CMS Credentials (Local)
+
+- **Login URL:** `http://localhost:4200/admin/login`
+- **Default Email:** `shahidhussaain08569@gmail.com`
+- **Default Password:** `Admin@Portfolio2026!`
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
