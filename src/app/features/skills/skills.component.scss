@@ -1,0 +1,154 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.skills-page {
+  padding-top: 3.5rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 5rem;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.skill-category-card {
+  padding: 2.25rem;
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+
+    .category-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .skill-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+  }
+
+  .skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .skill-pill-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      border-radius: $radius-md;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      transition: all $transition-fast;
+
+      &:hover {
+        border-color: var(--border-hover);
+        background: var(--bg-secondary);
+        transform: translateX(4px);
+      }
+
+      .skill-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .skill-name {
+          font-size: 0.925rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .star-badge {
+          color: #f59e0b;
+          display: inline-flex;
+        }
+      }
+
+      .proficiency-tag {
+        font-size: 0.725rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.2rem 0.5rem;
+        border-radius: $radius-sm;
+
+        &.core {
+          background: rgba(56, 189, 248, 0.12);
+          color: var(--accent-primary);
+          border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        &.proficient {
+          background: rgba(129, 140, 248, 0.12);
+          color: var(--accent-secondary);
+          border: 1px solid rgba(129, 140, 248, 0.25);
+        }
+
+        &.familiar {
+          background: rgba(148, 163, 184, 0.1);
+          color: var(--text-muted);
+          border: 1px solid var(--border-color);
+        }
+      }
+    }
+  }
+}
+
+/* Architectural Principles */
+.pillars-section {
+  padding-top: 2rem;
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @include md {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .pillar-card {
+      padding: 2rem;
+      text-align: left;
+
+      .pillar-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: $radius-md;
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--accent-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+      }
+
+      h4 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+      }
+
+      p {
+        font-size: 0.925rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+    }
+  }
+}

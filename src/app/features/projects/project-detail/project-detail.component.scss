@@ -1,0 +1,192 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.case-study-page {
+  padding-top: 3rem;
+}
+
+.back-nav {
+  margin-bottom: 2rem;
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.925rem;
+    color: var(--text-secondary);
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--accent-primary);
+    }
+  }
+}
+
+.case-header {
+  margin-bottom: 4rem;
+  max-width: 850px;
+
+  .header-badges {
+    margin-bottom: 1rem;
+  }
+
+  .case-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+
+    @include md {
+      font-size: 3rem;
+    }
+  }
+
+  .case-summary {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .case-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .tech-stack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.case-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .architecture-card,
+  .metrics-card,
+  .lessons-card {
+    @include md {
+      grid-column: span 2;
+    }
+  }
+}
+
+.case-card {
+  padding: 2.25rem;
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+
+    &.problem {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+    &.solution {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+    &.architecture {
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-primary);
+    }
+    &.metrics {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+    &.lessons {
+      background: rgba(129, 140, 248, 0.1);
+      color: var(--accent-secondary);
+    }
+  }
+
+  .card-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .card-text {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+
+    &.highlight-metrics {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+  }
+}
+
+/* Architecture visual layers */
+.architecture-diagram-visual {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  .arch-layer {
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem 1.5rem;
+    border-radius: $radius-md;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all $transition-fast;
+
+    &:hover {
+      border-color: var(--accent-primary);
+      transform: scale(1.02);
+    }
+
+    .layer-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .layer-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    &.domain {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    &.application {
+      border-color: rgba(129, 140, 248, 0.3);
+      background: rgba(129, 140, 248, 0.05);
+    }
+  }
+
+  .arch-arrow {
+    color: var(--accent-primary);
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+}

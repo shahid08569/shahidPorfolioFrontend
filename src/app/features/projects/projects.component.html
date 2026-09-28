@@ -1,0 +1,108 @@
+<div class="projects-page section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="code" [size]="14"></app-icon>
+        Portfolio
+      </span>
+      <h1 class="section-title">Projects &amp; Architectures</h1>
+      <p class="section-subtitle">
+        A curated selection of enterprise microservices, clean CQRS backends, and performant Angular web applications.
+      </p>
+    </div>
+
+    <!-- Search & Filters Bar -->
+    <div class="controls-bar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <app-icon name="terminal" [size]="18" class="search-icon"></app-icon>
+        <input
+          type="text"
+          placeholder="Filter by keyword, tech, or architecture..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          class="search-input"
+        />
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills">
+        <button
+          *ngFor="let cat of categories"
+          (click)="setCategory(cat)"
+          [class.active]="selectedCategory() === cat"
+          class="pill-btn"
+        >
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="projects-grid" *ngIf="filteredProjects().length > 0; else noResults">
+      <div class="project-card card" *ngFor="let project of filteredProjects()">
+        <div class="project-header">
+          <span class="case-study-badge" *ngIf="project.isCaseStudy">
+            <app-icon name="sparkles" [size]="14"></app-icon>
+            Case Study
+          </span>
+          <span class="featured-badge" *ngIf="project.isFeatured && !project.isCaseStudy">
+            Featured
+          </span>
+
+          <div class="project-actions">
+            <a
+              *ngIf="project.githubUrl"
+              [href]="project.githubUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="icon-action"
+              title="GitHub Repository"
+            >
+              <app-icon name="github" [size]="18"></app-icon>
+            </a>
+            <a
+              *ngIf="project.liveUrl"
+              [href]="project.liveUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="icon-action"
+              title="Live Demo"
+            >
+              <app-icon name="external-link" [size]="18"></app-icon>
+            </a>
+          </div>
+        </div>
+
+        <div class="project-body">
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-summary">{{ project.summary }}</p>
+
+          <div class="tech-stack-row">
+            <span class="badge" *ngFor="let tech of project.techStack">
+              {{ tech }}
+            </span>
+          </div>
+        </div>
+
+        <div class="project-footer">
+          <a [routerLink]="['/projects', project.slug]" class="details-link">
+            Explore Architecture &amp; Details
+            <app-icon name="arrow-right" [size]="16"></app-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noResults>
+      <div class="no-results card">
+        <app-icon name="code" [size]="40" class="no-results-icon"></app-icon>
+        <h3>No projects match your filter</h3>
+        <p>Try clearing your search query or selecting "All" categories.</p>
+        <button class="btn btn-outline" (click)="searchQuery.set(''); selectedCategory.set('All')">
+          Reset Filters
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>

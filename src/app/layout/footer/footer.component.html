@@ -1,0 +1,59 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="logo-mark">SH</span>
+          <span class="logo-title">Shahid Hussain</span>
+        </div>
+        <p class="footer-tagline">
+          Full-Stack .NET & Angular Developer. Designing resilient cloud architectures, scalable microservices, and clean, responsive web applications.
+        </p>
+      </div>
+
+      <div class="footer-links-group">
+        <h4 class="links-title">Quick Links</h4>
+        <ul class="footer-nav">
+          <li><a routerLink="/projects">Projects</a></li>
+          <li><a routerLink="/skills">Skills & Expertise</a></li>
+          <li><a routerLink="/experience">Experience Timeline</a></li>
+          <li><a routerLink="/blog">Articles & Notes</a></li>
+          <li><a routerLink="/contact">Get in Touch</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-social-group">
+        <h4 class="links-title">Connect</h4>
+        <div class="social-icons">
+          <a
+            *ngFor="let social of socials"
+            [href]="social.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-btn"
+            [attr.aria-label]="social.name"
+          >
+            <app-icon [name]="social.icon" [size]="18"></app-icon>
+          </a>
+        </div>
+        <p class="status-msg">
+          <span class="status-dot"></span>
+          Ready for new opportunities & contracts.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="copyright">
+        © {{ currentYear }} Shahid Hussain. Built with
+        <span class="highlight">Angular 22 SSR</span> &
+        <span class="highlight">.NET 10 Clean Architecture</span>.
+      </p>
+      <div class="bottom-links">
+        <a routerLink="/contact">Contact</a>
+        <span class="separator">•</span>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </div>
+  </div>
+</footer>

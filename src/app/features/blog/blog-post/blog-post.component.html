@@ -1,0 +1,49 @@
+<div class="article-page section">
+  <div class="container">
+    <div class="back-nav">
+      <a routerLink="/blog" class="back-link">
+        <app-icon name="arrow-right" [size]="16" style="transform: rotate(180deg);"></app-icon>
+        Back to all articles
+      </a>
+    </div>
+
+    <article class="article-container">
+      <header class="article-header">
+        <div class="article-meta">
+          <span class="read-time">
+            <app-icon name="clock" [size]="14"></app-icon>
+            {{ post().readTimeMinutes }} min read
+          </span>
+          <span class="publish-date" *ngIf="post().publishedAtUtc">
+            {{ post().publishedAtUtc | date: 'longDate' }}
+          </span>
+        </div>
+
+        <h1 class="article-title">{{ post().title }}</h1>
+        <p class="article-lead">{{ post().summary }}</p>
+
+        <div class="tags-row">
+          <span class="badge badge-primary" *ngFor="let tag of post().tags">
+            {{ tag }}
+          </span>
+        </div>
+      </header>
+
+      <div class="article-content card">
+        <pre class="markdown-body">{{ post().contentMarkdown }}</pre>
+      </div>
+
+      <!-- Author Bio Footer -->
+      <footer class="author-card card">
+        <div class="author-avatar">SH</div>
+        <div class="author-bio">
+          <h3 class="author-name">Written by Shahid Hussain</h3>
+          <p class="author-role">Senior Full-Stack .NET &amp; Angular Developer</p>
+          <p class="author-desc">
+            Passionate about domain-driven design, clean software architecture, and sub-second web performance.
+          </p>
+        </div>
+      </footer>
+    </article>
+  </div>
+</div>

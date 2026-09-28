@@ -1,0 +1,125 @@
+<div class="case-study-page section">
+  <div class="container">
+    <!-- Breadcrumb / Back Link -->
+    <div class="back-nav">
+      <a routerLink="/projects" class="back-link">
+        <app-icon name="arrow-right" [size]="16" style="transform: rotate(180deg);"></app-icon>
+        Back to all projects
+      </a>
+    </div>
+
+    <!-- Case Study Header -->
+    <header class="case-header">
+      <div class="header-badges">
+        <span class="badge badge-primary" *ngIf="project().isCaseStudy">
+          <app-icon name="sparkles" [size]="14"></app-icon>
+          Architecture Case Study
+        </span>
+      </div>
+
+      <h1 class="case-title">{{ project().title }}</h1>
+      <p class="case-summary">{{ project().summary }}</p>
+
+      <!-- Action Links -->
+      <div class="case-actions">
+        <a
+          *ngIf="project().githubUrl"
+          [href]="project().githubUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-outline"
+        >
+          <app-icon name="github" [size]="18"></app-icon>
+          Source Code
+        </a>
+        <a
+          *ngIf="project().liveUrl"
+          [href]="project().liveUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-primary"
+        >
+          <app-icon name="external-link" [size]="18"></app-icon>
+          Live System Demo
+        </a>
+      </div>
+
+      <!-- Tech Stack Badges -->
+      <div class="tech-stack-row">
+        <span class="badge" *ngFor="let tech of project().techStack">
+          {{ tech }}
+        </span>
+      </div>
+    </header>
+
+    <!-- Case Study Content Grid -->
+    <div class="case-grid">
+      <!-- Problem & Challenge -->
+      <div class="case-card card" *ngIf="project().problemStatement">
+        <div class="card-icon problem">
+          <app-icon name="terminal" [size]="20"></app-icon>
+        </div>
+        <h3 class="card-title">The Challenge &amp; Problem Statement</h3>
+        <p class="card-text">{{ project().problemStatement }}</p>
+      </div>
+
+      <!-- Solution & Technical Approach -->
+      <div class="case-card card" *ngIf="project().solutionStatement">
+        <div class="card-icon solution">
+          <app-icon name="code" [size]="20"></app-icon>
+        </div>
+        <h3 class="card-title">Engineering Solution</h3>
+        <p class="card-text">{{ project().solutionStatement }}</p>
+      </div>
+
+      <!-- Architecture Breakdown -->
+      <div class="case-card card architecture-card" *ngIf="project().architectureOverview">
+        <div class="card-icon architecture">
+          <app-icon name="server" [size]="20"></app-icon>
+        </div>
+        <h3 class="card-title">Clean Architecture Deep-Dive</h3>
+        <p class="card-text">{{ project().architectureOverview }}</p>
+
+        <div class="architecture-diagram-visual">
+          <div class="arch-layer domain">
+            <span class="layer-title">Domain Layer</span>
+            <span class="layer-desc">Pure Entities, Enums, Zero Dependencies</span>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-layer application">
+            <span class="layer-title">Application Layer</span>
+            <span class="layer-desc">CQRS Commands, Queries, MediatR, FluentValidation Pipeline</span>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-layer infra">
+            <span class="layer-title">Infrastructure Layer</span>
+            <span class="layer-desc">EF Core, SQL Server Express, MailKit, Password Hashing</span>
+          </div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-layer api">
+            <span class="layer-title">API &amp; UI Presentation</span>
+            <span class="layer-desc">ASP.NET Core Web API + Angular 22 Standalone SSR Hydration</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quantified Key Metrics -->
+      <div class="case-card card metrics-card" *ngIf="project().keyMetrics">
+        <div class="card-icon metrics">
+          <app-icon name="sparkles" [size]="20"></app-icon>
+        </div>
+        <h3 class="card-title">Quantified Business Impact &amp; Metrics</h3>
+        <p class="card-text highlight-metrics">{{ project().keyMetrics }}</p>
+      </div>
+
+      <!-- Lessons Learned -->
+      <div class="case-card card lessons-card" *ngIf="project().lessonsLearned">
+        <div class="card-icon lessons">
+          <app-icon name="check" [size]="20"></app-icon>
+        </div>
+        <h3 class="card-title">Engineering Insights &amp; Takeaways</h3>
+        <p class="card-text">{{ project().lessonsLearned }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Brand / Logo -->
+    <a routerLink="/" class="brand" (click)="closeMobileMenu()">
+      <div class="brand-avatar">
+        <span class="brand-initials">SH</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Shahid Hussain</span>
+        <span class="brand-role">Full-Stack Engineer</span>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+      <ul class="nav-links">
+        <li *ngFor="let item of navItems">
+          <a
+            [routerLink]="item.path"
+            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            {{ item.label }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Availability Badge (Recruiter hook) -->
+      <div class="availability-pill" title="Currently open to new roles & contracts">
+        <span class="status-indicator"></span>
+        <span class="status-text">Available</span>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button
+        class="action-btn theme-toggle"
+        (click)="themeService.toggleTheme()"
+        [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+      >
+        <app-icon [name]="themeService.currentTheme() === 'dark' ? 'sun' : 'moon'" [size]="18"></app-icon>
+      </button>
+
+      <!-- Mobile Hamburger Button -->
+      <button
+        class="action-btn mobile-menu-btn"
+        (click)="toggleMobileMenu()"
+        [attr.aria-label]="isMobileMenuOpen() ? 'Close menu' : 'Open menu'"
+      >
+        <app-icon [name]="isMobileMenuOpen() ? 'close' : 'menu'" [size]="22"></app-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" [class.open]="isMobileMenuOpen()">
+    <nav class="mobile-nav">
+      <ul class="mobile-nav-links">
+        <li *ngFor="let item of navItems">
+          <a
+            [routerLink]="item.path"
+            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+            routerLinkActive="active"
+            class="mobile-nav-link"
+            (click)="closeMobileMenu()"
+          >
+            {{ item.label }}
+          </a>
+        </li>
+      </ul>
+      <div class="mobile-drawer-footer">
+        <a routerLink="/contact" class="btn btn-primary" (click)="closeMobileMenu()">
+          Let's Talk
+          <app-icon name="arrow-right" [size]="16"></app-icon>
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,143 @@
+<div class="contact-page section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="email" [size]="14"></app-icon>
+        Let's Connect
+      </span>
+      <h1 class="section-title">Get In Touch</h1>
+      <p class="section-subtitle">
+        Have an upcoming project, architectural inquiry, or full-time position? Send a message and I'll get back to you promptly.
+      </p>
+    </div>
+
+    <div class="contact-layout">
+      <!-- Contact Cards & Info Sidebar -->
+      <div class="contact-sidebar">
+        <div class="info-card card" *ngFor="let card of contactCards">
+          <div class="info-icon">
+            <app-icon [name]="card.icon" [size]="22"></app-icon>
+          </div>
+          <div class="info-text">
+            <span class="info-title">{{ card.title }}</span>
+            <a *ngIf="card.action; else textOnly" [href]="card.action" class="info-val link">
+              {{ card.value }}
+            </a>
+            <ng-template #textOnly>
+              <span class="info-val">{{ card.value }}</span>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="response-pledge card">
+          <div class="pledge-header">
+            <app-icon name="sparkles" [size]="18" class="pledge-icon"></app-icon>
+            <h4>Fast Response Pledge</h4>
+          </div>
+          <p>
+            I actively check my messages and typically respond to all serious engineering inquiries within 24 hours.
+          </p>
+        </div>
+      </div>
+
+      <!-- Reactive Form Box -->
+      <div class="form-container card">
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" novalidate>
+          <!-- Anti-Spam Honeypot Field -->
+          <div class="honeypot-field" aria-hidden="true" style="display:none !important; position:absolute; left:-9999px;">
+            <label for="honeypot">Leave this empty</label>
+            <input id="honeypot" type="text" formControlName="honeypot" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <!-- Success Alert -->
+          <div class="alert alert-success" *ngIf="submitSuccess()">
+            <app-icon name="check" [size]="20"></app-icon>
+            <span>Thank you! Your message has been transmitted successfully. I will get back to you shortly.</span>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-error" *ngIf="errorMessage()">
+            <span>{{ errorMessage() }}</span>
+          </div>
+
+          <div class="form-row">
+            <!-- Full Name -->
+            <div class="form-group">
+              <label for="name" class="form-label">Your Name <span class="required">*</span></label>
+              <input
+                id="name"
+                type="text"
+                formControlName="name"
+                placeholder="e.g. Sarah Jenkins"
+                class="form-control"
+                [class.invalid]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched"
+              />
+              <span class="field-error" *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+                Please enter your name (min 2 characters).
+              </span>
+            </div>
+
+            <!-- Email Address -->
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="e.g. sarah@example.com"
+                class="form-control"
+                [class.invalid]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched"
+              />
+              <span class="field-error" *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+                Please enter a valid email address.
+              </span>
+            </div>
+          </div>
+
+          <!-- Subject -->
+          <div class="form-group">
+            <label for="subject" class="form-label">Subject <span class="required">*</span></label>
+            <input
+              id="subject"
+              type="text"
+              formControlName="subject"
+              placeholder="e.g. Full-Stack .NET / Angular Project Inquiry"
+              class="form-control"
+              [class.invalid]="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched"
+            />
+            <span class="field-error" *ngIf="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched">
+              Please enter a subject (min 3 characters).
+            </span>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label for="message" class="form-label">Message <span class="required">*</span></label>
+            <textarea
+              id="message"
+              rows="6"
+              formControlName="message"
+              placeholder="Tell me about your project, timeline, and goals..."
+              class="form-control"
+              [class.invalid]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched"
+            ></textarea>
+            <span class="field-error" *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+              Please write a message with at least 10 characters.
+            </span>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary submit-btn" [disabled]="isSubmitting()">
+              <span *ngIf="!isSubmitting()">
+                Send Message
+                <app-icon name="arrow-right" [size]="16"></app-icon>
+              </span>
+              <span *ngIf="isSubmitting()">Sending Transmission...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

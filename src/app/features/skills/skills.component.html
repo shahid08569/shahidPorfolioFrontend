@@ -1,0 +1,90 @@
+<div class="skills-page section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="server" [size]="14"></app-icon>
+        Technical Matrix
+      </span>
+      <h1 class="section-title">Skills &amp; Engineering Disciplines</h1>
+      <p class="section-subtitle">
+        A transparent overview of production-tested technologies, architectural paradigms, and design practices.
+      </p>
+    </div>
+
+    <!-- Skills Groups Grid -->
+    <div class="skills-grid">
+      <div class="skill-category-card card" *ngFor="let group of skillGroups()">
+        <div class="category-header">
+          <div class="category-icon-title">
+            <h3 class="category-title">{{ group.categoryName }}</h3>
+          </div>
+          <span class="skill-count">{{ group.skills.length }} Technologies</span>
+        </div>
+
+        <div class="skills-list">
+          <div class="skill-pill-item" *ngFor="let skill of group.skills">
+            <div class="skill-header">
+              <span class="skill-name">{{ skill.name }}</span>
+              <span class="star-badge" *ngIf="skill.isTopSkill" title="Key Focus / Top Skill">
+                <app-icon name="sparkles" [size]="14"></app-icon>
+              </span>
+            </div>
+            <div class="skill-meta">
+              <span
+                class="proficiency-tag"
+                [class.core]="skill.proficiency >= 90"
+                [class.proficient]="skill.proficiency >= 80 && skill.proficiency < 90"
+                [class.familiar]="skill.proficiency < 80"
+              >
+                {{ getProficiencyLabel(skill.proficiency) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Architectural Pillars / Values -->
+    <div class="pillars-section">
+      <div class="section-header">
+        <span class="section-eyebrow">Methodology</span>
+        <h2 class="section-title">Architectural Principles</h2>
+        <p class="section-subtitle">
+          How I write, structure, and maintain software for mission-critical enterprise systems.
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card card">
+          <div class="pillar-icon">
+            <app-icon name="code" [size]="24"></app-icon>
+          </div>
+          <h4>Clean Architecture &amp; Separation of Concerns</h4>
+          <p>
+            Zero external dependencies in the Domain layer. Business logic is pure and fully decoupled from databases, UI, and external third-party SDKs.
+          </p>
+        </div>
+
+        <div class="pillar-card card">
+          <div class="pillar-icon">
+            <app-icon name="terminal" [size]="24"></app-icon>
+          </div>
+          <h4>CQRS &amp; Pipeline Behaviors</h4>
+          <p>
+            Isolating read and write operations via MediatR enables specialized optimizations, decoupled commands, and centralized validation pipelines.
+          </p>
+        </div>
+
+        <div class="pillar-card card">
+          <div class="pillar-icon">
+            <app-icon name="check" [size]="24"></app-icon>
+          </div>
+          <h4>Test-Driven Reliability</h4>
+          <p>
+            Unit testing handlers with Moq and FluentAssertions, integrated with EF Core In-Memory / Testcontainers to guarantee regression-free releases.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

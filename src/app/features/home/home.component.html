@@ -1,0 +1,263 @@
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="container hero-container">
+    <div class="hero-content">
+      <!-- 10-Second Recruiter Hook / Status Badge -->
+      <div class="hero-status">
+        <span class="status-indicator"></span>
+        <span class="status-text">{{ settings().availabilityStatus }} • Based in {{ settings().currentLocation }}</span>
+      </div>
+
+      <h1 class="hero-title">
+        High-Performance <span class="gradient-text">.NET & Angular</span> Enterprise Architect
+      </h1>
+
+      <p class="hero-subtitle">
+        Hi, I'm <strong class="text-accent">{{ settings().fullName }}</strong>. {{ settings().oneLineBio }}
+      </p>
+
+      <!-- Primary Action Buttons -->
+      <div class="hero-actions">
+        <a routerLink="/projects" class="btn btn-primary">
+          Explore Projects
+          <app-icon name="arrow-right" [size]="16"></app-icon>
+        </a>
+        <a routerLink="/contact" class="btn btn-outline">
+          Get in Touch
+          <app-icon name="email" [size]="16"></app-icon>
+        </a>
+        <a [href]="settings().cvUrl" target="_blank" class="btn btn-secondary" download>
+          Download CV
+          <app-icon name="download" [size]="16"></app-icon>
+        </a>
+      </div>
+
+      <!-- Quick Social Icons -->
+      <div class="hero-socials">
+        <span class="socials-label">Find me on:</span>
+        <div class="social-links-row">
+          <a
+            *ngFor="let social of settings().socialLinks"
+            [href]="social.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hero-social-link"
+            [attr.aria-label]="social.platform"
+          >
+            <app-icon [name]="social.iconKey || social.platform.toLowerCase()" [size]="18"></app-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual / Architecture Graphic -->
+    <div class="hero-visual">
+      <div class="visual-glow-bg"></div>
+      <div class="code-terminal-card">
+        <div class="terminal-header">
+          <div class="terminal-buttons">
+            <span class="btn-dot close"></span>
+            <span class="btn-dot min"></span>
+            <span class="btn-dot max"></span>
+          </div>
+          <span class="terminal-title">ShahidPortfolio.sln - Clean Architecture</span>
+        </div>
+        <div class="terminal-body">
+          <div class="code-line"><span class="c-keyword">public class</span> <span class="c-type">SolutionArchitect</span></div>
+          <div class="code-line indent-1">&#123;</div>
+          <div class="code-line indent-2"><span class="c-keyword">public string</span> Name =&gt; <span class="c-string">"Shahid Hussain"</span>;</div>
+          <div class="code-line indent-2"><span class="c-keyword">public string[]</span> CoreStack =&gt; <span class="c-keyword">new</span>[]</div>
+          <div class="code-line indent-3">&#123;</div>
+          <div class="code-line indent-4"><span class="c-string">".NET 10 / C#"</span>,</div>
+          <div class="code-line indent-4"><span class="c-string">"ASP.NET Core Web API"</span>,</div>
+          <div class="code-line indent-4"><span class="c-string">"Clean Architecture &amp; CQRS"</span>,</div>
+          <div class="code-line indent-4"><span class="c-string">"Angular 22 (SSR)"</span>,</div>
+          <div class="code-line indent-4"><span class="c-string">"SQL Server &amp; EF Core"</span></div>
+          <div class="code-line indent-3">&#125;;</div>
+          <div class="code-line indent-2"><span class="c-keyword">public bool</span> DeliverCleanCode() =&gt; <span class="c-boolean">true</span>;</div>
+          <div class="code-line indent-1">&#125;</div>
+        </div>
+        <div class="terminal-badge-strip">
+          <span class="badge badge-primary">Clean Architecture</span>
+          <span class="badge badge-accent">CQRS / MediatR</span>
+          <span class="badge">Angular 22 Signals</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEY METRICS STRIP -->
+<section class="metrics-section">
+  <div class="container">
+    <div class="metrics-grid">
+      <div class="metric-card card" *ngFor="let m of keyMetrics">
+        <div class="metric-value gradient-text">{{ m.value }}</div>
+        <div class="metric-label">{{ m.label }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PROJECTS -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="code" [size]="14"></app-icon>
+        Portfolio Highlights
+      </span>
+      <h2 class="section-title">Featured Case Studies</h2>
+      <p class="section-subtitle">
+        Real-world enterprise solutions built with strict architectural separation, robust testing, and clean code.
+      </p>
+    </div>
+
+    <div class="projects-grid">
+      <div class="project-card card" *ngFor="let project of featuredProjects()">
+        <div class="project-card-header">
+          <div class="project-category-badge" *ngIf="project.isCaseStudy">
+            <app-icon name="sparkles" [size]="14"></app-icon>
+            Deep Case Study
+          </div>
+          <div class="project-links">
+            <a
+              *ngIf="project.githubUrl"
+              [href]="project.githubUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="icon-link"
+              title="View Source on GitHub"
+            >
+              <app-icon name="github" [size]="18"></app-icon>
+            </a>
+            <a
+              *ngIf="project.liveUrl"
+              [href]="project.liveUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="icon-link"
+              title="Live Demo"
+            >
+              <app-icon name="external-link" [size]="18"></app-icon>
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card-body">
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-summary">{{ project.summary }}</p>
+
+          <div class="project-tech-stack">
+            <span class="badge" *ngFor="let tech of project.techStack">
+              {{ tech }}
+            </span>
+          </div>
+        </div>
+
+        <div class="project-card-footer">
+          <a [routerLink]="['/projects', project.slug]" class="case-study-btn">
+            Read Case Study
+            <app-icon name="arrow-right" [size]="16"></app-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-all-wrapper">
+      <a routerLink="/projects" class="btn btn-outline">
+        View All Projects
+        <app-icon name="arrow-right" [size]="16"></app-icon>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TOP SKILLS SECTION -->
+<section class="section skills-preview-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="server" [size]="14"></app-icon>
+        Technical Competencies
+      </span>
+      <h2 class="section-title">Core Stack &amp; Architecture</h2>
+      <p class="section-subtitle">
+        Specialized in modern Microsoft and TypeScript ecosystems for high-throughput enterprise applications.
+      </p>
+    </div>
+
+    <div class="skills-highlight-grid">
+      <div class="skill-highlight-card card" *ngFor="let skill of topSkills()">
+        <div class="skill-icon-wrapper">
+          <app-icon [name]="skill.icon" [size]="24"></app-icon>
+        </div>
+        <div class="skill-info">
+          <span class="skill-category-tag">{{ skill.category }}</span>
+          <h4 class="skill-name">{{ skill.name }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-all-wrapper">
+      <a routerLink="/skills" class="btn btn-secondary">
+        Explore Full Technical Matrix
+        <app-icon name="arrow-right" [size]="16"></app-icon>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS SECTION -->
+<section class="section testimonials-section" *ngIf="testimonials().length > 0">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="sparkles" [size]="14"></app-icon>
+        Recommendations
+      </span>
+      <h2 class="section-title">Endorsements &amp; Feedback</h2>
+      <p class="section-subtitle">
+        What engineering leaders and product teams say about working together.
+      </p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card card" *ngFor="let item of testimonials()">
+        <div class="quote-icon">
+          <app-icon name="quote" [size]="28"></app-icon>
+        </div>
+        <p class="testimonial-text">"{{ item.content }}"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            {{ item.clientName.charAt(0) }}
+          </div>
+          <div class="author-details">
+            <h5 class="author-name">{{ item.clientName }}</h5>
+            <span class="author-title">{{ item.role }} • {{ item.company }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALL TO ACTION BANNER -->
+<section class="section cta-section">
+  <div class="container">
+    <div class="cta-banner card">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to build something extraordinary?</h2>
+        <p class="cta-desc">
+          Whether you need a dedicated senior full-stack developer or an enterprise architecture consultation, I am ready to help.
+        </p>
+      </div>
+      <div class="cta-actions">
+        <a routerLink="/contact" class="btn btn-primary">
+          Start a Conversation
+          <app-icon name="arrow-right" [size]="16"></app-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

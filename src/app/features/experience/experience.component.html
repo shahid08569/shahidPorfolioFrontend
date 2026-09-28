@@ -1,0 +1,88 @@
+<div class="experience-page section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="briefcase" [size]="14"></app-icon>
+        Career Journey
+      </span>
+      <h1 class="section-title">Experience &amp; Milestones</h1>
+      <p class="section-subtitle">
+        Proven track record of architecting and shipping mission-critical systems in fast-paced enterprise environments.
+      </p>
+    </div>
+
+    <!-- Professional Experience Timeline -->
+    <div class="timeline-container">
+      <div class="timeline-track"></div>
+
+      <div class="timeline-items">
+        <div class="timeline-item" *ngFor="let exp of experiences()">
+          <!-- Timeline Marker -->
+          <div class="timeline-marker" [class.current]="exp.isCurrent">
+            <span class="marker-dot"></span>
+          </div>
+
+          <!-- Timeline Card -->
+          <div class="timeline-card card">
+            <div class="card-header">
+              <div class="role-company">
+                <h3 class="role-title">{{ exp.role }}</h3>
+                <h4 class="company-name">
+                  {{ exp.company }}
+                  <span class="location-pill" *ngIf="exp.location">({{ exp.location }})</span>
+                </h4>
+              </div>
+
+              <div class="date-badge">
+                <span class="badge" [class.badge-primary]="exp.isCurrent">
+                  <app-icon name="calendar" [size]="14"></app-icon>
+                  {{ exp.startDate }} — {{ exp.isCurrent ? 'Present' : exp.endDate }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Achievements List -->
+            <ul class="achievements-list" *ngIf="exp.achievements && exp.achievements.length > 0">
+              <li *ngFor="let achievement of exp.achievements">
+                <app-icon name="check" [size]="16" class="check-icon"></app-icon>
+                <span>{{ achievement }}</span>
+              </li>
+            </ul>
+
+            <!-- Tech Stack Badges -->
+            <div class="tech-stack-row" *ngIf="exp.techStack && exp.techStack.length > 0">
+              <span class="badge" *ngFor="let tech of exp.techStack">
+                {{ tech }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Education Section -->
+    <div class="education-section">
+      <div class="section-header">
+        <span class="section-eyebrow">
+          <app-icon name="graduation" [size]="14"></app-icon>
+          Academic Background
+        </span>
+        <h2 class="section-title">Education &amp; Qualifications</h2>
+      </div>
+
+      <div class="education-grid">
+        <div class="education-card card" *ngFor="let edu of educations()">
+          <div class="edu-icon-wrapper">
+            <app-icon name="graduation" [size]="24"></app-icon>
+          </div>
+          <div class="edu-content">
+            <span class="edu-dates">{{ edu.startDate }} — {{ edu.endDate }}</span>
+            <h3 class="edu-degree">{{ edu.degree }} in {{ edu.fieldOfStudy }}</h3>
+            <h4 class="edu-institution">{{ edu.institution }}</h4>
+            <p class="edu-honors" *ngIf="edu.gradeOrHonors">{{ edu.gradeOrHonors }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
