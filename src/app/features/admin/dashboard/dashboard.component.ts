@@ -748,7 +748,12 @@ export class AdminDashboardComponent implements OnInit {
       heroCodeTitle: formVal.heroCodeTitle || 'ShahidPortfolio.sln - Clean Architecture',
       heroCodeSnippet: formVal.heroCodeSnippet || '',
       heroBadgesJson: JSON.stringify(badgesArray),
-      socialLinks: this.settings()?.socialLinks || [],
+      socialLinks: (this.settings()?.socialLinks || []).map((s, idx) => ({
+        platform: s.platform,
+        url: s.url,
+        iconKey: s.iconKey,
+        displayOrder: idx + 1,
+      })),
     };
 
     this.adminService.updateSettings(payload).subscribe({
@@ -759,7 +764,14 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.isSaving.set(false);
-        this.showError(err?.error?.message || 'Failed to save settings.');
+        if (err.status === 401) {
+          this.showError('Session expired. Please log in again.');
+          this.authService.logout();
+        } else if (err.status === 0) {
+          this.showError('Cannot connect to backend API. Please make sure the .NET server is running on http://localhost:5272.');
+        } else {
+          this.showError(err?.error?.message || err?.message || 'Failed to save settings.');
+        }
       },
     });
   }
@@ -784,12 +796,19 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => {
         this.isUploadingCv.set(false);
         this.selectedCvFile = null;
-        this.showNotice('CV uploaded successfully! Site link updated.');
+        this.showNotice('CV uploaded successfully! Public link updated to ' + (res.data || '/uploads/Shahid_Hussain_CV.pdf'));
         this.loadAllData();
       },
       error: (err) => {
         this.isUploadingCv.set(false);
-        this.showError(err?.error?.message || 'Failed to upload CV.');
+        if (err.status === 401) {
+          this.showError('Session expired. Please log in again.');
+          this.authService.logout();
+        } else if (err.status === 0) {
+          this.showError('Cannot connect to backend API. Please make sure the .NET server is running on http://localhost:5272.');
+        } else {
+          this.showError(err?.error?.message || err?.message || 'Failed to upload CV.');
+        }
       },
     });
   }
