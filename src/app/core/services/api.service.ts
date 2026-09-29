@@ -18,8 +18,17 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
+  resolveMediaUrl(path: string | undefined | null): string {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const backendBase = environment.apiUrl.replace('/api/v1', '');
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${backendBase}${cleanPath}`;
+  }
+
   getPublicSettings(): Observable<ApiResponse<PublicSettings>> {
-    return this.http.get<ApiResponse<PublicSettings>>(`${this.baseUrl}/settings/public`);
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<PublicSettings>>(`${this.baseUrl}/settings/public`, { params });
   }
 
   getProjects(filters?: { isFeatured?: boolean; tag?: string }): Observable<ApiResponse<ProjectCard[]>> {

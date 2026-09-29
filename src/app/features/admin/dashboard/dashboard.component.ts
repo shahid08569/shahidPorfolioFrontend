@@ -12,6 +12,7 @@ import { SkillCategoryGroup, SkillCategory } from '../../../core/models/skill.mo
 import { PublicSettings } from '../../../core/models/settings.model';
 import { Testimonial } from '../../../core/models/testimonial.model';
 import { Certificate } from '../../../core/models/certificate.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -53,6 +54,7 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly isSaving = signal(false);
   readonly isUploadingCv = signal(false);
+  readonly cvSuccessMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
@@ -796,11 +798,14 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => {
         this.isUploadingCv.set(false);
         this.selectedCvFile = null;
-        this.showNotice('CV uploaded successfully! Public link updated to ' + (res.data || '/uploads/Shahid_Hussain_CV.pdf'));
+        const resolvedUrl = this.getCvUrl(res.data || '/uploads/Shahid_Hussain_CV.pdf');
+        this.cvSuccessMessage.set('File uploaded and verified! Link: ' + resolvedUrl);
+        this.showNotice('CV uploaded successfully! Public link updated.');
         this.loadAllData();
       },
       error: (err) => {
         this.isUploadingCv.set(false);
+        this.cvSuccessMessage.set(null);
         if (err.status === 401) {
           this.showError('Session expired. Please log in again.');
           this.authService.logout();
@@ -816,6 +821,10 @@ export class AdminDashboardComponent implements OnInit {
   // ==========================================
   // HELPERS
   // ==========================================
+  getCvUrl(url: string | undefined | null): string {
+    const resolved = this.apiService.resolveMediaUrl(url);
+    return resolved || `${environment.apiUrl}/media/cv`;
+  }
   getCategoryName(cat: number): string {
     switch (cat) {
       case 1:

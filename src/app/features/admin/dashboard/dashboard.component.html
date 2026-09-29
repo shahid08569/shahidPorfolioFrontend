@@ -509,11 +509,19 @@
                 />
               </div>
 
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary" [disabled]="settingsForm.invalid || isSaving()">
-                  <span *ngIf="!isSaving()">Save All Settings &amp; Code</span>
+              <div class="form-actions settings-actions">
+                <button type="submit" class="btn btn-primary btn-save" [disabled]="settingsForm.invalid || isSaving()">
+                  <span class="spinner-border" *ngIf="isSaving()"></span>
+                  <span *ngIf="!isSaving()">
+                    <app-icon name="check" [size]="16"></app-icon>
+                    Save All Settings &amp; Code
+                  </span>
                   <span *ngIf="isSaving()">Saving Changes...</span>
                 </button>
+                <span class="inline-status-badge" *ngIf="actionMessage()">
+                  <app-icon name="check" [size]="16"></app-icon>
+                  {{ actionMessage() }}
+                </span>
               </div>
             </form>
           </div>
@@ -531,9 +539,9 @@
 
               <div class="current-cv-status" *ngIf="settings()?.cvUrl">
                 <span class="status-label">Current File:</span>
-                <a [href]="settings()?.cvUrl" target="_blank" class="cv-link">
+                <a [href]="getCvUrl(settings()?.cvUrl)" target="_blank" class="cv-link" title="Open verified CV link">
                   <app-icon name="external-link" [size]="14"></app-icon>
-                  {{ settings()?.cvUrl }}
+                  {{ getCvUrl(settings()?.cvUrl) }}
                 </a>
               </div>
 
@@ -556,13 +564,22 @@
 
               <button
                 type="button"
-                class="btn btn-primary btn-block"
+                class="btn btn-primary btn-block btn-cv-upload"
                 [disabled]="!selectedCvFile || isUploadingCv()"
                 (click)="uploadSelectedCv()"
               >
-                <span *ngIf="!isUploadingCv()">Upload New CV (.PDF)</span>
+                <span class="spinner-border" *ngIf="isUploadingCv()"></span>
+                <span *ngIf="!isUploadingCv()">
+                  <app-icon name="download" [size]="16"></app-icon>
+                  Upload New CV (.PDF)
+                </span>
                 <span *ngIf="isUploadingCv()">Uploading &amp; Replacing...</span>
               </button>
+
+              <div class="cv-success-notice" *ngIf="cvSuccessMessage()">
+                <app-icon name="check" [size]="16"></app-icon>
+                <span>{{ cvSuccessMessage() }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -667,7 +684,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="isProjectModalOpen.set(false)">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Save Project' }}
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Project...' : 'Save Project' }}</span>
           </button>
         </div>
       </form>
@@ -731,7 +749,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="isSkillModalOpen.set(false)">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="skillForm.invalid || isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Save Skill' }}
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Skill...' : 'Save Skill' }}</span>
           </button>
         </div>
       </form>
@@ -799,7 +818,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="isTestimonialModalOpen.set(false)">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="testimonialForm.invalid || isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Save Endorsement' }}
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Endorsement...' : 'Save Endorsement' }}</span>
           </button>
         </div>
       </form>
@@ -849,7 +869,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="isCertificateModalOpen.set(false)">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="certificateForm.invalid || isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Save Certificate' }}
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Certificate...' : 'Save Certificate' }}</span>
           </button>
         </div>
       </form>

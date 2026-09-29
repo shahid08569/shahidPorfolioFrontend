@@ -9,6 +9,7 @@ import { ProjectCard } from '../../core/models/project.model';
 import { PublicSettings } from '../../core/models/settings.model';
 import { Testimonial } from '../../core/models/testimonial.model';
 import { Certificate } from '../../core/models/certificate.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -115,6 +116,12 @@ export class HomeComponent implements OnInit {
     const num = raw.replace(/[^0-9]/g, '');
     const text = encodeURIComponent('Hello Shahid, I reviewed your developer portfolio and would like to connect about an opportunity.');
     return `https://wa.me/${num}?text=${text}`;
+  }
+
+  get cvDownloadUrl(): string {
+    const url = this.settings().cvUrl;
+    const resolved = this.apiService.resolveMediaUrl(url);
+    return resolved || `${environment.apiUrl}/media/cv`;
   }
 
   ngOnInit(): void {
