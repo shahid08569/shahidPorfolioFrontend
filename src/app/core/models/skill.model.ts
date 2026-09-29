@@ -10,6 +10,7 @@ export interface SkillItem {
   id: string;
   name: string;
   iconKey?: string;
+  icon?: string;
   proficiency: number;
   isTopSkill: boolean;
   displayOrder: number;

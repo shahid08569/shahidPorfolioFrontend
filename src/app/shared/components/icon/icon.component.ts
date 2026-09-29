@@ -145,6 +145,18 @@ export class IconComponent {
         '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.9 10.3h2.1v2.1h-2.1v-2.1zm-3.2 0h2.1v2.1h-2.1v-2.1zm-3.2 0h2.1v2.1H7.5v-2.1zm6.4-3.2h2.1v2.1h-2.1V7.1zm-3.2 0h2.1v2.1h-2.1V7.1zm-3.2 0h2.1v2.1H7.5V7.1zm6.4-3.2h2.1V6h-2.1V3.9zm8.5 7.4c-.5-.4-1.6-.6-2.6-.2-.2-.7-.6-1.3-1.2-1.7l-.6-.4-.4.6c-.4.7-.6 1.4-.4 2.1-.5.3-1.3.3-2 .3H1.2c-.4 1.7-.1 3.5.7 5 1.3 2.5 3.8 4.2 6.6 4.4 5.3.4 10.2-2.3 12.5-7.1 1.1-.1 2.1-.7 2.6-1.6l.3-.6-.6-.8z"/></svg>',
       workflow:
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"></rect><rect x="15" y="3" width="6" height="6" rx="1"></rect><rect x="9" y="15" width="6" height="6" rx="1"></rect><path d="M6 9v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9"></path><path d="M12 12v3"></path></svg>',
+      trash:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>',
+      edit:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+      plus:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+      eye:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+      whatsapp:
+        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.477-.15-.678.15-.2.301-.777.978-.953 1.18-.176.2-.352.225-.653.075-.301-.15-1.272-.469-2.423-1.496-.896-.799-1.501-1.787-1.677-2.088-.176-.301-.019-.464.132-.614.136-.135.301-.352.452-.527.151-.176.201-.301.301-.502.1-.2.05-.376-.025-.527-.075-.15-.678-1.633-.929-2.235-.245-.586-.494-.506-.678-.515-.176-.008-.376-.01-.577-.01-.201 0-.527.075-.803.376s-1.054 1.03-1.054 2.511 1.079 2.912 1.23 3.113c.151.2 2.124 3.243 5.146 4.549.719.311 1.281.497 1.719.636.722.23 1.378.197 1.898.12.58-.087 1.78-.727 2.031-1.43.251-.703.251-1.305.176-1.43-.075-.125-.276-.2-.577-.35zm-5.429 7.618h-.005a9.938 9.938 0 0 1-5.06-1.393l-.363-.215-3.761.986 1.003-3.666-.236-.375a9.923 9.923 0 0 1-1.52-5.334c0-5.498 4.474-9.972 9.976-9.972 2.664 0 5.168 1.038 7.051 2.921a9.914 9.914 0 0 1 2.919 7.051c0 5.499-4.474 9.973-9.976 9.973z"/></svg>',
+      certificate:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>',
     };
 
     return (

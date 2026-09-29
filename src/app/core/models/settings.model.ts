@@ -12,5 +12,9 @@ export interface PublicSettings {
   availabilityStatus: string;
   currentLocation: string;
   cvUrl: string;
+  whatsAppNumber: string;
+  heroCodeTitle: string;
+  heroCodeSnippet: string;
+  heroBadgesJson: string;
   socialLinks: SocialLink[];
 }

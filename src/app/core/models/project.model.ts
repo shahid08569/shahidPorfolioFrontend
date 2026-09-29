@@ -3,6 +3,11 @@ export interface ProjectCard {
   title: string;
   slug: string;
   summary: string;
+  problemStatement?: string;
+  solutionStatement?: string;
+  architectureOverview?: string;
+  keyMetrics?: string;
+  lessonsLearned?: string;
   thumbnailUrl: string;
   liveUrl?: string;
   githubUrl?: string;

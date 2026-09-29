@@ -4,15 +4,16 @@ import { RouterModule } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { SeoService } from '../../core/services/seo.service';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { FeedbackModalComponent } from '../../shared/components/feedback-modal/feedback-modal.component';
 import { ProjectCard } from '../../core/models/project.model';
 import { PublicSettings } from '../../core/models/settings.model';
 import { Testimonial } from '../../core/models/testimonial.model';
-import { SkillCategoryGroup } from '../../core/models/skill.model';
+import { Certificate } from '../../core/models/certificate.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, IconComponent],
+  imports: [CommonModule, RouterModule, IconComponent, FeedbackModalComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
@@ -20,7 +21,9 @@ export class HomeComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly seoService = inject(SeoService);
 
-  // Signals for state
+  readonly isFeedbackModalOpen = signal(false);
+
+  // Settings signal
   readonly settings = signal<PublicSettings>({
     fullName: 'Shahid Hussain',
     professionalTitle: 'Senior Full-Stack .NET & Angular Developer',
@@ -30,6 +33,22 @@ export class HomeComponent implements OnInit {
     availabilityStatus: 'Open to Work',
     currentLocation: 'Pakistan',
     cvUrl: '/uploads/Shahid_Hussain_CV.pdf',
+    whatsAppNumber: '923000000000',
+    heroCodeTitle: 'ShahidPortfolio.sln - Clean Architecture',
+    heroCodeSnippet: `public class SolutionArchitect
+{
+    public string Name => "Shahid Hussain";
+    public string[] CoreStack => new[]
+    {
+        ".NET 10 / C#",
+        "ASP.NET Core Web API",
+        "Clean Architecture & CQRS",
+        "Angular 22 (SSR)",
+        "SQL Server & EF Core"
+    };
+    public bool DeliverCleanCode() => true;
+}`,
+    heroBadgesJson: '["Clean Architecture", "CQRS / MediatR", "Angular 22 Signals"]',
     socialLinks: [
       { platform: 'GitHub', url: 'https://github.com/shahid08569', iconKey: 'github' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/shahidhussain', iconKey: 'linkedin' },
@@ -39,15 +58,23 @@ export class HomeComponent implements OnInit {
   readonly featuredProjects = signal<ProjectCard[]>([
     {
       id: '1',
-      title: 'Enterprise Clean Architecture Microservices Platform',
-      slug: 'enterprise-clean-architecture-platform',
+      title: 'Enterprise E-Commerce API & Management Portal',
+      slug: 'enterprise-ecommerce-portal',
       summary:
-        'A mission-critical event-driven enterprise platform handling high-volume order processing with ASP.NET Core, CQRS via MediatR, and modern Angular frontend.',
+        'Scalable multi-tenant e-commerce system built with .NET Clean Architecture, EF Core, SQL Server, and an Angular admin dashboard.',
+      problemStatement:
+        'Traditional monolith e-commerce backends suffer from high database contention and coupled business logic during peak promotional flash sales.',
+      solutionStatement:
+        'Engineered a decoupled Clean Architecture backend using CQRS and MediatR to isolate read and write workloads, integrated with Redis cache and optimistic concurrency in EF Core.',
+      architectureOverview:
+        'Layered Clean Architecture: Domain Core -> Application CQRS Commands/Queries -> Infrastructure SQL Server Persistence -> Web API with JWT Auth and Rate Limiting.',
+      keyMetrics:
+        'Maintained sub-90ms response times under 5,000 concurrent product catalog queries; achieved 99.9% uptime during load testing.',
       thumbnailUrl: '',
-      liveUrl: 'https://demo.shahidhussain.dev',
+      liveUrl: 'https://github.com/shahid08569/shahidPorfolioBackend',
       githubUrl: 'https://github.com/shahid08569/shahidPorfolioBackend',
       techStackJson: '[]',
-      techStack: ['.NET 10', 'ASP.NET Core', 'Angular 22', 'SQL Server', 'MediatR', 'Docker'],
+      techStack: ['.NET 10', 'ASP.NET Core', 'Angular 22', 'SQL Server', 'MediatR', 'Redis'],
       isFeatured: true,
       isCaseStudy: true,
       displayOrder: 1,
@@ -63,26 +90,8 @@ export class HomeComponent implements OnInit {
     { name: 'Docker & Microservices', category: 'DevOps', icon: 'terminal' },
   ]);
 
-  readonly testimonials = signal<Testimonial[]>([
-    {
-      id: '1',
-      clientName: 'Alexander Wright',
-      role: 'Head of Engineering',
-      company: 'Apex Cloud Solutions',
-      content:
-        'Shahid is an outstanding full-stack engineer. He delivered our enterprise microservices platform ahead of schedule with zero architectural regressions and impeccable code quality.',
-      linkedInUrl: 'https://linkedin.com',
-    },
-    {
-      id: '2',
-      clientName: 'Elena Rostova',
-      role: 'Principal Product Manager',
-      company: 'OmniTrade FinTech',
-      content:
-        'Working with Shahid was seamless. His mastery of both .NET backend architecture and Angular state management allowed us to launch a sub-second trading dashboard that our clients love.',
-      linkedInUrl: 'https://linkedin.com',
-    },
-  ]);
+  readonly testimonials = signal<Testimonial[]>([]);
+  readonly certificates = signal<Certificate[]>([]);
 
   readonly keyMetrics = [
     { value: '5+', label: 'Years Experience' },
@@ -90,6 +99,23 @@ export class HomeComponent implements OnInit {
     { value: '99.9%', label: 'Architecture Uptime' },
     { value: '< 80ms', label: 'Median API Latency' },
   ];
+
+  get heroBadges(): string[] {
+    try {
+      if (this.settings().heroBadgesJson) {
+        const parsed = JSON.parse(this.settings().heroBadgesJson);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return ['Clean Architecture', 'CQRS / MediatR', 'Angular 22 Signals'];
+  }
+
+  get whatsAppUrl(): string {
+    const raw = this.settings().whatsAppNumber || '923000000000';
+    const num = raw.replace(/[^0-9]/g, '');
+    const text = encodeURIComponent('Hello Shahid, I reviewed your developer portfolio and would like to connect about an opportunity.');
+    return `https://wa.me/${num}?text=${text}`;
+  }
 
   ngOnInit(): void {
     this.seoService.updateMeta({
@@ -101,7 +127,7 @@ export class HomeComponent implements OnInit {
     this.loadData();
   }
 
-  private loadData(): void {
+  loadData(): void {
     this.apiService.getPublicSettings().subscribe({
       next: (res) => {
         if (res.data) {
@@ -128,5 +154,22 @@ export class HomeComponent implements OnInit {
       },
       error: () => {},
     });
+
+    this.apiService.getCertificates().subscribe({
+      next: (res) => {
+        if (res.data && res.data.length > 0) {
+          this.certificates.set(res.data as Certificate[]);
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  openFeedbackModal(): void {
+    this.isFeedbackModalOpen.set(true);
+  }
+
+  closeFeedbackModal(): void {
+    this.isFeedbackModalOpen.set(false);
   }
 }

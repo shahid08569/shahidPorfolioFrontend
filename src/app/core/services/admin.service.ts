@@ -103,4 +103,46 @@ export class AdminService {
     formData.append('file', file);
     return this.http.post<ApiResponse<string>>(`${this.baseUrl}/media/upload-cv`, formData);
   }
+
+  // Testimonials / Endorsements
+  getAllTestimonials(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/admin/testimonials`);
+  }
+
+  approveTestimonial(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/admin/testimonials/${id}/approve`, {});
+  }
+
+  rejectTestimonial(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/admin/testimonials/${id}/reject`, {});
+  }
+
+  createTestimonial(command: any): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/admin/testimonials`, command);
+  }
+
+  updateTestimonial(id: string, command: any): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/admin/testimonials/${id}`, command);
+  }
+
+  deleteTestimonial(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/admin/testimonials/${id}`);
+  }
+
+  // Certificates
+  getAllCertificates(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/admin/certificates`);
+  }
+
+  createCertificate(command: any): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/admin/certificates`, command);
+  }
+
+  updateCertificate(id: string, command: any): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/admin/certificates/${id}`, command);
+  }
+
+  deleteCertificate(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/admin/certificates/${id}`);
+  }
 }

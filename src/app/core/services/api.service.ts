@@ -81,6 +81,14 @@ export class ApiService {
     return this.http.get<ApiResponse<Testimonial[]>>(`${this.baseUrl}/testimonials`);
   }
 
+  submitTestimonial(payload: any): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(`${this.baseUrl}/testimonials/submit`, payload);
+  }
+
+  getCertificates(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/certificates`);
+  }
+
   getBlogPosts(): Observable<ApiResponse<BlogPostCard[]>> {
     return this.http.get<ApiResponse<BlogPostCard[]>>(`${this.baseUrl}/blog`).pipe(
       map((response) => {

@@ -22,10 +22,15 @@
     </div>
   </header>
 
-  <!-- Notice Banner -->
-  <div class="notice-banner" *ngIf="actionMessage()">
+  <!-- Notice Banners -->
+  <div class="notice-banner success" *ngIf="actionMessage()">
     <app-icon name="check" [size]="18"></app-icon>
     <span>{{ actionMessage() }}</span>
+  </div>
+
+  <div class="notice-banner error" *ngIf="errorMessage()">
+    <app-icon name="close" [size]="18"></app-icon>
+    <span>{{ errorMessage() }}</span>
   </div>
 
   <div class="admin-body">
@@ -52,9 +57,19 @@
           <span>Skills Matrix</span>
         </button>
 
+        <button (click)="setTab('testimonials')" [class.active]="activeTab() === 'testimonials'" class="nav-item-btn">
+          <app-icon name="quote" [size]="18"></app-icon>
+          <span>Endorsements ({{ testimonials().length }})</span>
+        </button>
+
+        <button (click)="setTab('certificates')" [class.active]="activeTab() === 'certificates'" class="nav-item-btn">
+          <app-icon name="certificate" [size]="18"></app-icon>
+          <span>Certificates ({{ certificates().length }})</span>
+        </button>
+
         <button (click)="setTab('settings')" [class.active]="activeTab() === 'settings'" class="nav-item-btn">
           <app-icon name="sparkles" [size]="18"></app-icon>
-          <span>Site Settings</span>
+          <span>Site &amp; Terminal Code</span>
         </button>
       </nav>
     </aside>
@@ -65,7 +80,7 @@
       <section *ngIf="activeTab() === 'overview'" class="tab-pane">
         <div class="pane-header">
           <h2>Portfolio Telemetry &amp; Overview</h2>
-          <p>Real-time statistics of published portfolio content and recruiter inquiries.</p>
+          <p>Real-time statistics of published portfolio content, feedback, and inquiries.</p>
         </div>
 
         <div class="stats-cards-grid">
@@ -76,17 +91,17 @@
 
           <div class="stat-card card">
             <span class="stat-num gradient-text">{{ messages().length }}</span>
-            <span class="stat-label">Contact Messages</span>
+            <span class="stat-label">Contact Inquiries</span>
           </div>
 
           <div class="stat-card card">
-            <span class="stat-num gradient-text">{{ skillGroups().length }}</span>
-            <span class="stat-label">Skill Categories</span>
+            <span class="stat-num gradient-text">{{ testimonials().length }}</span>
+            <span class="stat-label">Client Endorsements</span>
           </div>
 
           <div class="stat-card card">
-            <span class="stat-num gradient-text">.NET 10</span>
-            <span class="stat-label">Clean Architecture API</span>
+            <span class="stat-num gradient-text">{{ certificates().length }}</span>
+            <span class="stat-label">Certifications</span>
           </div>
         </div>
 
@@ -94,13 +109,20 @@
           <h3>Quick Administration Actions</h3>
           <div class="quick-btns">
             <button (click)="setTab('projects'); openNewProjectModal()" class="btn btn-primary">
-              + New Case Study Project
+              <app-icon name="plus" [size]="16"></app-icon>
+              New Case Study Project
             </button>
             <button (click)="setTab('skills'); openNewSkillModal()" class="btn btn-outline">
-              + Add Technical Skill
+              <app-icon name="plus" [size]="16"></app-icon>
+              Add Technical Skill
             </button>
-            <button (click)="setTab('messages')" class="btn btn-secondary">
-              Review Messages Inbox
+            <button (click)="setTab('testimonials'); openNewTestimonialModal()" class="btn btn-outline">
+              <app-icon name="plus" [size]="16"></app-icon>
+              Add Endorsement
+            </button>
+            <button (click)="setTab('certificates'); openNewCertificateModal()" class="btn btn-outline">
+              <app-icon name="plus" [size]="16"></app-icon>
+              Add Certificate
             </button>
           </div>
         </div>
@@ -109,238 +131,542 @@
       <!-- 2. MESSAGES TAB -->
       <section *ngIf="activeTab() === 'messages'" class="tab-pane">
         <div class="pane-header">
-          <h2>Contact Inquiries Inbox</h2>
-          <p>Messages submitted through the portfolio contact form.</p>
+          <h2>Contact Inquiries ({{ messages().length }})</h2>
+          <p>Direct inquiries received through the portfolio contact form.</p>
         </div>
 
-        <div class="messages-list" *ngIf="messages().length > 0; else noMessages">
-          <div class="message-card card" *ngFor="let msg of messages()" [class.unread]="!msg.isRead">
-            <div class="msg-header">
-              <div class="sender-info">
-                <h4>{{ msg.name }} <span class="sender-email">&lt;{{ msg.email }}&gt;</span></h4>
-                <span class="msg-date">{{ msg.receivedAtUtc | date: 'medium' }}</span>
-              </div>
-              <div class="msg-status-actions">
-                <span class="status-pill" [class.read]="msg.isRead">
-                  {{ msg.isRead ? 'Read' : 'New' }}
-                </span>
-                <button *ngIf="!msg.isRead" (click)="markAsRead(msg.id)" class="btn btn-outline btn-sm">
-                  Mark as Read
-                </button>
-                <button (click)="deleteMessage(msg.id)" class="btn btn-secondary btn-sm">
-                  Delete
-                </button>
-              </div>
-            </div>
-            <div class="msg-subject"><strong>Subject:</strong> {{ msg.subject }}</div>
-            <p class="msg-body">{{ msg.message }}</p>
-          </div>
+        <div class="table-container card" *ngIf="messages().length > 0; else noMessages">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Sender</th>
+                <th>Subject</th>
+                <th>Received</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of messages()" [class.unread]="!m.isRead">
+                <td>
+                  <span class="badge" [class.badge-primary]="!m.isRead" [class.badge-muted]="m.isRead">
+                    {{ m.isRead ? 'Read' : 'New' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="sender-info">
+                    <strong>{{ m.name }}</strong>
+                    <span class="email-sub">{{ m.email }}</span>
+                  </div>
+                </td>
+                <td>{{ m.subject }}</td>
+                <td class="text-muted">{{ m.receivedAtUtc | date: 'short' }}</td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <button (click)="viewMessage(m)" class="btn btn-sm btn-outline" title="View Full Message">
+                      <app-icon name="eye" [size]="14"></app-icon>
+                    </button>
+                    <button (click)="confirmDeleteMessage(m)" class="btn btn-sm btn-danger" title="Delete Message">
+                      <app-icon name="trash" [size]="14"></app-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
         <ng-template #noMessages>
-          <div class="empty-state card">
-            <app-icon name="email" [size]="36"></app-icon>
-            <p>No contact messages in the inbox yet.</p>
+          <div class="empty-card card">
+            <p>No messages received yet. Once recruiters reach out, their messages will appear here.</p>
           </div>
         </ng-template>
       </section>
 
       <!-- 3. PROJECTS TAB -->
       <section *ngIf="activeTab() === 'projects'" class="tab-pane">
-        <div class="pane-header flex-between">
+        <div class="pane-header with-action">
           <div>
-            <h2>Manage Projects &amp; Case Studies</h2>
-            <p>Add, edit, and organize project architectures displayed to recruiters.</p>
+            <h2>Projects &amp; Case Studies ({{ projects().length }})</h2>
+            <p>Manage showcased projects, architecture deep-dives, and tech stacks.</p>
           </div>
           <button (click)="openNewProjectModal()" class="btn btn-primary">
+            <app-icon name="plus" [size]="16"></app-icon>
             + New Project
           </button>
         </div>
 
-        <div class="admin-table-wrapper card">
-          <table class="admin-table">
+        <div class="table-container card" *ngIf="projects().length > 0; else noProjects">
+          <table class="data-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Slug</th>
-                <th>Case Study</th>
-                <th>Featured</th>
-                <th>Actions</th>
+                <th>Project Title</th>
+                <th>Type</th>
+                <th>Links</th>
+                <th class="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let p of projects()">
-                <td><strong>{{ p.title }}</strong></td>
-                <td><code>{{ p.slug }}</code></td>
                 <td>
-                  <span class="badge badge-primary" *ngIf="p.isCaseStudy">Case Study</span>
+                  <div class="project-title-cell">
+                    <strong>{{ p.title }}</strong>
+                    <span class="slug-sub">/{{ p.slug }}</span>
+                  </div>
                 </td>
                 <td>
-                  <span class="badge badge-accent" *ngIf="p.isFeatured">Featured</span>
+                  <span class="badge badge-accent" *ngIf="p.isCaseStudy">Case Study</span>
+                  <span class="badge badge-primary" *ngIf="p.isFeatured && !p.isCaseStudy">Featured</span>
+                  <span class="badge" *ngIf="!p.isFeatured && !p.isCaseStudy">Standard</span>
                 </td>
-                <td class="table-actions">
-                  <a [routerLink]="['/projects', p.slug]" target="_blank" class="action-link">View</a>
-                  <button (click)="deleteProject(p.id)" class="action-btn-danger">Delete</button>
+                <td>
+                  <div class="links-preview">
+                    <a *ngIf="p.githubUrl" [href]="p.githubUrl" target="_blank" class="link-tag" title="GitHub">
+                      <app-icon name="github" [size]="14"></app-icon>
+                    </a>
+                    <a *ngIf="p.liveUrl" [href]="p.liveUrl" target="_blank" class="link-tag" title="Live Demo">
+                      <app-icon name="external-link" [size]="14"></app-icon>
+                    </a>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <button (click)="openEditProjectModal(p)" class="btn btn-sm btn-outline" title="Edit Project">
+                      <app-icon name="edit" [size]="14"></app-icon>
+                      Edit
+                    </button>
+                    <button (click)="confirmDeleteProject(p)" class="btn btn-sm btn-danger" title="Delete Project">
+                      <app-icon name="trash" [size]="14"></app-icon>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <ng-template #noProjects>
+          <div class="empty-card card">
+            <p>No projects configured yet. Click "+ New Project" to create your first architecture case study.</p>
+          </div>
+        </ng-template>
       </section>
 
       <!-- 4. SKILLS TAB -->
       <section *ngIf="activeTab() === 'skills'" class="tab-pane">
-        <div class="pane-header flex-between">
+        <div class="pane-header with-action">
           <div>
-            <h2>Technical Skills Matrix</h2>
-            <p>Configure technologies and competencies shown on the skills matrix.</p>
+            <h2>Skills Matrix</h2>
+            <p>Categorized competencies, frameworks, databases, and proficiency percentages.</p>
           </div>
           <button (click)="openNewSkillModal()" class="btn btn-primary">
+            <app-icon name="plus" [size]="16"></app-icon>
             + Add Skill
           </button>
         </div>
 
-        <div class="skills-admin-groups" *ngFor="let group of skillGroups()">
-          <h3 class="group-title">{{ group.categoryName }}</h3>
-          <div class="skills-admin-list">
-            <div class="skill-admin-item card" *ngFor="let skill of group.skills">
-              <span class="skill-name">{{ skill.name }}</span>
-              <div class="skill-right">
-                <span class="badge" *ngIf="skill.isTopSkill">Top Skill</span>
-                <button (click)="deleteSkill(skill.id)" class="action-btn-danger">Delete</button>
+        <div class="skill-groups-container">
+          <div class="skill-group-card card" *ngFor="let group of skillGroups()">
+            <h3 class="group-title">{{ group.categoryName }} ({{ group.skills.length }})</h3>
+            <div class="skills-mini-grid">
+              <div class="skill-item-row" *ngFor="let sk of group.skills">
+                <div class="skill-item-info">
+                  <app-icon [name]="sk.iconKey || sk.icon || 'server'" [size]="18"></app-icon>
+                  <strong>{{ sk.name }}</strong>
+                  <span class="star-pill" *ngIf="sk.isTopSkill" title="Top Skill">★</span>
+                </div>
+                <div class="skill-item-actions">
+                  <span class="prof-label">{{ sk.proficiency }}%</span>
+                  <button (click)="openEditSkillModal(sk, group.category)" class="btn-icon" title="Edit">
+                    <app-icon name="edit" [size]="14"></app-icon>
+                  </button>
+                  <button (click)="confirmDeleteSkill(sk)" class="btn-icon danger" title="Delete">
+                    <app-icon name="trash" [size]="14"></app-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 5. SETTINGS TAB -->
-      <section *ngIf="activeTab() === 'settings'" class="tab-pane">
-        <div class="pane-header">
-          <h2>Site Settings &amp; Profile</h2>
-          <p>Update your public bio, availability, location, and CV document.</p>
+      <!-- 5. TESTIMONIALS / ENDORSEMENTS TAB -->
+      <section *ngIf="activeTab() === 'testimonials'" class="tab-pane">
+        <div class="pane-header with-action">
+          <div>
+            <h2>Endorsements &amp; Feedback ({{ testimonials().length }})</h2>
+            <p>Client feedback submitted from the website. Approve submissions to make them visible publicly.</p>
+          </div>
+          <button (click)="openNewTestimonialModal()" class="btn btn-primary">
+            <app-icon name="plus" [size]="16"></app-icon>
+            + Add Endorsement
+          </button>
         </div>
 
-        <div class="settings-form-wrapper card">
-          <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" formControlName="fullName" class="form-control" />
+        <div class="testimonials-admin-grid" *ngIf="testimonials().length > 0; else noTestimonials">
+          <div class="testimonial-admin-card card" *ngFor="let t of testimonials()" [class.pending]="!t.isApproved">
+            <div class="card-top">
+              <div class="author-details">
+                <strong>{{ t.clientName }}</strong>
+                <span class="author-role">{{ t.role }} @ {{ t.company }}</span>
+                <span class="relationship-tag" *ngIf="t.relationship">{{ t.relationship }}</span>
               </div>
-
-              <div class="form-group">
-                <label class="form-label">Professional Title</label>
-                <input type="text" formControlName="professionalTitle" class="form-control" />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">One-Line Bio</label>
-              <input type="text" formControlName="oneLineBio" class="form-control" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">About Summary</label>
-              <textarea rows="4" formControlName="aboutSummary" class="form-control"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Availability Status</label>
-                <input type="text" formControlName="availabilityStatus" class="form-control" />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Current Location</label>
-                <input type="text" formControlName="currentLocation" class="form-control" />
+              <div class="approval-badge">
+                <span class="badge" [class.badge-success]="t.isApproved" [class.badge-warning]="!t.isApproved">
+                  {{ t.isApproved ? 'Approved & Live' : 'Pending Review' }}
+                </span>
               </div>
             </div>
 
-            <div class="form-group cv-upload-group">
-              <label class="form-label">Upload New CV (.pdf)</label>
-              <input type="file" accept=".pdf" (change)="onCvSelected($event)" class="file-input" />
-              <span class="current-cv-path" *ngIf="settingsForm.get('cvUrl')?.value">
-                Current CV: <code>{{ settingsForm.get('cvUrl')?.value }}</code>
-              </span>
+            <div class="star-rating-display">
+              <span *ngFor="let s of [1, 2, 3, 4, 5]" [class.filled]="s <= t.rating">★</span>
             </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-                {{ isSaving() ? 'Saving Changes...' : 'Save Settings' }}
+            <p class="content-preview">"{{ t.content }}"</p>
+
+            <div class="card-footer-actions">
+              <button
+                (click)="toggleTestimonialApproval(t)"
+                class="btn btn-sm"
+                [class.btn-success]="!t.isApproved"
+                [class.btn-outline]="t.isApproved"
+              >
+                <app-icon [name]="t.isApproved ? 'close' : 'check'" [size]="14"></app-icon>
+                {{ t.isApproved ? 'Unapprove (Hide)' : 'Approve & Publish' }}
+              </button>
+
+              <div class="btn-group">
+                <button (click)="openEditTestimonialModal(t)" class="btn btn-sm btn-outline">
+                  <app-icon name="edit" [size]="14"></app-icon>
+                  Edit
+                </button>
+                <button (click)="confirmDeleteTestimonial(t)" class="btn btn-sm btn-danger">
+                  <app-icon name="trash" [size]="14"></app-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTestimonials>
+          <div class="empty-card card">
+            <p>No client endorsements yet. Click "+ Add Endorsement" or let visitors submit from the home page.</p>
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- 6. CERTIFICATES TAB -->
+      <section *ngIf="activeTab() === 'certificates'" class="tab-pane">
+        <div class="pane-header with-action">
+          <div>
+            <h2>Certifications &amp; Accreditations ({{ certificates().length }})</h2>
+            <p>Showcase verified certifications from Microsoft, Meta, and industry authorities.</p>
+          </div>
+          <button (click)="openNewCertificateModal()" class="btn btn-primary">
+            <app-icon name="plus" [size]="16"></app-icon>
+            + Add Certificate
+          </button>
+        </div>
+
+        <div class="table-container card" *ngIf="certificates().length > 0; else noCerts">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Certificate Title</th>
+                <th>Issuing Organization</th>
+                <th>Issue Date</th>
+                <th>Credential Link</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cert of certificates()">
+                <td>
+                  <div class="cert-cell">
+                    <app-icon name="certificate" [size]="18" class="cert-icon"></app-icon>
+                    <strong>{{ cert.title }}</strong>
+                  </div>
+                </td>
+                <td>{{ cert.issuingOrganization }}</td>
+                <td class="text-muted">{{ cert.issueDate | date: 'mediumDate' }}</td>
+                <td>
+                  <a *ngIf="cert.credentialUrl" [href]="cert.credentialUrl" target="_blank" class="link-tag">
+                    <app-icon name="external-link" [size]="14"></app-icon>
+                    Verify
+                  </a>
+                </td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <button (click)="openEditCertificateModal(cert)" class="btn btn-sm btn-outline">
+                      <app-icon name="edit" [size]="14"></app-icon>
+                      Edit
+                    </button>
+                    <button (click)="confirmDeleteCertificate(cert)" class="btn btn-sm btn-danger">
+                      <app-icon name="trash" [size]="14"></app-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noCerts>
+          <div class="empty-card card">
+            <p>No certificates added yet. Click "+ Add Certificate" to list your verified qualifications.</p>
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- 7. SITE & TERMINAL SETTINGS TAB -->
+      <section *ngIf="activeTab() === 'settings'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Site Profile &amp; Hero Terminal Code</h2>
+          <p>Control hero typography, dynamic C# terminal snippet, WhatsApp contact, and upload your CV.</p>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Left Column: Site Info & Terminal Editor -->
+          <div class="settings-main-form card">
+            <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" novalidate>
+              <h3 class="form-section-title">Personal Profile Information</h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <input type="text" formControlName="fullName" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Professional Title *</label>
+                  <input type="text" formControlName="professionalTitle" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Current Location *</label>
+                  <input type="text" formControlName="currentLocation" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Availability Status *</label>
+                  <input type="text" formControlName="availabilityStatus" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">WhatsApp Number (e.g. 923001234567 without +) *</label>
+                <div class="input-with-icon">
+                  <app-icon name="whatsapp" [size]="18" class="input-icon"></app-icon>
+                  <input
+                    type="text"
+                    formControlName="whatsAppNumber"
+                    placeholder="923000000000"
+                    class="form-control with-icon"
+                  />
+                </div>
+                <span class="field-hint">Used for 1-click "Start a Conversation on WhatsApp" buttons.</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">One-Line Bio (Hero Subtitle) *</label>
+                <textarea rows="2" formControlName="oneLineBio" class="form-control"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">About Summary (Full Narrative)</label>
+                <textarea rows="4" formControlName="aboutSummary" class="form-control"></textarea>
+              </div>
+
+              <h3 class="form-section-title terminal-section-title">
+                <app-icon name="terminal" [size]="18"></app-icon>
+                Hero Terminal Code Window (Dynamic &amp; Editable)
+              </h3>
+
+              <div class="form-group">
+                <label class="form-label">Terminal Window Title *</label>
+                <input
+                  type="text"
+                  formControlName="heroCodeTitle"
+                  placeholder="ShahidPortfolio.sln - Clean Architecture"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">C# Code Snippet (Shown in Hero Code Window) *</label>
+                <textarea
+                  rows="12"
+                  formControlName="heroCodeSnippet"
+                  class="form-control code-editor-input"
+                  placeholder="public class SolutionArchitect { ... }"
+                ></textarea>
+                <span class="field-hint">This code is rendered directly in the hero interactive terminal with clean typography.</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Hero Badges (Comma-separated) *</label>
+                <input
+                  type="text"
+                  formControlName="heroBadges"
+                  placeholder="Clean Architecture, CQRS / MediatR, Angular 22 Signals"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="settingsForm.invalid || isSaving()">
+                  <span *ngIf="!isSaving()">Save All Settings &amp; Code</span>
+                  <span *ngIf="isSaving()">Saving Changes...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right Column: CV Upload Card -->
+          <div class="settings-sidebar-column">
+            <div class="card cv-upload-card">
+              <div class="cv-card-header">
+                <app-icon name="download" [size]="24" class="cv-icon"></app-icon>
+                <h3>Curriculum Vitae (CV / Resume)</h3>
+              </div>
+              <p class="cv-desc">
+                Upload your updated PDF resume. The public "Download CV" button automatically serves this document.
+              </p>
+
+              <div class="current-cv-status" *ngIf="settings()?.cvUrl">
+                <span class="status-label">Current File:</span>
+                <a [href]="settings()?.cvUrl" target="_blank" class="cv-link">
+                  <app-icon name="external-link" [size]="14"></app-icon>
+                  {{ settings()?.cvUrl }}
+                </a>
+              </div>
+
+              <div class="upload-dropzone">
+                <input
+                  type="file"
+                  id="cvFileInput"
+                  accept=".pdf"
+                  (change)="onCvFileSelected($event)"
+                  class="file-input-hidden"
+                />
+                <label for="cvFileInput" class="file-picker-label">
+                  <app-icon name="download" [size]="28"></app-icon>
+                  <span *ngIf="!selectedCvFile">Click to select PDF document</span>
+                  <span *ngIf="selectedCvFile" class="selected-name">
+                    Selected: {{ selectedCvFile.name }}
+                  </span>
+                </label>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-primary btn-block"
+                [disabled]="!selectedCvFile || isUploadingCv()"
+                (click)="uploadSelectedCv()"
+              >
+                <span *ngIf="!isUploadingCv()">Upload New CV (.PDF)</span>
+                <span *ngIf="isUploadingCv()">Uploading &amp; Replacing...</span>
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- PROJECT MODAL -->
-  <div class="modal-backdrop" *ngIf="isProjectModalOpen()">
-    <div class="modal-content card">
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- 1. DELETE / CONFIRM MODAL -->
+  <app-confirm-modal
+    *ngIf="confirmModal().isOpen"
+    [title]="confirmModal().title"
+    [message]="confirmModal().message"
+    [confirmText]="confirmModal().confirmText"
+    [isDanger]="confirmModal().isDanger"
+    [isLoading]="confirmModal().isLoading"
+    (confirmed)="executeConfirm()"
+    (cancelled)="closeConfirmModal()"
+  ></app-confirm-modal>
+
+  <!-- 2. PROJECT MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isProjectModalOpen()" (click)="isProjectModalOpen.set(false)">
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Create New Project / Case Study</h3>
-        <button (click)="isProjectModalOpen.set(false)" class="close-modal-btn">✕</button>
+        <h3>{{ projectForm.get('id')?.value ? 'Edit Architecture Project' : 'New Architecture Project' }}</h3>
+        <button class="modal-close" (click)="isProjectModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
       </div>
 
-      <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Title *</label>
-            <input type="text" formControlName="title" class="form-control" />
+      <form [formGroup]="projectForm" (ngSubmit)="saveProject()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Project Title *</label>
+              <input type="text" formControlName="title" class="form-control" placeholder="e.g. Enterprise E-Commerce API" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL Slug *</label>
+              <input type="text" formControlName="slug" class="form-control" placeholder="e.g. enterprise-ecommerce-api" />
+            </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Slug *</label>
-            <input type="text" formControlName="slug" class="form-control" placeholder="e.g. enterprise-microservices" />
+            <label class="form-label">Brief Summary *</label>
+            <textarea rows="2" formControlName="summary" class="form-control" placeholder="High-level value proposition and system goals..."></textarea>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="form-label">Summary *</label>
-          <textarea rows="2" formControlName="summary" class="form-control"></textarea>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Problem Statement</label>
+              <textarea rows="3" formControlName="problemStatement" class="form-control" placeholder="What scalability bottlenecks did the client face?"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Solution Statement</label>
+              <textarea rows="3" formControlName="solutionStatement" class="form-control" placeholder="How did Clean Architecture / CQRS resolve it?"></textarea>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Problem Statement</label>
-          <textarea rows="2" formControlName="problemStatement" class="form-control"></textarea>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Architecture Overview</label>
+            <textarea rows="3" formControlName="architectureOverview" class="form-control" placeholder="Domain Core -> MediatR -> EF Core -> SQL Server..."></textarea>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Engineering Solution</label>
-          <textarea rows="2" formControlName="solutionStatement" class="form-control"></textarea>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Key Metrics Achieved</label>
+              <input type="text" formControlName="keyMetrics" class="form-control" placeholder="e.g. Sub-90ms response times, 99.9% uptime" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tech Stack (Comma-separated)</label>
+              <input type="text" formControlName="techStack" class="form-control" placeholder=".NET 10, Angular, SQL Server, MediatR, Redis" />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Architecture Overview</label>
-          <textarea rows="2" formControlName="architectureOverview" class="form-control"></textarea>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">GitHub Repository URL</label>
+              <input type="url" formControlName="githubUrl" class="form-control" placeholder="https://github.com/..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Live System URL</label>
+              <input type="url" formControlName="liveUrl" class="form-control" placeholder="https://..." />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Key Metrics</label>
-          <input type="text" formControlName="keyMetrics" class="form-control" placeholder="e.g. 70% latency reduction" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Tech Stack (comma-separated)</label>
-          <input type="text" formControlName="techStack" class="form-control" placeholder=".NET 10, Angular 22, Docker, SQL Server" />
-        </div>
-
-        <div class="checkbox-row">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="isCaseStudy" />
-            Is Architecture Case Study
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="isFeatured" />
-            Is Featured on Home Page
-          </label>
+          <div class="form-row-checkboxes">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isFeatured" />
+              <span>Featured on Homepage</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isCaseStudy" />
+              <span>Full Case Study Page</span>
+            </label>
+          </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button" (click)="isProjectModalOpen.set(false)" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+          <button type="button" class="btn btn-outline" (click)="isProjectModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSaving()">
             {{ isSaving() ? 'Saving...' : 'Save Project' }}
           </button>
         </div>
@@ -348,50 +674,217 @@
     </div>
   </div>
 
-  <!-- SKILL MODAL -->
-  <div class="modal-backdrop" *ngIf="isSkillModalOpen()">
-    <div class="modal-content card" style="max-width: 480px;">
+  <!-- 3. SKILL MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isSkillModalOpen()" (click)="isSkillModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Add Technical Skill</h3>
-        <button (click)="isSkillModalOpen.set(false)" class="close-modal-btn">✕</button>
+        <h3>{{ skillForm.get('id')?.value ? 'Edit Technical Skill' : 'Add Technical Skill' }}</h3>
+        <button class="modal-close" (click)="isSkillModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
       </div>
 
-      <form [formGroup]="skillForm" (ngSubmit)="saveSkill()">
-        <div class="form-group">
-          <label class="form-label">Skill Name *</label>
-          <input type="text" formControlName="name" class="form-control" placeholder="e.g. RabbitMQ" />
-        </div>
+      <form [formGroup]="skillForm" (ngSubmit)="saveSkill()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-group">
+            <label class="form-label">Skill / Technology Name *</label>
+            <input type="text" formControlName="name" class="form-control" placeholder="e.g. .NET 10 / C#" />
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Category *</label>
-          <select formControlName="category" class="form-control">
-            <option [value]="0">Frontend</option>
-            <option [value]="1">Backend</option>
-            <option [value]="2">Database</option>
-            <option [value]="3">DevOps</option>
-            <option [value]="4">Tools</option>
-          </select>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select formControlName="category" class="form-control">
+                <option [ngValue]="1">Frontend</option>
+                <option [ngValue]="2">Backend</option>
+                <option [ngValue]="3">Database</option>
+                <option [ngValue]="4">Tools &amp; DevOps</option>
+                <option [ngValue]="5">Architecture</option>
+              </select>
+            </div>
 
-        <div class="form-group">
-          <label class="form-label">Proficiency (1-100)</label>
-          <input type="number" formControlName="proficiency" class="form-control" />
-        </div>
+            <div class="form-group">
+              <label class="form-label">Proficiency (1-100%) *</label>
+              <input type="number" formControlName="proficiency" class="form-control" min="1" max="100" />
+            </div>
+          </div>
 
-        <div class="checkbox-row">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="isTopSkill" />
-            Mark as Top Skill (Highlighted)
-          </label>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Icon Key</label>
+              <input type="text" formControlName="iconKey" class="form-control" placeholder="e.g. dotnet, angular, database" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Order</label>
+              <input type="number" formControlName="displayOrder" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isTopSkill" />
+              <span>Mark as Top Skill (Highlighted on Public Site)</span>
+            </label>
+          </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button" (click)="isSkillModalOpen.set(false)" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Add Skill' }}
+          <button type="button" class="btn btn-outline" (click)="isSkillModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="skillForm.invalid || isSaving()">
+            {{ isSaving() ? 'Saving...' : 'Save Skill' }}
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 4. TESTIMONIAL MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isTestimonialModalOpen()" (click)="isTestimonialModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ testimonialForm.get('id')?.value ? 'Edit Endorsement' : 'Add Client Endorsement' }}</h3>
+        <button class="modal-close" (click)="isTestimonialModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="testimonialForm" (ngSubmit)="saveTestimonial()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Client / Author Name *</label>
+              <input type="text" formControlName="clientName" class="form-control" placeholder="e.g. Alex Mercer" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role *</label>
+              <input type="text" formControlName="role" class="form-control" placeholder="e.g. VP of Engineering" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Company *</label>
+              <input type="text" formControlName="company" class="form-control" placeholder="e.g. CloudScale Systems" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Relationship</label>
+              <input type="text" formControlName="relationship" class="form-control" placeholder="Client / Engineering Lead" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Rating (1 to 5 Stars)</label>
+              <input type="number" formControlName="rating" min="1" max="5" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">LinkedIn URL</label>
+              <input type="url" formControlName="linkedInUrl" class="form-control" placeholder="https://linkedin.com/in/..." />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endorsement Content *</label>
+            <textarea rows="4" formControlName="content" class="form-control" placeholder="What was it like collaborating with Shahid?"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isApproved" />
+              <span>Approved &amp; Visible on Public Portfolio</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="isTestimonialModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="testimonialForm.invalid || isSaving()">
+            {{ isSaving() ? 'Saving...' : 'Save Endorsement' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. CERTIFICATE MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isCertificateModalOpen()" (click)="isCertificateModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ certificateForm.get('id')?.value ? 'Edit Certificate' : 'Add Certificate' }}</h3>
+        <button class="modal-close" (click)="isCertificateModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="certificateForm" (ngSubmit)="saveCertificate()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-group">
+            <label class="form-label">Certificate Title *</label>
+            <input type="text" formControlName="title" class="form-control" placeholder="e.g. Microsoft Certified: Azure Developer Associate" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Issuing Organization *</label>
+              <input type="text" formControlName="issuingOrganization" class="form-control" placeholder="e.g. Microsoft / Dometrain" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Issue Date *</label>
+              <input type="date" formControlName="issueDate" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Credential ID</label>
+              <input type="text" formControlName="credentialId" class="form-control" placeholder="e.g. AZ-204-98421" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Verification URL</label>
+              <input type="url" formControlName="credentialUrl" class="form-control" placeholder="https://learn.microsoft.com/..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="isCertificateModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="certificateForm.invalid || isSaving()">
+            {{ isSaving() ? 'Saving...' : 'Save Certificate' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. VIEW MESSAGE MODAL -->
+  <div class="modal-backdrop" *ngIf="isMessageViewModalOpen() && selectedMessage()" (click)="isMessageViewModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Contact Message Details</h3>
+        <button class="modal-close" (click)="isMessageViewModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <div class="message-meta-box">
+          <p><strong>From:</strong> {{ selectedMessage()?.name }} ({{ selectedMessage()?.email }})</p>
+          <p><strong>Subject:</strong> {{ selectedMessage()?.subject }}</p>
+          <p><strong>Date:</strong> {{ selectedMessage()?.receivedAtUtc | date: 'full' }}</p>
+        </div>
+
+        <div class="message-body-box">
+          <p>{{ selectedMessage()?.message }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a [href]="'mailto:' + selectedMessage()?.email + '?subject=Re: ' + selectedMessage()?.subject" class="btn btn-primary">
+          <app-icon name="email" [size]="16"></app-icon>
+          Reply via Email
+        </a>
+        <button type="button" class="btn btn-outline" (click)="isMessageViewModalOpen.set(false)">Close</button>
+      </div>
     </div>
   </div>
 </div>
