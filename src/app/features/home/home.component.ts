@@ -195,15 +195,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData();
   }
 
+  private initRetryCount = 0;
+
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.initAmbientCanvas();
 
-      // Direct-load multi-stage layout recalculation (ensures canvas resizes after browser paints CSS/fonts)
-      setTimeout(() => this.recheckCanvasDimensions?.(), 50);
-      setTimeout(() => this.recheckCanvasDimensions?.(), 200);
-      setTimeout(() => this.recheckCanvasDimensions?.(), 600);
-      setTimeout(() => this.recheckCanvasDimensions?.(), 1200);
+      // Multi-tier direct-load verification passes (guarantees canvas activates on initial paint/hydration)
+      requestAnimationFrame(() => this.initAmbientCanvas());
+      setTimeout(() => this.initAmbientCanvas(), 80);
+      setTimeout(() => this.initAmbientCanvas(), 250);
+      setTimeout(() => this.initAmbientCanvas(), 600);
+      setTimeout(() => this.initAmbientCanvas(), 1200);
     }
   }
 
@@ -213,6 +216,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
     }
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener);
@@ -229,17 +233,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initAmbientCanvas(): void {
-    const canvas = this.ambientCanvasRef?.nativeElement;
-    if (!canvas) return;
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Fail-safe element discovery across ViewChild, DOM ID, and class query
+    const canvas =
+      this.ambientCanvasRef?.nativeElement ||
+      (document.getElementById('ambientCanvas') as HTMLCanvasElement) ||
+      (document.querySelector('.hero-ambient-canvas') as HTMLCanvasElement);
+
+    if (!canvas) {
+      if (this.initRetryCount < 30) {
+        this.initRetryCount++;
+        requestAnimationFrame(() => this.initAmbientCanvas());
+      }
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Avoid duplicate render loops
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
 
     let width = 0;
     let height = 0;
     let dpr = 1;
 
-    // Constellation nodes definition
+    // ── 1. Constellation Nodes ────────────────────────────────
     interface ConstellationNode {
       x: number;
       y: number;
@@ -251,11 +274,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       pulseSpeed: number;
     }
 
-    const nodeColors = ['#d4a373', '#c08d5c', '#8f9d65', '#ccd5ae', '#b88350'];
-    const nodeCount = 52;
+    const nodeColors = ['#d4a373', '#c08d5c', '#8f9d65', '#ccd5ae', '#b88350', '#a3b178'];
+    const nodeCount = 58;
     const nodes: ConstellationNode[] = [];
 
-    // Floating Ambient Light Sparks
+    // ── 2. Floating Ambient Sparks ────────────────────────────
     interface Spark {
       x: number;
       y: number;
@@ -267,11 +290,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       color: string;
     }
 
-    const sparkColors = ['#d4a373', '#c08d5c', '#a3b178', '#ccd5ae'];
-    const sparkCount = 42;
+    const sparkColors = ['#d4a373', '#c08d5c', '#a3b178', '#ccd5ae', '#fefae0'];
+    const sparkCount = 48;
     const sparks: Spark[] = [];
 
-    // Floating Geometric Polygonal Shapes
+    // ── 3. Floating Geometric Wireframes ──────────────────────
     interface GeoShape {
       x: number;
       y: number;
@@ -285,13 +308,27 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const geoShapes: GeoShape[] = [
-      { x: 150, y: 180, vx: 0.15, vy: -0.1, size: 28, rot: 0, rotSpeed: 0.008, sides: 6, alpha: 0.22 },
-      { x: 800, y: 240, vx: -0.12, vy: 0.12, size: 36, rot: 0.5, rotSpeed: -0.006, sides: 4, alpha: 0.18 },
-      { x: 700, y: 520, vx: -0.1, vy: -0.15, size: 32, rot: 1.2, rotSpeed: 0.007, sides: 6, alpha: 0.2 },
-      { x: 260, y: 580, vx: 0.14, vy: 0.08, size: 24, rot: 0.8, rotSpeed: -0.009, sides: 3, alpha: 0.22 },
+      { x: 160, y: 190, vx: 0.18, vy: -0.12, size: 32, rot: 0, rotSpeed: 0.009, sides: 6, alpha: 0.28 },
+      { x: 820, y: 250, vx: -0.15, vy: 0.14, size: 40, rot: 0.5, rotSpeed: -0.007, sides: 4, alpha: 0.24 },
+      { x: 740, y: 540, vx: -0.12, vy: -0.18, size: 36, rot: 1.2, rotSpeed: 0.008, sides: 6, alpha: 0.26 },
+      { x: 280, y: 600, vx: 0.16, vy: 0.09, size: 28, rot: 0.8, rotSpeed: -0.011, sides: 3, alpha: 0.28 },
     ];
 
-    // Ensure all particles are distributed across active bounds
+    // ── 4. Floating Engineering Code Droplets ──────────────────
+    interface CodeDroplet {
+      x: number;
+      y: number;
+      vy: number;
+      text: string;
+      alpha: number;
+      alphaSpeed: number;
+      size: number;
+    }
+
+    const codeTokens = ['.NET 10', 'C# 13', 'CQRS', 'MediatR', 'async', '0101', 'EF Core', 'λ', '{ }', 'SSR', '< />'];
+    const dropletCount = 14;
+    const droplets: CodeDroplet[] = [];
+
     const ensureParticlesInBounds = () => {
       const w = Math.max(320, width);
       const h = Math.max(450, height);
@@ -304,20 +341,24 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (s.x <= 0 || s.x > w) s.x = Math.random() * w;
         if (s.y <= 0 || s.y > h) s.y = Math.random() * h;
       }
+      for (const d of droplets) {
+        if (d.x <= 0 || d.x > w) d.x = Math.random() * w;
+        if (d.y <= 0 || d.y > h) d.y = Math.random() * h;
+      }
       if (geoShapes.length >= 4) {
-        geoShapes[0].x = w * 0.15;
-        geoShapes[0].y = h * 0.25;
-        geoShapes[1].x = w * 0.85;
-        geoShapes[1].y = h * 0.35;
-        geoShapes[2].x = w * 0.72;
-        geoShapes[2].y = h * 0.75;
-        geoShapes[3].x = w * 0.28;
-        geoShapes[3].y = h * 0.82;
+        geoShapes[0].x = w * 0.14;
+        geoShapes[0].y = h * 0.22;
+        geoShapes[1].x = w * 0.86;
+        geoShapes[1].y = h * 0.32;
+        geoShapes[2].x = w * 0.74;
+        geoShapes[2].y = h * 0.78;
+        geoShapes[3].x = w * 0.26;
+        geoShapes[3].y = h * 0.84;
       }
     };
 
     const setupDimensions = () => {
-      dpr = window.devicePixelRatio || 1;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
       const heroEl = (canvas.closest('.hero-section') as HTMLElement) || canvas.parentElement;
       const parentRect = canvas.parentElement?.getBoundingClientRect();
       const heroRect = heroEl?.getBoundingClientRect();
@@ -335,7 +376,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         heroEl?.clientHeight || 0,
         parentRect?.height || 0,
         heroRect?.height || 0,
-        window.innerHeight ? Math.max(500, window.innerHeight - 68) : 700
+        window.innerHeight ? Math.max(520, window.innerHeight - 68) : 740
       );
 
       const newWidth = Math.max(320, measuredW);
@@ -367,9 +408,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       nodes.push({
         x: Math.random() * (width || 1200),
         y: Math.random() * (height || 800),
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        radius: Math.random() * 2.2 + 1.4,
+        vx: (Math.random() - 0.5) * 0.75,
+        vy: (Math.random() - 0.5) * 0.75,
+        radius: Math.random() * 2.4 + 1.6,
         color: nodeColors[i % nodeColors.length],
         pulsePhase: Math.random() * Math.PI * 2,
         pulseSpeed: 0.02 + Math.random() * 0.025,
@@ -381,23 +422,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       sparks.push({
         x: Math.random() * (width || 1200),
         y: Math.random() * (height || 800),
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: -0.4 - Math.random() * 0.5,
-        size: Math.random() * 2.8 + 1.2,
-        alpha: Math.random() * 0.6 + 0.25,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: -0.45 - Math.random() * 0.55,
+        size: Math.random() * 3.2 + 1.4,
+        alpha: Math.random() * 0.65 + 0.3,
         alphaSpeed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
         color: sparkColors[i % sparkColors.length],
       });
     }
 
+    // Populate code droplets
+    for (let i = 0; i < dropletCount; i++) {
+      droplets.push({
+        x: Math.random() * (width || 1200),
+        y: Math.random() * (height || 800),
+        vy: -0.35 - Math.random() * 0.4,
+        text: codeTokens[i % codeTokens.length],
+        alpha: Math.random() * 0.45 + 0.25,
+        alphaSpeed: (Math.random() * 0.015 + 0.008) * (Math.random() > 0.5 ? 1 : -1),
+        size: Math.floor(Math.random() * 3 + 11),
+      });
+    }
+
     ensureParticlesInBounds();
 
-    // Expose recheck method for delayed ticks
+    // Recheck method
     this.recheckCanvasDimensions = () => {
       setupDimensions();
     };
 
-    // Window resize handler
+    // Resize listeners
     const onResize = () => {
       if (!canvas) return;
       setupDimensions();
@@ -405,7 +459,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     window.addEventListener('resize', onResize, { passive: true });
     this.resizeListener = onResize;
 
-    // ResizeObserver on parent container to guarantee immediate paint
+    // ResizeObserver on parent container
     if (typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => {
         setupDimensions();
@@ -421,9 +475,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Interactive Mouse Coordinates & Autonomous Breathing Beacon
     let mouseX = width * 0.5;
-    let mouseY = height * 0.5;
+    let mouseY = height * 0.45;
     let targetMouseX = width * 0.5;
-    let targetMouseY = height * 0.5;
+    let targetMouseY = height * 0.45;
     let isUserInteracting = false;
     let lastUserInteractionTime = 0;
 
@@ -444,8 +498,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mouseLeaveListener = onMouseLeave;
 
     // ── 3D Topological Perspective Wave Parameters ────────────
-    const rows = 22;
-    const cols = 34;
+    const rows = 24;
+    const cols = 36;
     let time = 0;
     let frameCounter = 0;
 
@@ -454,7 +508,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       frameCounter++;
 
       // Periodic self-healing dimension verification
-      if (frameCounter % 40 === 0) {
+      if (frameCounter % 35 === 0) {
         const currentHeroW = canvas.parentElement?.clientWidth || window.innerWidth;
         const currentHeroH = canvas.parentElement?.clientHeight || (window.innerHeight - 68);
         if (width <= 0 || height <= 0 || Math.abs(currentHeroW - width) > 15 || Math.abs(currentHeroH - height) > 15) {
@@ -462,12 +516,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
 
-      // Check if user has been idle for > 4.5 seconds -> smoothly revert to autonomous breathing beacon
-      if (isUserInteracting && Date.now() - lastUserInteractionTime > 4500) {
+      // Revert to autonomous orbit if idle > 4 seconds
+      if (isUserInteracting && Date.now() - lastUserInteractionTime > 4000) {
         isUserInteracting = false;
       }
 
-      // Calculate active focal point (Cursor vs Autonomous Lissajous Orbit)
+      // Calculate active focal energy point (Cursor vs Autonomous Lissajous Orbit)
       let activeFocusX: number;
       let activeFocusY: number;
 
@@ -477,11 +531,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         activeFocusX = mouseX;
         activeFocusY = mouseY;
       } else {
-        // Dynamic autonomous orbit across the hero canvas — always active and alive on direct load!
-        const orbitX = width * 0.5 + Math.cos(time * 0.75) * (width * 0.28);
-        const orbitY = height * 0.48 + Math.sin(time * 1.15) * (height * 0.24);
-        mouseX += (orbitX - mouseX) * 0.04;
-        mouseY += (orbitY - mouseY) * 0.04;
+        // Continuous, mesmerizing autonomous orbit across the hero canvas
+        const orbitX = width * 0.5 + Math.cos(time * 0.75) * (width * 0.32);
+        const orbitY = height * 0.46 + Math.sin(time * 1.15) * (height * 0.25);
+        mouseX += (orbitX - mouseX) * 0.045;
+        mouseY += (orbitY - mouseY) * 0.045;
         activeFocusX = mouseX;
         activeFocusY = mouseY;
       }
@@ -489,13 +543,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       ctx.clearRect(0, 0, width, height);
 
       // 1. Draw 3D Topological Perspective Wave Grid
-      const perspective = 380;
-      const fovCenterY = height * 0.7;
+      const perspective = 390;
+      const fovCenterY = height * 0.72;
       const fovCenterX = width * 0.5;
-      const gridSpacingX = (width * 1.35) / cols;
-      const gridSpacingZ = 34;
+      const gridSpacingX = (width * 1.38) / cols;
+      const gridSpacingZ = 35;
 
-      // Calculate projected 3D points
       const points: { x: number; y: number; elevation: number }[][] = [];
 
       for (let r = 0; r < rows; r++) {
@@ -507,35 +560,35 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           const rawX = (c - cols / 2) * gridSpacingX;
 
           // Multi-frequency undulating wave physics
-          const wave1 = Math.sin(c * 0.22 + time * 1.1) * Math.cos(r * 0.26 + time * 0.85);
-          const wave2 = Math.sin(c * 0.12 - r * 0.15 + time * 0.65) * 0.5;
-          let elevation = (wave1 + wave2) * (34 + r * 1.8);
+          const wave1 = Math.sin(c * 0.24 + time * 1.15) * Math.cos(r * 0.28 + time * 0.88);
+          const wave2 = Math.sin(c * 0.14 - r * 0.16 + time * 0.7) * 0.55;
+          let elevation = (wave1 + wave2) * (38 + r * 2.0);
 
           // Screen projection
           const projX = fovCenterX + rawX * scale;
-          const projY = fovCenterY + (z * 0.35 - elevation) * scale;
+          const projY = fovCenterY + (z * 0.36 - elevation) * scale;
 
-          // Active focal point disturbance / shockwave ripple (cursor or breathing beacon)
+          // Active focal point disturbance / shockwave ripple
           const dx = projX - activeFocusX;
           const dy = projY - activeFocusY;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 260) {
-            const ripple = Math.sin(dist * 0.04 - time * 3.8) * Math.max(0, 1 - dist / 260);
-            elevation += ripple * 48;
+          if (dist < 280) {
+            const ripple = Math.sin(dist * 0.038 - time * 4.0) * Math.max(0, 1 - dist / 280);
+            elevation += ripple * 52;
           }
 
           points[r][c] = {
             x: projX,
-            y: fovCenterY + (z * 0.35 - elevation) * scale,
+            y: fovCenterY + (z * 0.36 - elevation) * scale,
             elevation,
           };
         }
       }
 
-      // Render horizontal wave ribbon lines
+      // Render horizontal wave ribbon lines with bold warm luminescence
       for (let r = 0; r < rows; r++) {
         const rowDepthRatio = 1 - r / rows;
-        const alpha = Math.max(0.1, rowDepthRatio * 0.45);
+        const alpha = Math.max(0.24, rowDepthRatio * 0.72);
 
         ctx.beginPath();
         for (let c = 0; c < cols; c++) {
@@ -550,28 +603,32 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        // Dynamic warm gradient stroke
+        // Dynamic warm gradient stroke with high contrast & rich tones
         const grad = ctx.createLinearGradient(0, 0, width, 0);
-        grad.addColorStop(0, `rgba(204, 213, 174, 0)`);
-        grad.addColorStop(0.2, `rgba(212, 163, 115, ${alpha * 0.75})`);
-        grad.addColorStop(0.5, `rgba(192, 141, 92, ${alpha * 1.15})`);
-        grad.addColorStop(0.8, `rgba(163, 177, 120, ${alpha * 0.85})`);
-        grad.addColorStop(1, `rgba(204, 213, 174, 0)`);
+        grad.addColorStop(0, 'rgba(204, 213, 174, 0)');
+        grad.addColorStop(0.15, `rgba(212, 163, 115, ${alpha * 0.95})`);
+        grad.addColorStop(0.5, `rgba(192, 141, 92, ${alpha * 1.35})`);
+        grad.addColorStop(0.85, `rgba(143, 157, 101, ${alpha * 1.05})`);
+        grad.addColorStop(1, 'rgba(204, 213, 174, 0)');
 
         ctx.strokeStyle = grad;
-        ctx.lineWidth = Math.max(1, (1 - r / rows) * 2.2);
+        ctx.lineWidth = Math.max(1.3, (1 - r / rows) * 2.8);
         ctx.stroke();
 
-        // Glowing crest beads along wave lines
+        // Glowing crest beads along wave lines with Bloom Glow
         if (r % 3 === 0) {
           for (let c = 0; c < cols; c += 4) {
             const pt = points[r][c];
             if (pt.x > 0 && pt.x < width) {
+              ctx.save();
+              ctx.shadowColor = pt.elevation > 0 ? '#d4a373' : '#8f9d65';
+              ctx.shadowBlur = 8;
               ctx.fillStyle = pt.elevation > 0 ? '#d4a373' : '#8f9d65';
-              ctx.globalAlpha = Math.max(0.2, alpha * 0.9);
+              ctx.globalAlpha = Math.max(0.4, alpha * 1.1);
               ctx.beginPath();
-              ctx.arc(pt.x, pt.y, Math.max(1.3, (1 - r / rows) * 3), 0, Math.PI * 2);
+              ctx.arc(pt.x, pt.y, Math.max(1.8, (1 - r / rows) * 4.2), 0, Math.PI * 2);
               ctx.fill();
+              ctx.restore();
             }
           }
         }
@@ -579,8 +636,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       ctx.globalAlpha = 1;
 
       // 2. Draw Interactive Constellation Nodes & Connecting Neural Lines
-      const maxConnectDist = 140;
-      const focusConnectDist = 190;
+      const maxConnectDist = 150;
+      const focusConnectDist = 210;
 
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
@@ -599,17 +656,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         const fdy = activeFocusY - n.y;
         const fDist = Math.sqrt(fdx * fdx + fdy * fdy);
         if (fDist < focusConnectDist && fDist > 0) {
-          const force = (1 - fDist / focusConnectDist) * 0.8;
+          const force = (1 - fDist / focusConnectDist) * 0.9;
           n.x += (fdx / fDist) * force;
           n.y += (fdy / fDist) * force;
 
           // Draw bright interactive beam to focal point
-          ctx.strokeStyle = `rgba(212, 163, 115, ${(1 - fDist / focusConnectDist) * 0.65})`;
-          ctx.lineWidth = 1.4;
+          ctx.save();
+          ctx.shadowColor = '#d4a373';
+          ctx.shadowBlur = 9;
+          ctx.strokeStyle = `rgba(212, 163, 115, ${(1 - fDist / focusConnectDist) * 0.85})`;
+          ctx.lineWidth = 1.8;
           ctx.beginPath();
           ctx.moveTo(n.x, n.y);
           ctx.lineTo(activeFocusX, activeFocusY);
           ctx.stroke();
+          ctx.restore();
         }
 
         // Connect nearby nodes
@@ -620,9 +681,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           const d = Math.sqrt(dx * dx + dy * dy);
 
           if (d < maxConnectDist) {
-            const alpha = (1 - d / maxConnectDist) * 0.42;
+            const alpha = (1 - d / maxConnectDist) * 0.52;
             ctx.strokeStyle = `rgba(192, 141, 92, ${alpha})`;
-            ctx.lineWidth = 0.9;
+            ctx.lineWidth = 1.0;
             ctx.beginPath();
             ctx.moveTo(n.x, n.y);
             ctx.lineTo(n2.x, n2.y);
@@ -632,23 +693,45 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Draw node with pulsing glow ring
         const pulse = Math.sin(n.pulsePhase) * 0.35 + 1;
+        ctx.save();
+        ctx.shadowColor = n.color;
+        ctx.shadowBlur = 7;
         ctx.fillStyle = n.color;
-        ctx.globalAlpha = 0.85;
+        ctx.globalAlpha = 0.92;
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.radius * pulse, 0, Math.PI * 2);
         ctx.fill();
 
         // Outer radiant ring
         ctx.strokeStyle = n.color;
-        ctx.globalAlpha = 0.28;
-        ctx.lineWidth = 0.8;
+        ctx.globalAlpha = 0.38;
+        ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius * 2.4 * pulse, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, n.radius * 2.5 * pulse, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
       }
       ctx.globalAlpha = 1;
 
-      // 3. Draw Floating Geometric Polygonal Wireframes
+      // 3. Draw Floating Engineering Code Droplets
+      ctx.save();
+      for (const cd of droplets) {
+        cd.y += cd.vy;
+        cd.alpha += cd.alphaSpeed;
+        if (cd.alpha > 0.55 || cd.alpha < 0.18) cd.alphaSpeed *= -1;
+
+        if (cd.y < -30) {
+          cd.y = height + 20;
+          cd.x = Math.random() * width;
+        }
+
+        ctx.font = `600 ${cd.size}px "JetBrains Mono", monospace`;
+        ctx.fillStyle = `rgba(107, 90, 71, ${Math.max(0, Math.min(1, cd.alpha))})`;
+        ctx.fillText(cd.text, cd.x, cd.y);
+      }
+      ctx.restore();
+
+      // 4. Draw Floating Geometric Polygonal Wireframes
       for (const g of geoShapes) {
         g.x += g.vx;
         g.y += g.vy;
@@ -663,7 +746,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         ctx.translate(g.x, g.y);
         ctx.rotate(g.rot);
         ctx.strokeStyle = 'rgba(192, 141, 92, ' + g.alpha + ')';
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.3;
 
         ctx.beginPath();
         for (let s = 0; s < g.sides; s++) {
@@ -676,9 +759,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         ctx.closePath();
         ctx.stroke();
 
-        // Inner vertex crosslines
         if (g.sides === 4 || g.sides === 6) {
-          ctx.strokeStyle = 'rgba(204, 213, 174, ' + (g.alpha * 0.6) + ')';
+          ctx.strokeStyle = 'rgba(204, 213, 174, ' + (g.alpha * 0.7) + ')';
           ctx.beginPath();
           ctx.moveTo(-g.size * 0.5, 0);
           ctx.lineTo(g.size * 0.5, 0);
@@ -690,16 +772,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         ctx.restore();
       }
 
-      // 4. Draw Floating Energy Sparks
+      // 5. Draw Floating Energy Sparks
       for (const s of sparks) {
         s.x += s.vx;
         s.y += s.vy;
         s.alpha += s.alphaSpeed;
-        if (s.alpha > 0.8 || s.alpha < 0.2) {
+        if (s.alpha > 0.85 || s.alpha < 0.22) {
           s.alphaSpeed *= -1;
         }
 
-        // Loop sparks smoothly
         if (s.y < -20) {
           s.y = height + 10;
           s.x = Math.random() * width;
@@ -713,8 +794,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Soft halo
-        ctx.globalAlpha = Math.max(0, Math.min(1, s.alpha * 0.35));
+        ctx.globalAlpha = Math.max(0, Math.min(1, s.alpha * 0.4));
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.size * 2.8, 0, Math.PI * 2);
         ctx.fill();

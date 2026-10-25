@@ -264,11 +264,22 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // ── Hero Content ──────────────────────────────────────────
 .hero-content {
   @include flex-col;
   gap: 1.75rem;
-  animation: fadeInUp 0.5s ease both;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 // Developer Profile Header with Avatar
@@ -604,14 +615,16 @@
   border: 1px solid var(--border);
   border-radius: $radius-card;
   overflow: hidden;
-  box-shadow: 0 8px 26px rgba(59, 47, 35, 0.11);
-  animation: card-float-gentle 7s ease-in-out infinite;
-  transition: transform 300ms ease, box-shadow 300ms ease;
+  box-shadow: 0 10px 30px rgba(59, 47, 35, 0.12), 0 0 20px rgba(212, 163, 115, 0.15);
+  animation: card-float-gentle 6s ease-in-out infinite;
+  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+  position: relative;
 
   &:hover {
     animation-play-state: paused;
-    transform: translateY(-5px);
-    box-shadow: 0 14px 36px rgba(59, 47, 35, 0.16);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 42px rgba(59, 47, 35, 0.18), 0 0 28px rgba(212, 163, 115, 0.28);
+    border-color: var(--bronze-dark);
   }
 }
 
@@ -1335,12 +1348,30 @@
   border: 1px solid var(--border);
   border-radius: $radius-card;
   box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease, border-color 300ms ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--tea-green), var(--light-bronze), var(--bronze-dark));
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
 
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 28px rgba(59, 47, 35, 0.14);
     border-color: var(--bronze-dark);
+
+    &::before {
+      opacity: 1;
+    }
 
     .skill-icon {
       background: var(--accent);
