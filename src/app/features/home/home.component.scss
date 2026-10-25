@@ -918,29 +918,29 @@
 
   &.badge-tl {
     top: 10px;
-    left: -20px;
+    left: -8px;
     animation: badge-drift-1 4.2s ease-in-out infinite;
   }
 
   &.badge-tr {
     top: 25px;
-    right: -24px;
+    right: -8px;
     animation: badge-drift-2 4.8s ease-in-out infinite 0.3s;
   }
 
   &.badge-bl {
     bottom: 25px;
-    left: -22px;
+    left: -8px;
     animation: badge-drift-3 4.5s ease-in-out infinite 0.7s;
   }
 
   &.badge-br {
     bottom: 12px;
-    right: -18px;
+    right: -8px;
     animation: badge-drift-4 5.2s ease-in-out infinite 1s;
   }
 
-  @include max-sm {
+  @include max-md {
     display: none;
   }
 }
@@ -1134,6 +1134,7 @@
 .projects-preview-section {
   position: relative;
   background: var(--bg);
+  overflow: hidden;
 }
 
 .projects-featured-grid {
@@ -1327,7 +1328,9 @@
 // SKILLS HIGHLIGHT (Alternate section: --bg-alt = --beige)
 // ═══════════════════════════════════════════════════════════
 .skills-highlight-section {
+  position: relative;
   background: var(--bg-alt);
+  overflow: hidden;
 }
 
 .skills-grid {
@@ -1423,6 +1426,7 @@
 .certs-section {
   position: relative;
   background: var(--bg);
+  overflow: hidden;
 }
 
 .certs-grid {
@@ -1553,6 +1557,7 @@
 .testimonials-section {
   position: relative;
   background: var(--bg-alt);
+  overflow: hidden;
 }
 
 .testimonials-header {
