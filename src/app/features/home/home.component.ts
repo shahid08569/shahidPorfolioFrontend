@@ -32,6 +32,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private animFrameId: number | null = null;
   private resizeListener?: () => void;
   private mouseMoveListener?: (e: MouseEvent) => void;
+  private mouseLeaveListener?: () => void;
+  private resizeObserver?: ResizeObserver;
+  private recheckCanvasDimensions?: () => void;
 
   // Typewriter dynamic headline signal
   readonly displayedHeadline = signal<string>('Building Enterprise-Grade .NET & Angular Solutions');
@@ -195,6 +198,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.initAmbientCanvas();
+
+      // Direct-load multi-stage layout recalculation (ensures canvas resizes after browser paints CSS/fonts)
+      setTimeout(() => this.recheckCanvasDimensions?.(), 50);
+      setTimeout(() => this.recheckCanvasDimensions?.(), 200);
+      setTimeout(() => this.recheckCanvasDimensions?.(), 600);
+      setTimeout(() => this.recheckCanvasDimensions?.(), 1200);
     }
   }
 
@@ -211,6 +220,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.mouseMoveListener) {
       window.removeEventListener('mousemove', this.mouseMoveListener);
     }
+    if (this.mouseLeaveListener) {
+      window.removeEventListener('mouseleave', this.mouseLeaveListener);
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   private initAmbientCanvas(): void {
@@ -224,40 +239,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     let height = 0;
     let dpr = 1;
 
-    const setupDimensions = () => {
-      dpr = window.devicePixelRatio || 1;
-      const rect = canvas.parentElement?.getBoundingClientRect() || { width: window.innerWidth, height: window.innerHeight };
-      width = rect.width;
-      height = rect.height;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-    };
-
-    setupDimensions();
-
-    const onResize = () => {
-      if (!canvas) return;
-      setupDimensions();
-    };
-    window.addEventListener('resize', onResize, { passive: true });
-    this.resizeListener = onResize;
-
-    // Interactive Mouse Coordinates
-    let mouseX = -2000;
-    let mouseY = -2000;
-    let targetMouseX = -2000;
-    let targetMouseY = -2000;
-
-    const onMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      targetMouseX = e.clientX - rect.left;
-      targetMouseY = e.clientY - rect.top;
-    };
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    this.mouseMoveListener = onMouseMove;
-
-    // ── Interactive Constellation Nodes & Energy Sparks ──────
+    // Constellation nodes definition
     interface ConstellationNode {
       x: number;
       y: number;
@@ -273,20 +255,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const nodeCount = 52;
     const nodes: ConstellationNode[] = [];
 
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
-        x: Math.random() * (width || window.innerWidth),
-        y: Math.random() * (height || window.innerHeight),
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        radius: Math.random() * 2.2 + 1.4,
-        color: nodeColors[i % nodeColors.length],
-        pulsePhase: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.02 + Math.random() * 0.025,
-      });
-    }
-
-    // ── Floating Ambient Light Sparks ──────────────────────────
+    // Floating Ambient Light Sparks
     interface Spark {
       x: number;
       y: number;
@@ -302,20 +271,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const sparkCount = 42;
     const sparks: Spark[] = [];
 
-    for (let i = 0; i < sparkCount; i++) {
-      sparks.push({
-        x: Math.random() * (width || window.innerWidth),
-        y: Math.random() * (height || window.innerHeight),
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: -0.4 - Math.random() * 0.5,
-        size: Math.random() * 2.8 + 1.2,
-        alpha: Math.random() * 0.6 + 0.25,
-        alphaSpeed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
-        color: sparkColors[i % sparkColors.length],
-      });
-    }
-
-    // ── Floating Geometric Polygonal Shapes ────────────────────
+    // Floating Geometric Polygonal Shapes
     interface GeoShape {
       x: number;
       y: number;
@@ -329,23 +285,206 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const geoShapes: GeoShape[] = [
-      { x: width * 0.15, y: height * 0.25, vx: 0.15, vy: -0.1, size: 28, rot: 0, rotSpeed: 0.008, sides: 6, alpha: 0.22 },
-      { x: width * 0.85, y: height * 0.35, vx: -0.12, vy: 0.12, size: 36, rot: 0.5, rotSpeed: -0.006, sides: 4, alpha: 0.18 },
-      { x: width * 0.72, y: height * 0.75, vx: -0.1, vy: -0.15, size: 32, rot: 1.2, rotSpeed: 0.007, sides: 6, alpha: 0.2 },
-      { x: width * 0.28, y: height * 0.82, vx: 0.14, vy: 0.08, size: 24, rot: 0.8, rotSpeed: -0.009, sides: 3, alpha: 0.22 },
+      { x: 150, y: 180, vx: 0.15, vy: -0.1, size: 28, rot: 0, rotSpeed: 0.008, sides: 6, alpha: 0.22 },
+      { x: 800, y: 240, vx: -0.12, vy: 0.12, size: 36, rot: 0.5, rotSpeed: -0.006, sides: 4, alpha: 0.18 },
+      { x: 700, y: 520, vx: -0.1, vy: -0.15, size: 32, rot: 1.2, rotSpeed: 0.007, sides: 6, alpha: 0.2 },
+      { x: 260, y: 580, vx: 0.14, vy: 0.08, size: 24, rot: 0.8, rotSpeed: -0.009, sides: 3, alpha: 0.22 },
     ];
+
+    // Ensure all particles are distributed across active bounds
+    const ensureParticlesInBounds = () => {
+      const w = Math.max(320, width);
+      const h = Math.max(450, height);
+
+      for (const n of nodes) {
+        if (n.x <= 0 || n.x > w) n.x = Math.random() * w;
+        if (n.y <= 0 || n.y > h) n.y = Math.random() * h;
+      }
+      for (const s of sparks) {
+        if (s.x <= 0 || s.x > w) s.x = Math.random() * w;
+        if (s.y <= 0 || s.y > h) s.y = Math.random() * h;
+      }
+      if (geoShapes.length >= 4) {
+        geoShapes[0].x = w * 0.15;
+        geoShapes[0].y = h * 0.25;
+        geoShapes[1].x = w * 0.85;
+        geoShapes[1].y = h * 0.35;
+        geoShapes[2].x = w * 0.72;
+        geoShapes[2].y = h * 0.75;
+        geoShapes[3].x = w * 0.28;
+        geoShapes[3].y = h * 0.82;
+      }
+    };
+
+    const setupDimensions = () => {
+      dpr = window.devicePixelRatio || 1;
+      const heroEl = (canvas.closest('.hero-section') as HTMLElement) || canvas.parentElement;
+      const parentRect = canvas.parentElement?.getBoundingClientRect();
+      const heroRect = heroEl?.getBoundingClientRect();
+
+      const measuredW = Math.max(
+        canvas.parentElement?.clientWidth || 0,
+        heroEl?.clientWidth || 0,
+        parentRect?.width || 0,
+        heroRect?.width || 0,
+        window.innerWidth || 0
+      );
+
+      const measuredH = Math.max(
+        canvas.parentElement?.clientHeight || 0,
+        heroEl?.clientHeight || 0,
+        parentRect?.height || 0,
+        heroRect?.height || 0,
+        window.innerHeight ? Math.max(500, window.innerHeight - 68) : 700
+      );
+
+      const newWidth = Math.max(320, measuredW);
+      const newHeight = Math.max(450, measuredH);
+
+      const sizeChanged = Math.abs(newWidth - width) > 2 || Math.abs(newHeight - height) > 2;
+
+      width = newWidth;
+      height = newHeight;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      if (sizeChanged) {
+        ensureParticlesInBounds();
+      }
+    };
+
+    // Initial measurement
+    setupDimensions();
+
+    // Populate initial nodes
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * (width || 1200),
+        y: Math.random() * (height || 800),
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7,
+        radius: Math.random() * 2.2 + 1.4,
+        color: nodeColors[i % nodeColors.length],
+        pulsePhase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.02 + Math.random() * 0.025,
+      });
+    }
+
+    // Populate initial sparks
+    for (let i = 0; i < sparkCount; i++) {
+      sparks.push({
+        x: Math.random() * (width || 1200),
+        y: Math.random() * (height || 800),
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: -0.4 - Math.random() * 0.5,
+        size: Math.random() * 2.8 + 1.2,
+        alpha: Math.random() * 0.6 + 0.25,
+        alphaSpeed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
+        color: sparkColors[i % sparkColors.length],
+      });
+    }
+
+    ensureParticlesInBounds();
+
+    // Expose recheck method for delayed ticks
+    this.recheckCanvasDimensions = () => {
+      setupDimensions();
+    };
+
+    // Window resize handler
+    const onResize = () => {
+      if (!canvas) return;
+      setupDimensions();
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+    this.resizeListener = onResize;
+
+    // ResizeObserver on parent container to guarantee immediate paint
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        setupDimensions();
+      });
+      if (canvas.parentElement) {
+        this.resizeObserver.observe(canvas.parentElement);
+      }
+      const heroSection = canvas.closest('.hero-section');
+      if (heroSection) {
+        this.resizeObserver.observe(heroSection);
+      }
+    }
+
+    // Interactive Mouse Coordinates & Autonomous Breathing Beacon
+    let mouseX = width * 0.5;
+    let mouseY = height * 0.5;
+    let targetMouseX = width * 0.5;
+    let targetMouseY = height * 0.5;
+    let isUserInteracting = false;
+    let lastUserInteractionTime = 0;
+
+    const onMouseMove = (e: MouseEvent) => {
+      isUserInteracting = true;
+      lastUserInteractionTime = Date.now();
+      const rect = canvas.getBoundingClientRect();
+      targetMouseX = e.clientX - rect.left;
+      targetMouseY = e.clientY - rect.top;
+    };
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    this.mouseMoveListener = onMouseMove;
+
+    const onMouseLeave = () => {
+      isUserInteracting = false;
+    };
+    window.addEventListener('mouseleave', onMouseLeave, { passive: true });
+    this.mouseLeaveListener = onMouseLeave;
 
     // ── 3D Topological Perspective Wave Parameters ────────────
     const rows = 22;
     const cols = 34;
     let time = 0;
+    let frameCounter = 0;
 
     const render = () => {
       time += 0.024;
+      frameCounter++;
 
-      // Smooth mouse easing
-      mouseX += (targetMouseX - mouseX) * 0.08;
-      mouseY += (targetMouseY - mouseY) * 0.08;
+      // Periodic self-healing dimension verification
+      if (frameCounter % 40 === 0) {
+        const currentHeroW = canvas.parentElement?.clientWidth || window.innerWidth;
+        const currentHeroH = canvas.parentElement?.clientHeight || (window.innerHeight - 68);
+        if (width <= 0 || height <= 0 || Math.abs(currentHeroW - width) > 15 || Math.abs(currentHeroH - height) > 15) {
+          setupDimensions();
+        }
+      }
+
+      // Check if user has been idle for > 4.5 seconds -> smoothly revert to autonomous breathing beacon
+      if (isUserInteracting && Date.now() - lastUserInteractionTime > 4500) {
+        isUserInteracting = false;
+      }
+
+      // Calculate active focal point (Cursor vs Autonomous Lissajous Orbit)
+      let activeFocusX: number;
+      let activeFocusY: number;
+
+      if (isUserInteracting && targetMouseX > -100 && targetMouseX < width + 100) {
+        mouseX += (targetMouseX - mouseX) * 0.08;
+        mouseY += (targetMouseY - mouseY) * 0.08;
+        activeFocusX = mouseX;
+        activeFocusY = mouseY;
+      } else {
+        // Dynamic autonomous orbit across the hero canvas — always active and alive on direct load!
+        const orbitX = width * 0.5 + Math.cos(time * 0.75) * (width * 0.28);
+        const orbitY = height * 0.48 + Math.sin(time * 1.15) * (height * 0.24);
+        mouseX += (orbitX - mouseX) * 0.04;
+        mouseY += (orbitY - mouseY) * 0.04;
+        activeFocusX = mouseX;
+        activeFocusY = mouseY;
+      }
 
       ctx.clearRect(0, 0, width, height);
 
@@ -376,13 +515,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           const projX = fovCenterX + rawX * scale;
           const projY = fovCenterY + (z * 0.35 - elevation) * scale;
 
-          // Interactive mouse disturbance / shockwave ripple
-          const dx = projX - mouseX;
-          const dy = projY - mouseY;
+          // Active focal point disturbance / shockwave ripple (cursor or breathing beacon)
+          const dx = projX - activeFocusX;
+          const dy = projY - activeFocusY;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 240) {
-            const ripple = Math.sin(dist * 0.04 - time * 4) * Math.max(0, 1 - dist / 240);
-            elevation += ripple * 45;
+          if (dist < 260) {
+            const ripple = Math.sin(dist * 0.04 - time * 3.8) * Math.max(0, 1 - dist / 260);
+            elevation += ripple * 48;
           }
 
           points[r][c] = {
@@ -441,7 +580,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // 2. Draw Interactive Constellation Nodes & Connecting Neural Lines
       const maxConnectDist = 140;
-      const mouseConnectDist = 180;
+      const focusConnectDist = 190;
 
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
@@ -449,25 +588,27 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         n.y += n.vy;
         n.pulsePhase += n.pulseSpeed;
 
-        // Bounce from walls
-        if (n.x < 0 || n.x > width) n.vx *= -1;
-        if (n.y < 0 || n.y > height) n.vy *= -1;
+        // Bounce from walls smoothly
+        if (n.x < 0) { n.x = 0; n.vx *= -1; }
+        if (n.x > width) { n.x = width; n.vx *= -1; }
+        if (n.y < 0) { n.y = 0; n.vy *= -1; }
+        if (n.y > height) { n.y = height; n.vy *= -1; }
 
-        // Mouse attraction physics
-        const mdx = mouseX - n.x;
-        const mdy = mouseY - n.y;
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mDist < mouseConnectDist && mDist > 0) {
-          const force = (1 - mDist / mouseConnectDist) * 0.8;
-          n.x += (mdx / mDist) * force;
-          n.y += (mdy / mDist) * force;
+        // Focal energy beacon attraction physics
+        const fdx = activeFocusX - n.x;
+        const fdy = activeFocusY - n.y;
+        const fDist = Math.sqrt(fdx * fdx + fdy * fdy);
+        if (fDist < focusConnectDist && fDist > 0) {
+          const force = (1 - fDist / focusConnectDist) * 0.8;
+          n.x += (fdx / fDist) * force;
+          n.y += (fdy / fDist) * force;
 
-          // Draw bright interactive beam to cursor
-          ctx.strokeStyle = `rgba(212, 163, 115, ${(1 - mDist / mouseConnectDist) * 0.65})`;
+          // Draw bright interactive beam to focal point
+          ctx.strokeStyle = `rgba(212, 163, 115, ${(1 - fDist / focusConnectDist) * 0.65})`;
           ctx.lineWidth = 1.4;
           ctx.beginPath();
           ctx.moveTo(n.x, n.y);
-          ctx.lineTo(mouseX, mouseY);
+          ctx.lineTo(activeFocusX, activeFocusY);
           ctx.stroke();
         }
 
@@ -636,10 +777,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.apiService.getPublicSettings().subscribe({
       next: (res) => {
         if (res.data) {
+          const oldHeadlines = this.settings()?.heroHeadlinesJson;
           this.settings.set(res.data);
           this.hasProfileImageError.set(false);
           this.hasHeroImageError.set(false);
-          this.startTypewriter();
+          if (res.data.heroHeadlinesJson && res.data.heroHeadlinesJson !== oldHeadlines) {
+            this.startTypewriter();
+          }
         }
       },
       error: () => {},
