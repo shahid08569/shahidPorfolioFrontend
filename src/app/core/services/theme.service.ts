@@ -10,7 +10,7 @@ export class ThemeService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly storageKey = 'shahid_portfolio_theme';
 
-  readonly currentTheme = signal<Theme>('dark');
+  readonly currentTheme = signal<Theme>('light');
 
   constructor() {
     this.initTheme();
@@ -20,28 +20,19 @@ export class ThemeService {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
-
-    const saved = localStorage.getItem(this.storageKey) as Theme | null;
-    if (saved === 'dark' || saved === 'light') {
-      this.setTheme(saved);
-      return;
-    }
-
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.setTheme(prefersDark ? 'dark' : 'light');
+    this.setTheme('light');
   }
 
   toggleTheme(): void {
-    const nextTheme: Theme = this.currentTheme() === 'dark' ? 'light' : 'dark';
-    this.setTheme(nextTheme);
+    this.setTheme('light');
   }
 
   setTheme(theme: Theme): void {
-    this.currentTheme.set(theme);
+    this.currentTheme.set('light');
 
     if (isPlatformBrowser(this.platformId)) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem(this.storageKey, theme);
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem(this.storageKey, 'light');
     }
   }
 }

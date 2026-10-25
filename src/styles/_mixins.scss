@@ -1,33 +1,128 @@
 @use './variables' as *;
 
-// Media query mixins
-@mixin sm {
-  @media (min-width: #{$bp-sm}) { @content; }
-}
+// ── Media Query Mixins ──────────────────────────────────────
+@mixin xs { @media (min-width: #{$bp-xs}) { @content; } }
+@mixin sm { @media (min-width: #{$bp-sm}) { @content; } }
+@mixin md { @media (min-width: #{$bp-md}) { @content; } }
+@mixin lg { @media (min-width: #{$bp-lg}) { @content; } }
+@mixin xl { @media (min-width: #{$bp-xl}) { @content; } }
+@mixin xxl { @media (min-width: #{$bp-2xl}) { @content; } }
 
-@mixin md {
-  @media (min-width: #{$bp-md}) { @content; }
-}
+@mixin max-sm { @media (max-width: #{$bp-sm}) { @content; } }
+@mixin max-md { @media (max-width: #{$bp-md}) { @content; } }
+@mixin max-lg { @media (max-width: #{$bp-lg}) { @content; } }
 
-@mixin lg {
-  @media (min-width: #{$bp-lg}) { @content; }
-}
-
-@mixin xl {
-  @media (min-width: #{$bp-xl}) { @content; }
-}
-
-// Glassmorphism helper
-@mixin glass-panel {
+// ── Glassmorphism ───────────────────────────────────────────
+@mixin glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--border-color);
 }
 
-// Flex center helper
+@mixin glass-strong {
+  background: var(--bg-glass-2);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--border-color);
+}
+
+// Alias for backward compat
+@mixin glass-panel { @include glass; }
+
+// ── Flex helpers ────────────────────────────────────────────
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Typography ──────────────────────────────────────────────
+@mixin heading-xl {
+  font-family: $font-headings;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-heading);
+}
+
+@mixin heading-lg {
+  font-family: $font-headings;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-heading);
+}
+
+@mixin heading-md {
+  font-family: $font-headings;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text-heading);
+}
+
+// ── Visual FX ───────────────────────────────────────────────
+@mixin gradient-text($direction: 135deg, $from: var(--text-heading), $to: var(--bronze-dark)) {
+  color: var(--text-heading);
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+@mixin glow-emerald {
+  box-shadow: 0 4px 14px rgba(59, 47, 35, 0.08);
+}
+
+@mixin glow-violet {
+  box-shadow: 0 4px 14px rgba(59, 47, 35, 0.08);
+}
+
+@mixin card-hover {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-lg);
+    border-color: var(--border-hover);
+  }
+}
+
+// ── Truncation ──────────────────────────────────────────────
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// ── Scrollbar ────────────────────────────────────────────────
+@mixin custom-scrollbar($width: 4px) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+  &::-webkit-scrollbar { width: $width; height: $width; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: $radius-full;
+    &:hover { background: var(--accent-emerald); }
+  }
 }

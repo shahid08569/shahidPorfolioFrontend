@@ -1,82 +1,113 @@
-<header class="header">
-  <div class="header-container">
-    <!-- Brand / Logo -->
+<header class="header" [class.scrolled]="isScrolled()">
+  <div class="header-inner">
+
+    <!-- ── Brand Logo ─────────────────────────────────────────── -->
     <a routerLink="/" class="brand" (click)="closeMobileMenu()">
-      <div class="brand-avatar">
-        <span class="brand-initials">SH</span>
+      <div class="brand-monogram">
+        <img src="/logo.svg" alt="Shahid Logo" class="brand-logo-img" />
+        <div class="monogram-ring"></div>
       </div>
       <div class="brand-text">
-        <span class="brand-name">Shahid Hussain</span>
+        <span class="brand-name">{{ fullName() }}</span>
         <span class="brand-role">Full-Stack Engineer</span>
       </div>
     </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="desktop-nav">
-      <ul class="nav-links">
-        <li *ngFor="let item of navItems">
-          <a
-            [routerLink]="item.path"
-            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-            routerLinkActive="active"
-            class="nav-link"
-          >
-            {{ item.label }}
-          </a>
-        </li>
+    <!-- ── Desktop Navigation ─────────────────────────────────── -->
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <ul class="nav-list">
+        @for (item of navItems; track item.path) {
+          <li class="nav-item">
+            <a
+              [routerLink]="item.path"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              routerLinkActive="active"
+              class="nav-link"
+            >
+              {{ item.label }}
+              <span class="nav-underline"></span>
+            </a>
+          </li>
+        }
       </ul>
     </nav>
 
-    <!-- Header Actions -->
+    <!-- ── Header Actions ─────────────────────────────────────── -->
     <div class="header-actions">
-      <!-- Availability Badge (Recruiter hook) -->
-      <div class="availability-pill" title="Currently open to new roles & contracts">
-        <span class="status-indicator"></span>
-        <span class="status-text">Available</span>
+
+      <!-- Availability status pill (Facebook style online dot) -->
+      <div class="avail-pill" [title]="availability()">
+        <span class="fb-online-dot" aria-hidden="true"></span>
+        <span class="avail-text">Available</span>
       </div>
 
-      <!-- Theme Switcher -->
-      <button
-        class="action-btn theme-toggle"
-        (click)="themeService.toggleTheme()"
-        [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
-      >
-        <app-icon [name]="themeService.currentTheme() === 'dark' ? 'sun' : 'moon'" [size]="18"></app-icon>
-      </button>
+      <!-- Hire Me CTA -->
+      <a routerLink="/contact" class="btn btn-primary btn-sm hire-btn" (click)="closeMobileMenu()">
+        <app-icon name="email" [size]="14"></app-icon>
+        Hire Me
+      </a>
 
-      <!-- Mobile Hamburger Button -->
+      <!-- Hamburger (mobile) -->
       <button
-        class="action-btn mobile-menu-btn"
+        class="icon-btn hamburger"
         (click)="toggleMobileMenu()"
         [attr.aria-label]="isMobileMenuOpen() ? 'Close menu' : 'Open menu'"
+        [attr.aria-expanded]="isMobileMenuOpen()"
       >
-        <app-icon [name]="isMobileMenuOpen() ? 'close' : 'menu'" [size]="22"></app-icon>
+        <span class="ham-bar" [class.open]="isMobileMenuOpen()"></span>
+        <span class="ham-bar" [class.open]="isMobileMenuOpen()"></span>
+        <span class="ham-bar" [class.open]="isMobileMenuOpen()"></span>
       </button>
     </div>
   </div>
 
-  <!-- Mobile Drawer Menu -->
-  <div class="mobile-drawer" [class.open]="isMobileMenuOpen()">
-    <nav class="mobile-nav">
-      <ul class="mobile-nav-links">
-        <li *ngFor="let item of navItems">
-          <a
-            [routerLink]="item.path"
-            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-            routerLinkActive="active"
-            class="mobile-nav-link"
-            (click)="closeMobileMenu()"
-          >
-            {{ item.label }}
-          </a>
-        </li>
-      </ul>
-      <div class="mobile-drawer-footer">
-        <a routerLink="/contact" class="btn btn-primary" (click)="closeMobileMenu()">
-          Let's Talk
-          <app-icon name="arrow-right" [size]="16"></app-icon>
-        </a>
+  <!-- ── Mobile Overlay ─────────────────────────────────────────── -->
+  <div
+    class="mobile-overlay"
+    [class.visible]="isMobileMenuOpen()"
+    (click)="closeMobileMenu()"
+    aria-hidden="true"
+  ></div>
+
+  <!-- ── Mobile Drawer ──────────────────────────────────────────── -->
+  <div class="mobile-drawer" [class.open]="isMobileMenuOpen()" role="dialog" aria-modal="true">
+    <div class="drawer-header">
+      <div class="brand-monogram sm">
+        <span>{{ initials }}</span>
       </div>
+      <div>
+        <div class="brand-name">{{ fullName() }}</div>
+        <div class="avail-pill inline">
+          <span class="fb-online-dot" aria-hidden="true"></span>
+          <span>{{ availability() }}</span>
+        </div>
+      </div>
+      <button class="icon-btn ml-auto" (click)="closeMobileMenu()" aria-label="Close menu">
+        <app-icon name="close" [size]="20"></app-icon>
+      </button>
+    </div>
+
+    <nav class="drawer-nav">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          routerLinkActive="active"
+          class="drawer-link"
+          (click)="closeMobileMenu()"
+        >
+          <app-icon [name]="item.icon || 'arrow-right'" [size]="18"></app-icon>
+          <span>{{ item.label }}</span>
+          <app-icon name="chevron-right" [size]="14" class="drawer-chevron"></app-icon>
+        </a>
+      }
     </nav>
+
+    <div class="drawer-footer">
+      <a routerLink="/contact" class="btn btn-primary w-full" (click)="closeMobileMenu()">
+        <app-icon name="email" [size]="16"></app-icon>
+        Let's Build Something
+      </a>
+    </div>
   </div>
 </header>

@@ -104,6 +104,18 @@ export class AdminService {
     return this.http.post<ApiResponse<string>>(`${this.baseUrl}/media/upload-cv`, formData);
   }
 
+  uploadProfilePhoto(file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/media/upload-photo`, formData);
+  }
+
+  uploadHeroImage(file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/media/upload-hero-image`, formData);
+  }
+
   // Testimonials / Endorsements
   getAllTestimonials(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/admin/testimonials`);

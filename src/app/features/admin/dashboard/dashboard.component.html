@@ -3,6 +3,7 @@
   <header class="admin-topbar">
     <div class="topbar-left">
       <div class="cms-logo">
+        <img src="/logo.svg" alt="Shahid Logo" class="cms-logo-img" />
         <span class="logo-pill">CMS</span>
         <span class="brand-text">Portfolio Control Center</span>
       </div>
@@ -52,6 +53,11 @@
           <span>Projects ({{ projects().length }})</span>
         </button>
 
+        <button (click)="setTab('blog')" [class.active]="activeTab() === 'blog'" class="nav-item-btn">
+          <app-icon name="edit" [size]="18"></app-icon>
+          <span>Articles &amp; Blog ({{ blogPosts().length }})</span>
+        </button>
+
         <button (click)="setTab('skills')" [class.active]="activeTab() === 'skills'" class="nav-item-btn">
           <app-icon name="server" [size]="18"></app-icon>
           <span>Skills Matrix</span>
@@ -67,12 +73,68 @@
           <span>Certificates ({{ certificates().length }})</span>
         </button>
 
-        <button (click)="setTab('settings')" [class.active]="activeTab() === 'settings'" class="nav-item-btn">
-          <app-icon name="sparkles" [size]="18"></app-icon>
-          <span>Site &amp; Terminal Code</span>
+        <button (click)="setTab('profile')" [class.active]="activeTab() === 'profile'" class="nav-item-btn">
+          <app-icon name="user" [size]="18"></app-icon>
+          <span>Site Profile &amp; Bio</span>
+        </button>
+
+        <button (click)="setTab('terminal')" [class.active]="activeTab() === 'terminal'" class="nav-item-btn">
+          <app-icon name="terminal" [size]="18"></app-icon>
+          <span>Hero Terminal Code</span>
+        </button>
+
+        <button (click)="setTab('media')" [class.active]="activeTab() === 'media'" class="nav-item-btn">
+          <app-icon name="download" [size]="18"></app-icon>
+          <span>CV &amp; Media Assets</span>
         </button>
       </nav>
     </aside>
+
+    <!-- Mobile Horizontal Tabs Navigation (Visible on screen < lg) -->
+    <div class="admin-mobile-nav">
+      <div class="mobile-nav-scroll">
+        <button (click)="setTab('overview')" [class.active]="activeTab() === 'overview'" class="mobile-nav-btn">
+          <app-icon name="terminal" [size]="15"></app-icon>
+          <span>Overview</span>
+        </button>
+        <button (click)="setTab('messages')" [class.active]="activeTab() === 'messages'" class="mobile-nav-btn">
+          <app-icon name="email" [size]="15"></app-icon>
+          <span>Messages ({{ messages().length }})</span>
+        </button>
+        <button (click)="setTab('projects')" [class.active]="activeTab() === 'projects'" class="mobile-nav-btn">
+          <app-icon name="code" [size]="15"></app-icon>
+          <span>Projects ({{ projects().length }})</span>
+        </button>
+        <button (click)="setTab('blog')" [class.active]="activeTab() === 'blog'" class="mobile-nav-btn">
+          <app-icon name="edit" [size]="15"></app-icon>
+          <span>Articles ({{ blogPosts().length }})</span>
+        </button>
+        <button (click)="setTab('skills')" [class.active]="activeTab() === 'skills'" class="mobile-nav-btn">
+          <app-icon name="server" [size]="15"></app-icon>
+          <span>Skills Matrix</span>
+        </button>
+        <button (click)="setTab('testimonials')" [class.active]="activeTab() === 'testimonials'" class="mobile-nav-btn">
+          <app-icon name="quote" [size]="15"></app-icon>
+          <span>Endorsements ({{ testimonials().length }})</span>
+        </button>
+        <button (click)="setTab('certificates')" [class.active]="activeTab() === 'certificates'" class="mobile-nav-btn">
+          <app-icon name="certificate" [size]="15"></app-icon>
+          <span>Certificates</span>
+        </button>
+        <button (click)="setTab('profile')" [class.active]="activeTab() === 'profile'" class="mobile-nav-btn">
+          <app-icon name="user" [size]="15"></app-icon>
+          <span>Profile</span>
+        </button>
+        <button (click)="setTab('terminal')" [class.active]="activeTab() === 'terminal'" class="mobile-nav-btn">
+          <app-icon name="terminal" [size]="15"></app-icon>
+          <span>Terminal</span>
+        </button>
+        <button (click)="setTab('media')" [class.active]="activeTab() === 'media'" class="mobile-nav-btn">
+          <app-icon name="download" [size]="15"></app-icon>
+          <span>CV &amp; Media</span>
+        </button>
+      </div>
+    </div>
 
     <!-- Main Content Area -->
     <main class="admin-main">
@@ -87,6 +149,11 @@
           <div class="stat-card card">
             <span class="stat-num gradient-text">{{ projects().length }}</span>
             <span class="stat-label">Published Projects</span>
+          </div>
+
+          <div class="stat-card card">
+            <span class="stat-num gradient-text">{{ blogPosts().length }}</span>
+            <span class="stat-label">Published Articles</span>
           </div>
 
           <div class="stat-card card">
@@ -111,6 +178,10 @@
             <button (click)="setTab('projects'); openNewProjectModal()" class="btn btn-primary">
               <app-icon name="plus" [size]="16"></app-icon>
               New Case Study Project
+            </button>
+            <button (click)="setTab('blog'); openNewBlogModal()" class="btn btn-outline">
+              <app-icon name="plus" [size]="16"></app-icon>
+              Write Article
             </button>
             <button (click)="setTab('skills'); openNewSkillModal()" class="btn btn-outline">
               <app-icon name="plus" [size]="16"></app-icon>
@@ -250,6 +321,72 @@
         </ng-template>
       </section>
 
+      <!-- BLOG TAB -->
+      <section *ngIf="activeTab() === 'blog'" class="tab-pane">
+        <div class="pane-header with-action">
+          <div>
+            <h2>Articles &amp; Technical Writing ({{ blogPosts().length }})</h2>
+            <p>Publish architecture insights, technical tutorials, and engineering notes.</p>
+          </div>
+          <button (click)="openNewBlogModal()" class="btn btn-primary">
+            <app-icon name="plus" [size]="16"></app-icon>
+            + New Article
+          </button>
+        </div>
+
+        <div class="table-container card" *ngIf="blogPosts().length > 0; else noBlogPosts">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Title &amp; Summary</th>
+                <th>Slug</th>
+                <th>Read Time</th>
+                <th>Published Date</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let post of blogPosts()">
+                <td>
+                  <div class="project-title-cell">
+                    <strong>{{ post.title }}</strong>
+                    <span class="slug-sub">{{ post.summary }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge badge-accent">/blog/{{ post.slug }}</span>
+                </td>
+                <td>
+                  <span class="badge">{{ post.readTimeMinutes }} min read</span>
+                </td>
+                <td class="text-muted">
+                  {{ post.publishedAtUtc ? (post.publishedAtUtc | date: 'mediumDate') : 'Draft' }}
+                </td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <a [routerLink]="['/blog', post.slug]" target="_blank" class="btn btn-sm btn-outline" title="View Public Post">
+                      <app-icon name="eye" [size]="14"></app-icon>
+                    </a>
+                    <button (click)="openEditBlogModal(post)" class="btn btn-sm btn-outline" title="Edit Article">
+                      <app-icon name="edit" [size]="14"></app-icon>
+                      Edit
+                    </button>
+                    <button (click)="confirmDeleteBlog(post)" class="btn btn-sm btn-danger" title="Delete Article">
+                      <app-icon name="trash" [size]="14"></app-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noBlogPosts>
+          <div class="empty-card card">
+            <p>No articles published yet. Click "+ New Article" to share your technical knowledge.</p>
+          </div>
+        </ng-template>
+      </section>
+
       <!-- 4. SKILLS TAB -->
       <section *ngIf="activeTab() === 'skills'" class="tab-pane">
         <div class="pane-header with-action">
@@ -259,33 +396,79 @@
           </div>
           <button (click)="openNewSkillModal()" class="btn btn-primary">
             <app-icon name="plus" [size]="16"></app-icon>
-            + Add Skill
+            + Add New Skill
           </button>
         </div>
 
-        <div class="skill-groups-container">
-          <div class="skill-group-card card" *ngFor="let group of skillGroups()">
-            <h3 class="group-title">{{ group.categoryName }} ({{ group.skills.length }})</h3>
-            <div class="skills-mini-grid">
-              <div class="skill-item-row" *ngFor="let sk of group.skills">
-                <div class="skill-item-info">
-                  <app-icon [name]="sk.iconKey || sk.icon || 'server'" [size]="18"></app-icon>
-                  <strong>{{ sk.name }}</strong>
-                  <span class="star-pill" *ngIf="sk.isTopSkill" title="Top Skill">★</span>
-                </div>
-                <div class="skill-item-actions">
-                  <span class="prof-label">{{ sk.proficiency }}%</span>
-                  <button (click)="openEditSkillModal(sk, group.category)" class="btn-icon" title="Edit">
-                    <app-icon name="edit" [size]="14"></app-icon>
-                  </button>
-                  <button (click)="confirmDeleteSkill(sk)" class="btn-icon danger" title="Delete">
-                    <app-icon name="trash" [size]="14"></app-icon>
-                  </button>
-                </div>
+        <div class="skill-categories-stack" *ngIf="skillGroups().length > 0; else noSkills">
+          <div class="skill-category-panel" *ngFor="let group of skillGroups()">
+            <div class="category-panel-header">
+              <div class="category-title-wrap">
+                <span class="category-indicator-dot"></span>
+                <h3>{{ group.categoryName }}</h3>
+                <span class="count-badge">{{ group.skills.length }} Skills</span>
               </div>
+            </div>
+
+            <div class="category-table-wrap">
+              <table class="skills-data-table">
+                <thead>
+                  <tr>
+                    <th>Technology</th>
+                    <th>Status</th>
+                    <th>Proficiency Level</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sk of group.skills">
+                    <td>
+                      <div class="skill-name-cell">
+                        <div class="skill-icon-avatar">
+                          <app-icon [name]="sk.iconKey || sk.icon || 'server'" [size]="16"></app-icon>
+                        </div>
+                        <span class="skill-title-text">{{ sk.name }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="top-skill-badge" *ngIf="sk.isTopSkill">
+                        ★ Top Skill
+                      </span>
+                      <span class="standard-skill-badge" *ngIf="!sk.isTopSkill">
+                        Standard
+                      </span>
+                    </td>
+                    <td>
+                      <div class="proficiency-cell">
+                        <div class="progress-track">
+                          <div class="progress-bar-fill" [style.width.%]="sk.proficiency"></div>
+                        </div>
+                        <span class="pct-text">{{ sk.proficiency }}%</span>
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      <div class="actions-cluster">
+                        <button (click)="openEditSkillModal(sk, group.category)" class="btn-action edit" title="Edit Skill">
+                          <app-icon name="edit" [size]="14"></app-icon>
+                          <span>Edit</span>
+                        </button>
+                        <button (click)="confirmDeleteSkill(sk)" class="btn-action delete" title="Delete Skill">
+                          <app-icon name="trash" [size]="14"></app-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+
+        <ng-template #noSkills>
+          <div class="empty-card">
+            <p>No skills recorded yet. Click "+ Add New Skill" to add your core competencies.</p>
+          </div>
+        </ng-template>
       </section>
 
       <!-- 5. TESTIMONIALS / ENDORSEMENTS TAB -->
@@ -414,19 +597,27 @@
         </ng-template>
       </section>
 
-      <!-- 7. SITE & TERMINAL SETTINGS TAB -->
-      <section *ngIf="activeTab() === 'settings'" class="tab-pane">
+      <!-- 7. SITE PROFILE & BIO TAB -->
+      <section *ngIf="activeTab() === 'profile'" class="tab-pane">
         <div class="pane-header">
-          <h2>Site Profile &amp; Hero Terminal Code</h2>
-          <p>Control hero typography, dynamic C# terminal snippet, WhatsApp contact, and upload your CV.</p>
+          <h2>Site Profile &amp; Narrative</h2>
+          <p>Organized modular settings for personal identity, career availability, and your developer biography.</p>
         </div>
 
-        <div class="settings-grid">
-          <!-- Left Column: Site Info & Terminal Editor -->
-          <div class="settings-main-form card">
-            <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" novalidate>
-              <h3 class="form-section-title">Personal Profile Information</h3>
+        <div class="settings-cards-stack">
+          <!-- Card 1: Personal & Professional Identity -->
+          <div class="admin-modular-card card">
+            <div class="card-section-header">
+              <div class="header-icon-wrap">
+                <app-icon name="user" [size]="20"></app-icon>
+              </div>
+              <div class="header-text">
+                <h3>1. Personal &amp; Professional Identity</h3>
+                <p>Your public name, professional title, and primary location displayed across the site.</p>
+              </div>
+            </div>
 
+            <form [formGroup]="settingsForm" (ngSubmit)="saveIdentitySettings()" novalidate>
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">Full Name *</label>
@@ -438,148 +629,475 @@
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Current Location *</label>
-                  <input type="text" formControlName="currentLocation" class="form-control" />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Availability Status *</label>
-                  <input type="text" formControlName="availabilityStatus" class="form-control" />
-                </div>
-              </div>
-
               <div class="form-group">
-                <label class="form-label">WhatsApp Number (e.g. 923001234567 without +) *</label>
-                <div class="input-with-icon">
-                  <app-icon name="whatsapp" [size]="18" class="input-icon"></app-icon>
-                  <input
-                    type="text"
-                    formControlName="whatsAppNumber"
-                    placeholder="923000000000"
-                    class="form-control with-icon"
-                  />
-                </div>
-                <span class="field-hint">Used for 1-click "Start a Conversation on WhatsApp" buttons.</span>
+                <label class="form-label">Current Location *</label>
+                <input type="text" formControlName="currentLocation" class="form-control" placeholder="e.g. Pakistan, Remote Worldwide" />
               </div>
 
-              <div class="form-group">
-                <label class="form-label">One-Line Bio (Hero Subtitle) *</label>
-                <textarea rows="2" formControlName="oneLineBio" class="form-control"></textarea>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">About Summary (Full Narrative)</label>
-                <textarea rows="4" formControlName="aboutSummary" class="form-control"></textarea>
-              </div>
-
-              <h3 class="form-section-title terminal-section-title">
-                <app-icon name="terminal" [size]="18"></app-icon>
-                Hero Terminal Code Window (Dynamic &amp; Editable)
-              </h3>
-
-              <div class="form-group">
-                <label class="form-label">Terminal Window Title *</label>
-                <input
-                  type="text"
-                  formControlName="heroCodeTitle"
-                  placeholder="ShahidPortfolio.sln - Clean Architecture"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">C# Code Snippet (Shown in Hero Code Window) *</label>
-                <textarea
-                  rows="12"
-                  formControlName="heroCodeSnippet"
-                  class="form-control code-editor-input"
-                  placeholder="public class SolutionArchitect { ... }"
-                ></textarea>
-                <span class="field-hint">This code is rendered directly in the hero interactive terminal with clean typography.</span>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Hero Badges (Comma-separated) *</label>
-                <input
-                  type="text"
-                  formControlName="heroBadges"
-                  placeholder="Clean Architecture, CQRS / MediatR, Angular 22 Signals"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-actions settings-actions">
-                <button type="submit" class="btn btn-primary btn-save" [disabled]="settingsForm.invalid || isSaving()">
-                  <span class="spinner-border" *ngIf="isSaving()"></span>
-                  <span *ngIf="!isSaving()">
-                    <app-icon name="check" [size]="16"></app-icon>
-                    Save All Settings &amp; Code
-                  </span>
-                  <span *ngIf="isSaving()">Saving Changes...</span>
+              <div class="card-footer-actions">
+                <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                  <app-icon name="check" [size]="14"></app-icon>
+                  Save Identity Information
                 </button>
-                <span class="inline-status-badge" *ngIf="actionMessage()">
-                  <app-icon name="check" [size]="16"></app-icon>
-                  {{ actionMessage() }}
-                </span>
               </div>
             </form>
           </div>
 
-          <!-- Right Column: CV Upload Card -->
-          <div class="settings-sidebar-column">
-            <div class="card cv-upload-card">
-              <div class="cv-card-header">
-                <app-icon name="download" [size]="24" class="cv-icon"></app-icon>
-                <h3>Curriculum Vitae (CV / Resume)</h3>
+          <!-- Card 2: Career Availability & Direct Contact -->
+          <div class="admin-modular-card card">
+            <div class="card-section-header">
+              <div class="header-icon-wrap">
+                <app-icon name="whatsapp" [size]="20"></app-icon>
               </div>
-              <p class="cv-desc">
-                Upload your updated PDF resume. The public "Download CV" button automatically serves this document.
-              </p>
+              <div class="header-text">
+                <h3>2. Career Availability &amp; WhatsApp Contact</h3>
+                <p>Live availability status pill and direct WhatsApp communication channel for recruiters.</p>
+              </div>
+            </div>
 
-              <div class="current-cv-status" *ngIf="settings()?.cvUrl">
-                <span class="status-label">Current File:</span>
-                <a [href]="getCvUrl(settings()?.cvUrl)" target="_blank" class="cv-link" title="Open verified CV link">
-                  <app-icon name="external-link" [size]="14"></app-icon>
-                  {{ getCvUrl(settings()?.cvUrl) }}
+            <form [formGroup]="settingsForm" (ngSubmit)="saveAvailabilitySettings()" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Availability Status *</label>
+                  <input type="text" formControlName="availabilityStatus" class="form-control" placeholder="e.g. Open to Work, Available for Hire" />
+                  <span class="field-hint">Rendered alongside the live green status dot in the navbar &amp; hero.</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">WhatsApp Number (e.g. 923001234567 without +) *</label>
+                  <div class="input-with-icon">
+                    <app-icon name="whatsapp" [size]="18" class="input-icon"></app-icon>
+                    <input
+                      type="text"
+                      formControlName="whatsAppNumber"
+                      placeholder="923000000000"
+                      class="form-control with-icon"
+                    />
+                  </div>
+                  <span class="field-hint">Used for 1-click "Chat on WhatsApp" buttons.</span>
+                </div>
+              </div>
+
+              <div class="card-footer-actions">
+                <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                  <app-icon name="check" [size]="14"></app-icon>
+                  Save Availability &amp; WhatsApp
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Card 3: Bio & Detailed Engineering Narrative -->
+          <div class="admin-modular-card card">
+            <div class="card-section-header">
+              <div class="header-icon-wrap">
+                <app-icon name="edit" [size]="20"></app-icon>
+              </div>
+              <div class="header-text">
+                <h3>3. Public Bio &amp; Engineering Narrative</h3>
+                <p>Hero one-line subtitle and comprehensive career summary.</p>
+              </div>
+            </div>
+
+            <form [formGroup]="settingsForm" (ngSubmit)="saveNarrativeSettings()" novalidate>
+              <div class="form-group">
+                <label class="form-label">One-Line Bio (Hero Subtitle) *</label>
+                <textarea rows="2" formControlName="oneLineBio" class="form-control" placeholder="Architecting resilient enterprise microservices..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">About Summary (Full Narrative)</label>
+                <textarea rows="5" formControlName="aboutSummary" class="form-control" placeholder="Senior software engineer with deep expertise in .NET 10..."></textarea>
+              </div>
+
+              <div class="card-footer-actions">
+                <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                  <app-icon name="check" [size]="14"></app-icon>
+                  Save Bio &amp; Narrative
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. HERO TERMINAL CODE TAB -->
+      <section *ngIf="activeTab() === 'terminal'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Hero Architecture Code Window</h2>
+          <p>Modular controls for typewriter headlines, solution architect C# code snippet, and architecture badges.</p>
+        </div>
+
+        <div class="terminal-workspace-grid">
+          <!-- Left Column: Modular Editor Cards Stack -->
+          <div class="terminal-editor-panel">
+            <!-- Modular Card 1: Typewriter Headlines -->
+            <div class="admin-modular-card card mb-4">
+              <div class="card-section-header">
+                <div class="header-icon-wrap">
+                  <app-icon name="sparkles" [size]="18"></app-icon>
+                </div>
+                <div class="header-text">
+                  <h3>1. Typewriter Headline Rotator</h3>
+                  <p>One phrase per line. Cycles automatically on the homepage hero.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="settingsForm" (ngSubmit)="saveHeadlinesSettings()" novalidate>
+                <div class="form-group">
+                  <textarea
+                    rows="4"
+                    formControlName="heroHeadlines"
+                    class="form-control"
+                    placeholder="Building Enterprise-Grade .NET &amp; Angular Solutions&#10;Architecting Scalable Clean Architecture &amp; CQRS Systems&#10;Engineering Resilient Cloud-Ready Microservices"
+                  ></textarea>
+                </div>
+
+                <div class="card-footer-actions">
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                    <app-icon name="check" [size]="14"></app-icon>
+                    Save Typewriter Headlines
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Modular Card 2: C# Code Snippet -->
+            <div class="admin-modular-card card mb-4">
+              <div class="card-section-header">
+                <div class="header-icon-wrap">
+                  <app-icon name="code" [size]="18"></app-icon>
+                </div>
+                <div class="header-text">
+                  <h3>2. Solution Architect C# Code Snippet</h3>
+                  <p>Rendered in the interactive hero code terminal.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="settingsForm" (ngSubmit)="saveCodeSnippetSettings()" novalidate>
+                <div class="form-group">
+                  <label class="form-label">Terminal Window Title *</label>
+                  <input
+                    type="text"
+                    formControlName="heroCodeTitle"
+                    placeholder="ShahidPortfolio.sln - Clean Architecture"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">C# Code Snippet *</label>
+                  <textarea
+                    rows="10"
+                    formControlName="heroCodeSnippet"
+                    class="form-control code-editor-input"
+                    placeholder="public class SolutionArchitect { ... }"
+                  ></textarea>
+                </div>
+
+                <div class="card-footer-actions">
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                    <app-icon name="check" [size]="14"></app-icon>
+                    Save C# Code Snippet
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Modular Card 3: Architecture Stack Badges -->
+            <div class="admin-modular-card card">
+              <div class="card-section-header">
+                <div class="header-icon-wrap">
+                  <app-icon name="server" [size]="18"></app-icon>
+                </div>
+                <div class="header-text">
+                  <h3>3. Architecture Stack Badges</h3>
+                  <p>Comma-separated badges displayed beneath the hero terminal window.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="settingsForm" (ngSubmit)="saveBadgesSettings()" novalidate>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    formControlName="heroBadges"
+                    placeholder="Clean Architecture, CQRS / MediatR, Angular 22 Signals"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="card-footer-actions">
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving()">
+                    <app-icon name="check" [size]="14"></app-icon>
+                    Save Stack Badges
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Interactive Terminal Preview -->
+          <div class="terminal-preview-column">
+            <div class="terminal-preview-header">
+              <span class="preview-badge">Live Preview</span>
+              <span class="preview-subtitle">How it renders on the public hero page</span>
+            </div>
+
+            <div class="terminal-preview-box">
+              <div class="terminal-preview-bar">
+                <div class="traffic-dots">
+                  <span class="td red"></span>
+                  <span class="td yellow"></span>
+                  <span class="td green"></span>
+                </div>
+                <div class="terminal-preview-title">{{ previewTerminalTitle }}</div>
+                <div class="terminal-preview-meta">
+                  <span class="pulse-dot"></span>
+                  <span>.NET 10 (Release)</span>
+                </div>
+              </div>
+              <div class="terminal-preview-body">
+                <pre class="terminal-code-block"><code>{{ previewTerminalSnippet }}</code></pre>
+              </div>
+            </div>
+
+            <div class="terminal-preview-badges" *ngIf="previewHeroBadges.length">
+              <div class="preview-badges-title">Hero Badges Output:</div>
+              <div class="badges-chips">
+                <span *ngFor="let badge of previewHeroBadges" class="badge-chip">
+                  <app-icon name="check" [size]="12"></app-icon>
+                  {{ badge }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. CV & MEDIA ASSETS TAB -->
+      <section *ngIf="activeTab() === 'media'" class="tab-pane">
+        <div class="pane-header">
+          <h2>Curriculum Vitae (CV) &amp; Profile Media</h2>
+          <p>Upload and verify your downloadable resume PDF and public portrait photo with real-time test verification.</p>
+        </div>
+
+        <div class="media-assets-grid">
+          <!-- Left Card: CV / Resume Management -->
+          <div class="card media-card">
+            <div class="media-card-header">
+              <div class="header-icon-wrap cv-icon-wrap">
+                <app-icon name="download" [size]="24"></app-icon>
+              </div>
+              <div class="header-text-wrap">
+                <h3>Curriculum Vitae (Resume PDF)</h3>
+                <p>Public "Download CV" buttons serve this verified document directly.</p>
+              </div>
+            </div>
+
+            <div class="verified-file-status">
+              <div class="status-top">
+                <span class="status-indicator-pill active">
+                  <span class="pulse-dot green"></span>
+                  Active &amp; Ready
+                </span>
+                <span class="file-format-tag">PDF</span>
+              </div>
+              <div class="status-url-row">
+                <span class="url-label">Public Access URL:</span>
+                <code class="url-value">{{ getCvUrl(settings()?.cvUrl) }}</code>
+              </div>
+              <div class="status-actions">
+                <a
+                  [href]="getCvUrl(settings()?.cvUrl)"
+                  target="_blank"
+                  download="Shahid_Hussain_CV.pdf"
+                  class="btn btn-outline btn-sm btn-verify-cv"
+                >
+                  <app-icon name="download" [size]="14"></app-icon>
+                  Test Download / View Current CV
                 </a>
               </div>
+            </div>
 
-              <div class="upload-dropzone">
-                <input
-                  type="file"
-                  id="cvFileInput"
-                  accept=".pdf"
-                  (change)="onCvFileSelected($event)"
-                  class="file-input-hidden"
-                />
-                <label for="cvFileInput" class="file-picker-label">
-                  <app-icon name="download" [size]="28"></app-icon>
-                  <span *ngIf="!selectedCvFile">Click to select PDF document</span>
-                  <span *ngIf="selectedCvFile" class="selected-name">
-                    Selected: {{ selectedCvFile.name }}
-                  </span>
-                </label>
-              </div>
-
-              <button
-                type="button"
-                class="btn btn-primary btn-block btn-cv-upload"
-                [disabled]="!selectedCvFile || isUploadingCv()"
-                (click)="uploadSelectedCv()"
-              >
-                <span class="spinner-border" *ngIf="isUploadingCv()"></span>
-                <span *ngIf="!isUploadingCv()">
-                  <app-icon name="download" [size]="16"></app-icon>
-                  Upload New CV (.PDF)
+            <div class="upload-dropzone">
+              <input
+                type="file"
+                id="mediaCvFileInput"
+                accept=".pdf"
+                (change)="onCvFileSelected($event)"
+                class="file-input-hidden"
+              />
+              <label for="mediaCvFileInput" class="file-picker-label">
+                <app-icon name="download" [size]="32"></app-icon>
+                <span *ngIf="!selectedCvFile" class="picker-prompt">
+                  <strong>Click or Drag to Select New CV (.PDF)</strong>
+                  <span class="picker-sub">Standard A4 / US Letter PDF up to 10 MB</span>
                 </span>
-                <span *ngIf="isUploadingCv()">Uploading &amp; Replacing...</span>
-              </button>
+                <span *ngIf="selectedCvFile" class="selected-name">
+                  Selected File: {{ selectedCvFile.name }} ({{ (selectedCvFile.size / 1024).toFixed(1) }} KB)
+                </span>
+              </label>
+            </div>
 
-              <div class="cv-success-notice" *ngIf="cvSuccessMessage()">
+            <button
+              type="button"
+              class="btn btn-primary btn-block btn-upload-media"
+              [disabled]="!selectedCvFile || isUploadingCv()"
+              (click)="uploadSelectedCv()"
+            >
+              <span class="spinner-border" *ngIf="isUploadingCv()"></span>
+              <span *ngIf="!isUploadingCv()">
                 <app-icon name="check" [size]="16"></app-icon>
-                <span>{{ cvSuccessMessage() }}</span>
+                Upload &amp; Replace Active CV (.PDF)
+              </span>
+              <span *ngIf="isUploadingCv()">Uploading &amp; Replacing File...</span>
+            </button>
+
+            <div class="cv-success-notice" *ngIf="cvSuccessMessage()">
+              <app-icon name="check" [size]="16"></app-icon>
+              <span>{{ cvSuccessMessage() }}</span>
+            </div>
+          </div>
+
+          <!-- Right Card: Profile Photo Management -->
+          <div class="card media-card">
+            <div class="media-card-header">
+              <div class="header-icon-wrap photo-icon-wrap">
+                <app-icon name="user" [size]="24"></app-icon>
               </div>
+              <div class="header-text-wrap">
+                <h3>Professional Portrait Photo</h3>
+                <p>Displayed inside the glowing avatar frame on the public hero page.</p>
+              </div>
+            </div>
+
+            <div class="avatar-preview-container">
+              <div class="avatar-frame">
+                <img
+                  [src]="profilePhotoUrl"
+                  alt="Current Profile Photo"
+                  class="avatar-preview-img"
+                  (error)="hasProfileImageError.set(true)"
+                  [class.hidden]="hasProfileImageError()"
+                />
+                <div class="avatar-preview-fallback" *ngIf="hasProfileImageError()">
+                  <span>SH</span>
+                </div>
+                <div class="avatar-status-dot" title="Active on Public Site"></div>
+              </div>
+              <div class="avatar-meta-info">
+                <strong>Public Hero Avatar</strong>
+                <span>Recommended: Square ratio (e.g. 800x800px), JPG/PNG/WebP</span>
+              </div>
+            </div>
+
+            <div class="upload-dropzone">
+              <input
+                type="file"
+                id="mediaPhotoFileInput"
+                accept="image/png, image/jpeg, image/webp"
+                (change)="onPhotoFileSelected($event)"
+                class="file-input-hidden"
+              />
+              <label for="mediaPhotoFileInput" class="file-picker-label">
+                <app-icon name="image" [size]="32"></app-icon>
+                <span *ngIf="!selectedPhotoFile" class="picker-prompt">
+                  <strong>Click or Drag to Select Portrait Photo</strong>
+                  <span class="picker-sub">Supported formats: JPG, PNG, WebP up to 10 MB</span>
+                </span>
+                <span *ngIf="selectedPhotoFile" class="selected-name">
+                  Selected Image: {{ selectedPhotoFile.name }} ({{ (selectedPhotoFile.size / 1024).toFixed(1) }} KB)
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-primary btn-block btn-upload-media"
+              [disabled]="!selectedPhotoFile || isUploadingPhoto()"
+              (click)="uploadSelectedPhoto()"
+            >
+              <span class="spinner-border" *ngIf="isUploadingPhoto()"></span>
+              <span *ngIf="!isUploadingPhoto()">
+                <app-icon name="check" [size]="16"></app-icon>
+                Upload &amp; Set Profile Photo
+              </span>
+              <span *ngIf="isUploadingPhoto()">Uploading Image...</span>
+            </button>
+
+            <div class="cv-success-notice" *ngIf="photoSuccessMessage()">
+              <app-icon name="check" [size]="16"></app-icon>
+              <span>{{ photoSuccessMessage() }}</span>
+            </div>
+          </div>
+
+          <!-- Third Card: Hero Showcase Image (Right-Side Card) -->
+          <div class="card media-card">
+            <div class="media-card-header">
+              <div class="header-icon-wrap photo-icon-wrap">
+                <app-icon name="sparkles" [size]="24"></app-icon>
+              </div>
+              <div class="header-text-wrap">
+                <h3>Hero Showcase Image</h3>
+                <p>Featured prominently in the right-side animated card on your home page.</p>
+              </div>
+            </div>
+
+            <div class="avatar-preview-container">
+              <div class="avatar-frame hero-frame">
+                <img
+                  *ngIf="heroImageUrl"
+                  [src]="heroImageUrl"
+                  alt="Current Hero Showcase Image"
+                  class="avatar-preview-img hero-preview-img"
+                />
+                <div class="avatar-preview-fallback" *ngIf="!heroImageUrl">
+                  <app-icon name="image" [size]="36"></app-icon>
+                </div>
+                <div class="avatar-status-dot" title="Active on Public Site"></div>
+              </div>
+              <div class="avatar-meta-info">
+                <strong>Homepage Right Card Showcase</strong>
+                <span>Recommended: High-resolution portrait or architecture visual (JPG/PNG/WebP)</span>
+              </div>
+            </div>
+
+            <div class="upload-dropzone">
+              <input
+                type="file"
+                id="mediaHeroFileInput"
+                accept="image/png, image/jpeg, image/webp"
+                (change)="onHeroFileSelected($event)"
+                class="file-input-hidden"
+              />
+              <label for="mediaHeroFileInput" class="file-picker-label">
+                <app-icon name="image" [size]="32"></app-icon>
+                <span *ngIf="!selectedHeroFile" class="picker-prompt">
+                  <strong>Click or Drag to Select Hero Showcase Image</strong>
+                  <span class="picker-sub">Supported formats: JPG, PNG, WebP up to 10 MB</span>
+                </span>
+                <span *ngIf="selectedHeroFile" class="selected-name">
+                  Selected Image: {{ selectedHeroFile.name }} ({{ (selectedHeroFile.size / 1024).toFixed(1) }} KB)
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-primary btn-block btn-upload-media"
+              [disabled]="!selectedHeroFile || isUploadingHero()"
+              (click)="uploadSelectedHero()"
+            >
+              <span class="spinner-border" *ngIf="isUploadingHero()"></span>
+              <span *ngIf="!isUploadingHero()">
+                <app-icon name="check" [size]="16"></app-icon>
+                Upload &amp; Set Hero Showcase Image
+              </span>
+              <span *ngIf="isUploadingHero()">Uploading Image...</span>
+            </button>
+
+            <div class="cv-success-notice" *ngIf="heroSuccessMessage()">
+              <app-icon name="check" [size]="16"></app-icon>
+              <span>{{ heroSuccessMessage() }}</span>
             </div>
           </div>
         </div>
@@ -906,6 +1424,76 @@
         </a>
         <button type="button" class="btn btn-outline" (click)="isMessageViewModalOpen.set(false)">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 7. BLOG MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isBlogModalOpen()" (click)="closeBlogModal()">
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ blogForm.get('id')?.value ? 'Edit Article' : 'Write New Article' }}</h3>
+        <button class="modal-close" (click)="closeBlogModal()">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="blogForm" (ngSubmit)="saveBlogPost()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Article Title *</label>
+              <input type="text" formControlName="title" class="form-control" placeholder="e.g. Architecting Clean Architecture with .NET 10" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL Slug *</label>
+              <input type="text" formControlName="slug" class="form-control" placeholder="e.g. architecting-clean-architecture-dotnet-10" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Brief Summary *</label>
+            <textarea rows="2" formControlName="summary" class="form-control" placeholder="Quick 2-line takeaway for readers and preview cards..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Content (Markdown) *</label>
+            <textarea rows="8" formControlName="contentMarkdown" class="form-control code-font" placeholder="# Introduction&#10;&#10;Write your deep-dive technical article content here..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tags (Comma-separated) *</label>
+              <input type="text" formControlName="tags" class="form-control" placeholder="Clean Architecture, .NET 10, CQRS, C#" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Read Time (Minutes) *</label>
+              <input type="number" formControlName="readTimeMinutes" class="form-control" min="1" max="120" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Cover Image URL (Optional)</label>
+              <input type="text" formControlName="coverImageUrl" class="form-control" placeholder="https://... or /uploads/..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Publication Status *</label>
+              <select formControlName="status" class="form-control">
+                <option [ngValue]="2">Published (Live on Public Site)</option>
+                <option [ngValue]="1">Draft (Hidden)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="closeBlogModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="blogForm.invalid || isSaving()">
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Article...' : 'Save & Publish Article' }}</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

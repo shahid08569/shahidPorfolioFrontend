@@ -1,316 +1,553 @@
-<!-- HERO SECTION -->
-<section class="hero-section">
+<!-- ═══════════════════════════════════════════════════════════
+     HERO SECTION — Premium Split Layout
+════════════════════════════════════════════════════════════ -->
+<section class="hero-section" id="top">
+  <!-- Ambient background animated canvas & tech matrix -->
+  <div class="hero-bg" aria-hidden="true">
+    <!-- Interactive Living Constellation Network Canvas -->
+    <canvas #ambientCanvas class="hero-ambient-canvas"></canvas>
+
+    <!-- Visible Fluid Aurora Glow Waves -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    <div class="ambient-orb orb-4"></div>
+
+    <!-- Architectural Grid & Moving Scan Laser Beam -->
+    <div class="grid-overlay"></div>
+    <div class="grid-scan-beam"></div>
+
+    <!-- Floating Engineering Code Tokens -->
+    <div class="floating-code-symbols">
+      <span class="symbol-token sym-1">&#123;&nbsp;&#125;</span>
+      <span class="symbol-token sym-2">&lt;/&gt;</span>
+      <span class="symbol-token sym-3">.NET 10</span>
+      <span class="symbol-token sym-4">CQRS</span>
+      <span class="symbol-token sym-5">async</span>
+      <span class="symbol-token sym-6">λ</span>
+      <span class="symbol-token sym-7">&#91;&nbsp;&#93;</span>
+      <span class="symbol-token sym-8">// Clean Arch</span>
+    </div>
+
+    <!-- Concentric Architectural Radar Rings -->
+    <div class="radar-rings-wrap">
+      <div class="radar-ring r-1"></div>
+      <div class="radar-ring r-2"></div>
+      <div class="radar-ring r-3"></div>
+      <div class="radar-sweep"></div>
+    </div>
+  </div>
+
   <div class="container hero-container">
+    <!-- ── LEFT: Content ──────────────────────────────────── -->
     <div class="hero-content">
-      <!-- 10-Second Recruiter Hook / Status Badge -->
-      <div class="hero-status">
-        <span class="status-indicator"></span>
-        <span class="status-text">{{ settings().availabilityStatus }} • Based in {{ settings().currentLocation }}</span>
+
+      <!-- Developer Profile Avatar & Status Hook -->
+      <div class="developer-profile-header">
+        <div class="profile-avatar-wrapper">
+          <img
+            [src]="profilePhotoUrl"
+            [alt]="settings().fullName"
+            class="profile-avatar-img"
+            [class.hidden]="hasProfileImageError()"
+            (error)="onProfileImageError()"
+          />
+          <div class="profile-avatar-fallback" *ngIf="hasProfileImageError()">
+            <span>SH</span>
+          </div>
+          <div class="avatar-ring-glow"></div>
+          <span class="avatar-online-dot" title="Available for hire"></span>
+        </div>
+
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span>{{ settings().availabilityStatus }}</span>
+          <span class="pill-sep">·</span>
+          <span>{{ settings().currentLocation }}</span>
+        </div>
       </div>
 
-      <h1 class="hero-title">
-        High-Performance <span class="gradient-text">.NET & Angular</span> Enterprise Architect
+      <!-- Headline with Animated Typewriter -->
+      <h1 class="hero-headline" aria-live="polite">
+        <span class="typewriter-text">{{ displayedHeadline() }}</span>
+        <span class="typewriter-cursor" aria-hidden="true"></span>
       </h1>
 
-      <p class="hero-subtitle">
-        Hi, I'm <strong class="text-accent">{{ settings().fullName }}</strong>. {{ settings().oneLineBio }}
+      <!-- Subtitle -->
+      <p class="hero-sub">
+        Hi, I'm <strong class="name-highlight">{{ settings().fullName }}</strong>
+        — {{ settings().oneLineBio }}
       </p>
 
-      <!-- Primary Action Buttons with 1-Click WhatsApp -->
-      <div class="hero-actions">
-        <!-- 1-Click WhatsApp Direct Conversation -->
-        <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" title="Direct WhatsApp Chat">
+      <!-- CTA Row -->
+      <div class="hero-cta">
+        <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
           <app-icon name="whatsapp" [size]="18"></app-icon>
-          <span>Start a Conversation</span>
+          Start a Conversation
         </a>
 
-        <a routerLink="/projects" class="btn btn-primary">
-          Explore Projects
+        <a routerLink="/projects" class="btn btn-primary btn-lg">
+          View Projects
           <app-icon name="arrow-right" [size]="16"></app-icon>
         </a>
 
-        <a [href]="cvDownloadUrl" target="_blank" class="btn btn-secondary" download="Shahid_Hussain_CV.pdf" title="Download Curriculum Vitae">
+        <a [href]="cvDownloadUrl" target="_blank" class="btn btn-secondary btn-lg" download="Shahid_Hussain_CV.pdf">
           <app-icon name="download" [size]="16"></app-icon>
           Download CV
         </a>
       </div>
 
-      <!-- Quick Social Icons -->
-      <div class="hero-socials">
-        <span class="socials-label">Find me on:</span>
-        <div class="social-links-row">
-          <a
-            *ngFor="let social of settings().socialLinks"
-            [href]="social.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hero-social-link"
-            [attr.aria-label]="social.platform"
-          >
-            <app-icon [name]="social.iconKey || social.platform.toLowerCase()" [size]="18"></app-icon>
-          </a>
+      <!-- Social quick-links -->
+      <div class="hero-socials" *ngIf="settings().socialLinks?.length">
+        <span class="socials-label">Connect:</span>
+        <div class="socials-row">
+          @for (s of settings().socialLinks; track s.platform) {
+            <a
+              [href]="s.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hero-social"
+              [attr.aria-label]="s.platform"
+            >
+              <app-icon [name]="s.iconKey || s.platform.toLowerCase()" [size]="17"></app-icon>
+            </a>
+          }
         </div>
       </div>
     </div>
 
-    <!-- Hero Visual / Dynamic Architecture Code Terminal Graphic -->
+    <!-- ── RIGHT: Animated Showcase & Architecture Card ───────────────── -->
     <div class="hero-visual">
-      <div class="visual-glow-bg"></div>
-      <div class="code-terminal-card">
-        <div class="terminal-header">
-          <div class="terminal-buttons">
-            <span class="btn-dot close"></span>
-            <span class="btn-dot min"></span>
-            <span class="btn-dot max"></span>
+      <div class="terminal-wrap">
+        <div class="code-terminal hero-showcase-card">
+          <!-- Terminal / Showcase chrome bar -->
+          <div class="terminal-bar">
+            <div class="traffic-lights">
+              <span class="tl red"></span>
+              <span class="tl amber"></span>
+              <span class="tl green"></span>
+            </div>
+
+            <!-- View switch tabs: Visual Showcase vs Code -->
+            <div class="showcase-tabs">
+              <button
+                type="button"
+                class="showcase-tab-btn"
+                [class.active]="activeHeroTab() === 'visual'"
+                (click)="activeHeroTab.set('visual')"
+                title="View Visual Architecture Showcase"
+              >
+                <app-icon name="sparkles" [size]="13"></app-icon>
+                <span>Showcase</span>
+              </button>
+              <button
+                type="button"
+                class="showcase-tab-btn"
+                [class.active]="activeHeroTab() === 'code'"
+                (click)="activeHeroTab.set('code')"
+                title="View Clean Architecture Code"
+              >
+                <app-icon name="code" [size]="13"></app-icon>
+                <span>Architecture</span>
+              </button>
+            </div>
+
+            <!-- .NET 10 / C# 13 strictly 1-line badge -->
+            <div class="terminal-status-pill">
+              <span class="status-indicator-dot"></span>
+              <span class="pill-title">.NET 10 / C# 13</span>
+            </div>
           </div>
-          <span class="terminal-title">{{ settings().heroCodeTitle }}</span>
-        </div>
-        <div class="terminal-body">
-          <pre class="code-pre"><code>{{ settings().heroCodeSnippet }}</code></pre>
-        </div>
-        <div class="terminal-badge-strip">
-          <span class="badge badge-accent" *ngFor="let badge of heroBadges">
-            {{ badge }}
-          </span>
+
+          <!-- Card Body: TAB A - Visual Showcase -->
+          <div class="showcase-body-visual" *ngIf="activeHeroTab() === 'visual'">
+            <div class="showcase-ambient-glow"></div>
+
+            <div class="showcase-image-stage">
+              <div class="image-frame-glow"></div>
+              <img
+                [src]="heroImageUrl"
+                [alt]="settings().fullName + ' - Architecture Showcase'"
+                class="showcase-hero-img"
+                [class.hidden]="hasHeroImageError()"
+                (error)="onHeroImageError()"
+              />
+
+              <div class="showcase-hero-fallback" *ngIf="hasHeroImageError()">
+                <div class="fallback-monogram">{{ settings().fullName?.charAt(0) || 'S' }}</div>
+                <div class="fallback-title">{{ settings().fullName }}</div>
+                <div class="fallback-sub">{{ settings().professionalTitle }}</div>
+              </div>
+
+              <!-- Floating Animated Badge 1: Top-Left -->
+              <div class="floating-badge badge-tl">
+                <span class="badge-icon-wrap"><app-icon name="server" [size]="13"></app-icon></span>
+                <span class="badge-label">Clean Architecture &amp; CQRS</span>
+              </div>
+
+              <!-- Floating Animated Badge 2: Top-Right -->
+              <div class="floating-badge badge-tr">
+                <span class="badge-dot-live"></span>
+                <span class="badge-label">High-Throughput APIs</span>
+              </div>
+
+              <!-- Floating Animated Badge 3: Bottom-Left -->
+              <div class="floating-badge badge-bl">
+                <span class="badge-icon-wrap"><app-icon name="code" [size]="13"></app-icon></span>
+                <span class="badge-label">Angular 22 &amp; Signals</span>
+              </div>
+
+              <!-- Floating Animated Badge 4: Bottom-Right -->
+              <div class="floating-badge badge-br">
+                <span class="badge-icon-wrap"><app-icon name="check" [size]="13"></app-icon></span>
+                <span class="badge-label">99.9% Production Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Body: TAB B - Code Terminal -->
+          <div class="terminal-body" *ngIf="activeHeroTab() === 'code'">
+            <pre class="code-block"><code>{{ settings().heroCodeSnippet }}</code></pre>
+          </div>
+
+          <!-- Integrated Architecture Tech Badges strip -->
+          <div class="terminal-footer-bar">
+            <div class="footer-status-label">
+              <app-icon name="server" [size]="13"></app-icon>
+              <span>Architecture Stack</span>
+            </div>
+            <div class="terminal-badges">
+              @for (badge of heroBadges; track badge) {
+                <span class="ide-badge">{{ badge }}</span>
+              }
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- KEY METRICS STRIP -->
-<section class="metrics-section">
+<!-- ═══════════════════════════════════════════════════════════
+     STATS STRIP
+════════════════════════════════════════════════════════════ -->
+<section class="stats-section">
   <div class="container">
-    <div class="metrics-grid">
-      <div class="metric-card card" *ngFor="let m of keyMetrics">
-        <div class="metric-value gradient-text">{{ m.value }}</div>
-        <div class="metric-label">{{ m.label }}</div>
-      </div>
+    <div class="stats-grid">
+      @for (m of keyMetrics; track m.label) {
+        <div class="stat-item">
+          <div class="stat-value gradient-text">{{ m.value }}</div>
+          <div class="stat-label">{{ m.label }}</div>
+        </div>
+      }
     </div>
   </div>
 </section>
 
-<!-- FEATURED ARCHITECTURE CASE STUDY -->
-<section class="section case-study-preview-section" *ngIf="featuredProjects().length > 0">
+<!-- ═══════════════════════════════════════════════════════════
+     FEATURED PROJECTS
+════════════════════════════════════════════════════════════ -->
+<section class="section projects-preview-section" *ngIf="featuredProjects().length > 0">
+  <div class="section-ambient-glow glow-left" aria-hidden="true"></div>
+  <div class="section-ambient-glow glow-right" aria-hidden="true"></div>
+
   <div class="container">
     <div class="section-header">
       <span class="section-eyebrow">
-        <app-icon name="sparkles" [size]="14"></app-icon>
-        Architectural Showcase
+        <app-icon name="sparkles" [size]="13"></app-icon>
+        Featured Work
       </span>
-      <h2 class="section-title">Featured Enterprise System</h2>
+      <h2 class="section-title">Case Study Showcase</h2>
       <p class="section-subtitle">
-        A deep dive into how Clean Architecture, CQRS, and Angular solve real-world scalability and performance challenges.
+        Real-world enterprise systems built with Clean Architecture, CQRS, and modern Angular.
       </p>
     </div>
 
-    <div class="case-study-showcase card" *ngFor="let project of featuredProjects()">
-      <div class="case-study-header">
-        <div class="case-badge-row">
-          <span class="badge badge-primary">Case Study</span>
-          <span class="badge" *ngIf="project.isFeatured">Featured Architecture</span>
-        </div>
-        <h3 class="case-title">{{ project.title }}</h3>
-        <p class="case-summary">{{ project.summary }}</p>
-      </div>
+    <div class="projects-featured-grid">
+      @for (project of featuredProjects(); track project.id) {
+        <div class="project-card card">
+          <!-- Thumbnail / placeholder -->
+          <div class="project-thumbnail" [class.no-thumb]="!project.thumbnailUrl">
+            <img
+              *ngIf="project.thumbnailUrl"
+              [src]="project.thumbnailUrl"
+              [alt]="project.title"
+              loading="lazy"
+            />
+            <div *ngIf="!project.thumbnailUrl" class="thumb-placeholder">
+              <app-icon name="code" [size]="40"></app-icon>
+            </div>
 
-      <div class="case-grid">
-        <div class="case-box problem-box" *ngIf="project.problemStatement">
-          <div class="box-icon">
-            <app-icon name="terminal" [size]="18"></app-icon>
+            <!-- Overlay -->
+            <div class="project-overlay">
+              <a
+                *ngIf="project.liveUrl"
+                [href]="project.liveUrl"
+                target="_blank"
+                class="btn btn-primary btn-sm"
+              >
+                <app-icon name="external-link" [size]="14"></app-icon>
+                Live Demo
+              </a>
+              <a
+                [routerLink]="['/projects', project.slug]"
+                class="btn btn-secondary btn-sm"
+              >
+                <app-icon name="info" [size]="14"></app-icon>
+                Case Study
+              </a>
+            </div>
           </div>
-          <h4>The Architectural Challenge</h4>
-          <p>{{ project.problemStatement }}</p>
-        </div>
 
-        <div class="case-box solution-box" *ngIf="project.solutionStatement">
-          <div class="box-icon">
-            <app-icon name="code" [size]="18"></app-icon>
+          <div class="project-body">
+            <!-- Badges -->
+            <div class="project-badges">
+              <span class="badge badge-emerald" *ngIf="project.isFeatured">
+                <app-icon name="sparkles" [size]="10"></app-icon>
+                Featured
+              </span>
+              <span class="badge badge-violet" *ngIf="project.isCaseStudy">
+                <app-icon name="document" [size]="10"></app-icon>
+                Case Study
+              </span>
+            </div>
+
+            <h3 class="project-title">{{ project.title }}</h3>
+            <p class="project-summary">{{ project.summary }}</p>
+
+            <!-- Problem / Solution cards -->
+            <div class="ps-grid" *ngIf="project.problemStatement || project.solutionStatement">
+              <div class="ps-card problem" *ngIf="project.problemStatement">
+                <div class="ps-label">
+                  <app-icon name="terminal" [size]="14"></app-icon>
+                  Challenge
+                </div>
+                <p>{{ project.problemStatement }}</p>
+              </div>
+              <div class="ps-card solution" *ngIf="project.solutionStatement">
+                <div class="ps-label">
+                  <app-icon name="code" [size]="14"></app-icon>
+                  Solution
+                </div>
+                <p>{{ project.solutionStatement }}</p>
+              </div>
+            </div>
+
+            <!-- Metrics bar -->
+            <div class="metrics-bar" *ngIf="project.keyMetrics">
+              <app-icon name="chart" [size]="15"></app-icon>
+              <span>{{ project.keyMetrics }}</span>
+            </div>
+
+            <!-- Tech tags -->
+            <div class="tech-tags" *ngIf="project.techStack?.length">
+              @for (t of project.techStack!.slice(0, 6); track t) {
+                <span class="badge">{{ t }}</span>
+              }
+            </div>
+
+            <!-- Footer links -->
+            <div class="project-links">
+              <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" class="btn btn-outline btn-sm">
+                <app-icon name="github" [size]="15"></app-icon>
+                Source
+              </a>
+              <a [routerLink]="['/projects', project.slug]" class="btn btn-primary btn-sm">
+                View Details
+                <app-icon name="arrow-right" [size]="14"></app-icon>
+              </a>
+            </div>
           </div>
-          <h4>The Engineering Solution</h4>
-          <p>{{ project.solutionStatement }}</p>
         </div>
-      </div>
-
-      <div class="case-metrics-bar" *ngIf="project.keyMetrics">
-        <app-icon name="check" [size]="18" class="metric-check"></app-icon>
-        <div class="metric-text">
-          <strong>Key Impact:</strong>
-          <span>{{ project.keyMetrics }}</span>
-        </div>
-      </div>
-
-      <div class="case-footer">
-        <div class="tech-tags">
-          <span class="badge" *ngFor="let t of project.techStack">{{ t }}</span>
-        </div>
-        <div class="case-links">
-          <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" class="btn btn-outline btn-sm">
-            <app-icon name="github" [size]="16"></app-icon>
-            Source Code
-          </a>
-          <a *ngIf="project.liveUrl" [href]="project.liveUrl" target="_blank" class="btn btn-primary btn-sm">
-            <app-icon name="external-link" [size]="16"></app-icon>
-            Live Demo
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CORE STACK & ARCHITECTURE PILLARS -->
-<section class="section stack-section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">
-        <app-icon name="server" [size]="14"></app-icon>
-        Technical Competencies
-      </span>
-      <h2 class="section-title">Core Stack &amp; Architecture</h2>
-      <p class="section-subtitle">
-        Specialized in modern Microsoft and TypeScript ecosystems for high-throughput enterprise applications.
-      </p>
+      }
     </div>
 
-    <div class="skills-highlight-grid">
-      <div class="skill-highlight-card card" *ngFor="let skill of topSkills()">
-        <div class="skill-icon-wrapper">
-          <app-icon [name]="skill.icon" [size]="24"></app-icon>
-        </div>
-        <div class="skill-info">
-          <span class="skill-category-tag">{{ skill.category }}</span>
-          <h4 class="skill-name">{{ skill.name }}</h4>
-        </div>
-      </div>
-    </div>
-
-    <div class="view-all-wrapper">
-      <a routerLink="/skills" class="btn btn-secondary">
-        Explore Full Technical Matrix
+    <div class="section-cta">
+      <a routerLink="/projects" class="btn btn-outline">
+        Browse All Projects
         <app-icon name="arrow-right" [size]="16"></app-icon>
       </a>
     </div>
   </div>
 </section>
 
-<!-- CERTIFICATES & QUALIFICATIONS SECTION -->
-<section class="section certs-section" *ngIf="certificates().length > 0">
+<!-- ═══════════════════════════════════════════════════════════
+     SKILLS HIGHLIGHT
+════════════════════════════════════════════════════════════ -->
+<section class="section skills-highlight-section">
+  <div class="section-ambient-glow glow-center" aria-hidden="true"></div>
   <div class="container">
     <div class="section-header">
       <span class="section-eyebrow">
-        <app-icon name="certificate" [size]="14"></app-icon>
-        Accreditations
+        <app-icon name="server" [size]="13"></app-icon>
+        Technical Expertise
       </span>
-      <h2 class="section-title">Verified Certifications</h2>
+      <h2 class="section-title">Core Stack &amp; Architecture</h2>
       <p class="section-subtitle">
-        Validated technical expertise in cloud systems, clean architecture, and modern application development.
+        Specialized in Microsoft and TypeScript ecosystems for high-throughput enterprise applications.
       </p>
     </div>
 
-    <div class="certs-grid">
-      <div class="cert-card card" *ngFor="let cert of certificates()">
-        <div class="cert-header">
-          <div class="cert-badge-icon">
-            <app-icon name="certificate" [size]="24"></app-icon>
+    <div class="skills-grid">
+      @for (skill of topSkills(); track skill.name) {
+        <div class="skill-card card">
+          <div class="skill-icon">
+            <app-icon [name]="skill.icon" [size]="22"></app-icon>
           </div>
-          <span class="cert-org">{{ cert.issuingOrganization }}</span>
+          <div class="skill-info">
+            <span class="skill-cat">{{ skill.category }}</span>
+            <h4 class="skill-name">{{ skill.name }}</h4>
+          </div>
         </div>
-        <h4 class="cert-title">{{ cert.title }}</h4>
-        <div class="cert-meta">
-          <span class="cert-date" *ngIf="cert.issueDate">Issued: {{ cert.issueDate | date: 'mediumDate' }}</span>
-          <span class="cert-id" *ngIf="cert.credentialId">ID: {{ cert.credentialId }}</span>
-        </div>
-        <a *ngIf="cert.credentialUrl" [href]="cert.credentialUrl" target="_blank" rel="noopener noreferrer" class="cert-verify-link">
-          <app-icon name="external-link" [size]="14"></app-icon>
-          Verify Credential
-        </a>
-      </div>
+      }
+    </div>
+
+    <div class="section-cta">
+      <a routerLink="/skills" class="btn btn-secondary">
+        Full Skills Matrix
+        <app-icon name="arrow-right" [size]="16"></app-icon>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- ENDORSEMENTS & CLIENT FEEDBACK SECTION -->
-<section class="section testimonials-section">
+<!-- ═══════════════════════════════════════════════════════════
+     CERTIFICATIONS
+════════════════════════════════════════════════════════════ -->
+<section class="section certs-section" *ngIf="certificates().length > 0">
+  <div class="section-ambient-glow glow-right" aria-hidden="true"></div>
   <div class="container">
-    <div class="section-header with-action-header">
+    <div class="section-header">
+      <span class="section-eyebrow">
+        <app-icon name="certificate" [size]="13"></app-icon>
+        Accreditations
+      </span>
+      <h2 class="section-title">Verified Certifications</h2>
+      <p class="section-subtitle">Validated technical expertise backed by recognized industry certifications.</p>
+    </div>
+
+    <div class="certs-grid">
+      @for (cert of certificates(); track cert.id) {
+        <div class="cert-card card">
+          <div class="cert-icon-wrap">
+            <app-icon name="certificate" [size]="26"></app-icon>
+          </div>
+          <div class="cert-info">
+            <span class="cert-org">{{ cert.issuingOrganization }}</span>
+            <h4 class="cert-title">{{ cert.title }}</h4>
+            <div class="cert-meta">
+              <span *ngIf="cert.issueDate" class="cert-date">
+                <app-icon name="calendar" [size]="12"></app-icon>
+                {{ cert.issueDate | date:'MMM yyyy' }}
+              </span>
+              <span *ngIf="cert.credentialId" class="cert-id">ID: {{ cert.credentialId }}</span>
+            </div>
+          </div>
+          <a
+            *ngIf="cert.credentialUrl"
+            [href]="cert.credentialUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="cert-verify"
+          >
+            <app-icon name="external-link" [size]="14"></app-icon>
+            Verify
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TESTIMONIALS / ENDORSEMENTS
+════════════════════════════════════════════════════════════ -->
+<section class="section testimonials-section">
+  <div class="section-ambient-glow glow-left" aria-hidden="true"></div>
+  <div class="container">
+    <div class="testimonials-header">
       <div>
         <span class="section-eyebrow">
-          <app-icon name="quote" [size]="14"></app-icon>
-          Recommendations
+          <app-icon name="quote" [size]="13"></app-icon>
+          Social Proof
         </span>
         <h2 class="section-title">Endorsements &amp; Feedback</h2>
         <p class="section-subtitle">
-          What engineering leaders, clients, and technical collaborators say about working together.
+          What engineering leaders and clients say about working together.
         </p>
       </div>
-
-      <!-- Public Button to open Endorsement submission modal -->
-      <button (click)="openFeedbackModal()" class="btn btn-outline leave-feedback-btn">
-        <app-icon name="plus" [size]="16"></app-icon>
-        Leave an Endorsement
+      <button (click)="openFeedbackModal()" class="btn btn-outline leave-btn">
+        <app-icon name="plus" [size]="15"></app-icon>
+        Leave Feedback
       </button>
     </div>
 
-    <div class="testimonials-grid" *ngIf="testimonials().length > 0; else noTestimonialsMsg">
-      <div class="testimonial-card card" *ngFor="let item of testimonials()">
-        <div class="card-quote-top">
-          <div class="star-rating">
-            <span *ngFor="let s of [1, 2, 3, 4, 5]" [class.active]="s <= item.rating">★</span>
+    <div class="testimonials-grid" *ngIf="testimonials().length > 0; else noTestimonials">
+      @for (item of testimonials(); track item.id) {
+        <div class="testimonial-card card">
+          <!-- Stars -->
+          <div class="stars-row">
+            @for (star of [1,2,3,4,5]; track star) {
+              <span class="star" [class.active]="star <= item.rating">★</span>
+            }
           </div>
-          <div class="quote-icon">
-            <app-icon name="quote" [size]="20"></app-icon>
+
+          <p class="testimonial-text">"{{ item.content }}"</p>
+
+          <div class="testimonial-author">
+            <div class="author-avatar">{{ item.clientName.charAt(0) }}</div>
+            <div class="author-info">
+              <strong class="author-name">{{ item.clientName }}</strong>
+              <span class="author-role">{{ item.role }} · {{ item.company }}</span>
+              <span class="author-rel" *ngIf="item.relationship">{{ item.relationship }}</span>
+            </div>
+            <a *ngIf="item.linkedInUrl" [href]="item.linkedInUrl" target="_blank" class="linkedin-link" aria-label="LinkedIn">
+              <app-icon name="linkedin" [size]="16"></app-icon>
+            </a>
           </div>
         </div>
-
-        <p class="testimonial-text">"{{ item.content }}"</p>
-
-        <div class="testimonial-author">
-          <div class="author-avatar">
-            {{ item.clientName.charAt(0) }}
-          </div>
-          <div class="author-details">
-            <h5 class="author-name">{{ item.clientName }}</h5>
-            <span class="author-title">{{ item.role }} • {{ item.company }}</span>
-            <span class="author-rel" *ngIf="item.relationship">{{ item.relationship }}</span>
-          </div>
-        </div>
-      </div>
+      }
     </div>
 
-    <ng-template #noTestimonialsMsg>
-      <div class="empty-testimonials card">
-        <p>No endorsements yet. Have you worked with Shahid? Click "Leave an Endorsement" to submit your feedback!</p>
+    <ng-template #noTestimonials>
+      <div class="empty-state card">
+        <app-icon name="quote" [size]="36"></app-icon>
+        <p>No endorsements yet. Be the first to leave feedback!</p>
+        <button (click)="openFeedbackModal()" class="btn btn-primary btn-sm">Leave Feedback</button>
       </div>
     </ng-template>
   </div>
 </section>
 
-<!-- CALL TO ACTION BANNER WITH WHATSAPP -->
+<!-- ═══════════════════════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════════════════════════ -->
 <section class="section cta-section">
   <div class="container">
     <div class="cta-banner card">
+      <div class="cta-glow"></div>
       <div class="cta-content">
-        <h2 class="cta-title">Ready to build something extraordinary?</h2>
+        <h2 class="cta-title">Ready to build something remarkable?</h2>
         <p class="cta-desc">
-          Whether you need a dedicated senior full-stack developer or an enterprise architecture consultation, I am ready to collaborate.
+          Open to full-time roles, freelance contracts, and exciting collaborations.
+          Let's create impactful software together.
         </p>
-      </div>
-      <div class="cta-actions">
-        <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
-          <app-icon name="whatsapp" [size]="18"></app-icon>
-          <span>Chat on WhatsApp</span>
-        </a>
-        <a routerLink="/contact" class="btn btn-outline">
-          Send Message
-          <app-icon name="email" [size]="16"></app-icon>
-        </a>
+        <div class="cta-actions">
+          <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
+            <app-icon name="whatsapp" [size]="18"></app-icon>
+            Chat on WhatsApp
+          </a>
+          <a routerLink="/contact" class="btn btn-outline btn-lg">
+            <app-icon name="email" [size]="16"></app-icon>
+            Send a Message
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PUBLIC FEEDBACK MODAL -->
+<!-- Feedback Modal -->
 <app-feedback-modal
   *ngIf="isFeedbackModalOpen()"
   (closed)="closeFeedbackModal()"

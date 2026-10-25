@@ -16,5 +16,8 @@ export interface PublicSettings {
   heroCodeTitle: string;
   heroCodeSnippet: string;
   heroBadgesJson: string;
+  profilePhotoUrl?: string;
+  heroImageUrl?: string;
+  heroHeadlinesJson?: string;
   socialLinks: SocialLink[];
 }

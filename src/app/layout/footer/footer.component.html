@@ -1,58 +1,127 @@
 <footer class="footer">
+  <!-- Decorative top glow line -->
+  <div class="footer-glow-line"></div>
+
   <div class="footer-container">
-    <div class="footer-top">
+    <!-- ── Top Grid ──────────────────────────────────────────── -->
+    <div class="footer-grid">
+
+      <!-- Brand Column -->
       <div class="footer-brand">
-        <div class="footer-logo">
-          <span class="logo-mark">SH</span>
-          <span class="logo-title">Shahid Hussain</span>
+        <a routerLink="/" class="footer-logo">
+          <div class="logo-mark">
+            <img src="/logo.svg" alt="Shahid" class="footer-logo-img" />
+          </div>
+          <span class="logo-name">{{ fullName }}</span>
+        </a>
+        <p class="footer-bio">{{ tagline }}</p>
+
+        <!-- Availability Status -->
+        <div class="footer-status">
+          <span class="status-dot"></span>
+          <span>{{ availability }}</span>
         </div>
-        <p class="footer-tagline">
-          Full-Stack .NET & Angular Developer. Designing resilient cloud architectures, scalable microservices, and clean, responsive web applications.
-        </p>
+
+        <!-- Social Links -->
+        <div class="social-row">
+          @for (s of socialLinks; track s.platform) {
+            <a
+              [href]="s.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-icon-btn"
+              [attr.aria-label]="s.platform"
+              [title]="s.platform"
+            >
+              <app-icon [name]="s.iconKey || s.platform.toLowerCase()" [size]="17"></app-icon>
+            </a>
+          }
+        </div>
       </div>
 
-      <div class="footer-links-group">
-        <h4 class="links-title">Quick Links</h4>
-        <ul class="footer-nav">
-          <li><a routerLink="/projects">Projects</a></li>
-          <li><a routerLink="/skills">Skills & Expertise</a></li>
-          <li><a routerLink="/experience">Experience Timeline</a></li>
-          <li><a routerLink="/blog">Articles & Notes</a></li>
-          <li><a routerLink="/contact">Get in Touch</a></li>
+      <!-- Quick Links -->
+      <div class="footer-links-col">
+        <h4 class="footer-col-title">Navigation</h4>
+        <ul class="footer-nav-list">
+          @for (link of quickLinks; track link.path) {
+            <li>
+              <a [routerLink]="link.path" class="footer-nav-link">
+                <app-icon name="chevron-right" [size]="12"></app-icon>
+                {{ link.label }}
+              </a>
+            </li>
+          }
+          @for (link of moreLinks; track link.path) {
+            <li>
+              <a [routerLink]="link.path" class="footer-nav-link">
+                <app-icon name="chevron-right" [size]="12"></app-icon>
+                {{ link.label }}
+              </a>
+            </li>
+          }
         </ul>
       </div>
 
-      <div class="footer-social-group">
-        <h4 class="links-title">Connect</h4>
-        <div class="social-icons">
-          <a
-            *ngFor="let social of socials"
-            [href]="social.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="social-btn"
-            [attr.aria-label]="social.name"
-          >
-            <app-icon [name]="social.icon" [size]="18"></app-icon>
-          </a>
-        </div>
-        <p class="status-msg">
-          <span class="status-dot"></span>
-          Ready for new opportunities & contracts.
+      <!-- Services Column -->
+      <div class="footer-links-col">
+        <h4 class="footer-col-title">Services</h4>
+        <ul class="footer-nav-list">
+          <li><a class="footer-nav-link" routerLink="/contact">
+            <app-icon name="chevron-right" [size]="12"></app-icon>API Development
+          </a></li>
+          <li><a class="footer-nav-link" routerLink="/contact">
+            <app-icon name="chevron-right" [size]="12"></app-icon>Angular Apps
+          </a></li>
+          <li><a class="footer-nav-link" routerLink="/contact">
+            <app-icon name="chevron-right" [size]="12"></app-icon>Clean Architecture
+          </a></li>
+          <li><a class="footer-nav-link" routerLink="/contact">
+            <app-icon name="chevron-right" [size]="12"></app-icon>Freelance Projects
+          </a></li>
+          <li><a class="footer-nav-link" routerLink="/contact">
+            <app-icon name="chevron-right" [size]="12"></app-icon>Code Review
+          </a></li>
+        </ul>
+      </div>
+
+      <!-- CTA Column -->
+      <div class="footer-cta-col">
+        <h4 class="footer-col-title">Let's Connect</h4>
+        <p class="footer-cta-text">
+          Available for full-time roles, freelance projects, and open-source collaborations.
         </p>
+        <a routerLink="/contact" class="btn btn-primary footer-cta-btn">
+          <app-icon name="email" [size]="16"></app-icon>
+          Get in Touch
+        </a>
+        <a routerLink="/projects" class="btn btn-outline footer-cta-btn mt-sm">
+          <app-icon name="code" [size]="16"></app-icon>
+          View Portfolio
+        </a>
       </div>
     </div>
 
+    <!-- ── Bottom Bar ─────────────────────────────────────────── -->
     <div class="footer-bottom">
       <p class="copyright">
-        © {{ currentYear }} Shahid Hussain. Built with
-        <span class="highlight">Angular 22 SSR</span> &
-        <span class="highlight">.NET 10 Clean Architecture</span>.
+        © {{ currentYear }}
+        <strong>{{ fullName }}</strong>.
+        Built with
+        <span class="tech-tag">Angular 22 SSR</span>
+        +
+        <span class="tech-tag">.NET 10</span>
+        +
+        <span class="tech-tag">Clean Architecture</span>.
       </p>
-      <div class="bottom-links">
-        <a routerLink="/contact">Contact</a>
-        <span class="separator">•</span>
-        <a href="#top">Back to top ↑</a>
+      <div class="footer-bottom-links">
+        <a routerLink="/contact" class="bottom-link">Contact</a>
+        <span class="dot">·</span>
+        <a routerLink="/blog" class="bottom-link">Blog</a>
+        <span class="dot">·</span>
+        <a href="#top" class="bottom-link back-top">
+          Back to top
+          <app-icon name="arrow-up" [size]="13"></app-icon>
+        </a>
       </div>
     </div>
   </div>

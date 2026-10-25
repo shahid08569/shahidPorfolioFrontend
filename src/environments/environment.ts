@@ -1,4 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5272/api/v1',
+  apiUrl:
+    typeof window !== 'undefined' && (window as any).__API_URL__
+      ? (window as any).__API_URL__
+      : 'http://localhost:5272/api/v1',
 };

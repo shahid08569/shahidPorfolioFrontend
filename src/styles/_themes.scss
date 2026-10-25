@@ -1,53 +1,83 @@
-// CSS Custom Properties for Light and Dark themes
+// ============================================================
+// WARM, EARTHY LIGHT THEME — .NET + Angular Portfolio
+// ============================================================
 
-:root, [data-theme='dark'] {
-  // Dark Theme (Default developer aesthetic)
-  --bg-primary: #0a0d14;
-  --bg-secondary: #121622;
-  --bg-tertiary: #1a2030;
-  --bg-glass: rgba(18, 22, 34, 0.75);
+:root, [data-theme='light'], [data-theme='dark'] {
+  // ── 1. Color palette (Exact values specified by prompt) ────
+  --tea-green: #ccd5ae;
+  --beige: #e9edc9;
+  --cornsilk: #fefae0;
+  --papaya-whip: #faedcd;
+  --light-bronze: #d4a373;
+  --bronze-dark: #c08d5c; // (hover shade)
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  // ── Semantic aliases ─────────────────────────────────────
+  --bg: var(--cornsilk);
+  --bg-alt: var(--beige);
+  --card: var(--papaya-whip);
+  --border: var(--tea-green);
+  --accent: var(--light-bronze);
+  --text-heading: #3b2f23;
+  --text: #4a3f33;
+  --text-muted: #6b5a47;
 
-  --accent-primary: #38bdf8;         // Cyber sky cyan
-  --accent-secondary: #818cf8;       // Soft indigo
-  --accent-hover: #0284c7;
-  --accent-glow: rgba(56, 189, 248, 0.25);
+  // ── Typography ───────────────────────────────────────────
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --border-color: rgba(148, 163, 184, 0.12);
-  --border-hover: rgba(56, 189, 248, 0.35);
+  // ── Card Shadows ─────────────────────────────────────────
+  --card-shadow: 0 4px 14px rgba(59, 47, 35, 0.08);
+  --card-shadow-lg: 0 8px 24px rgba(59, 47, 35, 0.14);
 
-  --card-bg: rgba(18, 22, 34, 0.85);
-  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  // ── Gradients ────────────────────────────────────────────
+  --gradient-hero: linear-gradient(180deg, var(--tea-green) 0%, var(--cornsilk) 100%);
 
-  --status-available: #10b981;
-  --status-busy: #f59e0b;
-}
+  // ── Compatibility Aliases mapped to the warm earthy palette ──
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--bg-alt);
+  --bg-tertiary: var(--card);
+  --bg-elevated: var(--card);
+  --bg-glass: var(--tea-green);
+  --bg-glass-2: var(--beige);
 
-[data-theme='light'] {
-  // Light Theme
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-glass: rgba(255, 255, 255, 0.85);
+  --text-primary: var(--text-heading);
+  --text-secondary: var(--text);
+  --text-inverse: var(--bg);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --border-color: var(--border);
+  --border-subtle: var(--border);
+  --border-hover: var(--bronze-dark);
+  --border-focus: var(--accent);
+  --border-violet: var(--border);
 
-  --accent-primary: #0284c7;
-  --accent-secondary: #6366f1;
-  --accent-hover: #0369a1;
-  --accent-glow: rgba(2, 132, 199, 0.15);
+  --card-bg: var(--card);
+  --card-bg-hover: var(--card);
 
-  --border-color: rgba(15, 23, 42, 0.08);
-  --border-hover: rgba(2, 132, 199, 0.3);
+  --accent-primary: var(--accent);
+  --accent-secondary: var(--bronze-dark);
+  --accent-hover: var(--bronze-dark);
+  --accent-glow: rgba(212, 163, 115, 0.25);
 
-  --card-bg: #ffffff;
-  --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+  --accent-emerald: var(--bronze-dark);
+  --accent-emerald-dim: var(--bronze-dark);
+  --accent-emerald-glow: rgba(192, 141, 92, 0.20);
+  --accent-emerald-ultra: rgba(204, 213, 174, 0.35);
 
-  --status-available: #059669;
-  --status-busy: #d97706;
+  --accent-violet: var(--bronze-dark);
+  --accent-violet-bright: var(--bronze-dark);
+  --accent-violet-glow: rgba(192, 141, 92, 0.20);
+  --accent-violet-ultra: rgba(233, 237, 201, 0.40);
+
+  --status-green: var(--bronze-dark);
+  --status-available: var(--bronze-dark);
+  --status-amber: var(--accent);
+  --status-red: #3b2f23;
+  --status-blue: var(--accent);
+
+  --gradient-primary: linear-gradient(135deg, var(--accent) 0%, var(--bronze-dark) 100%);
+  --gradient-emerald: linear-gradient(135deg, var(--accent) 0%, var(--bronze-dark) 100%);
+  --gradient-violet: linear-gradient(135deg, var(--accent) 0%, var(--bronze-dark) 100%);
+  --gradient-dark: linear-gradient(180deg, var(--beige) 0%, var(--cornsilk) 100%);
+  --gradient-mesh: none;
 }

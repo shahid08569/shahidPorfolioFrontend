@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Dark Architectural Canvas Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="50%" stop-color="#0B1120" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Metallic Emerald-Cyan-Purple Glow Rim -->
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+
+    <!-- Primary S Brand Gradient -->
+    <linearGradient id="brandGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Secondary S Brand Gradient -->
+    <linearGradient id="brandGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+
+    <!-- Outer Ambient Glow -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Squircle with Subtle Metallic Border -->
+  <rect
+    x="24"
+    y="24"
+    width="464"
+    height="464"
+    rx="112"
+    fill="url(#bgGrad)"
+    stroke="url(#rimGrad)"
+    stroke-width="7"
+  />
+
+  <!-- Subtle Ambient Glow Ring -->
+  <circle cx="256" cy="256" r="160" fill="#06B6D4" opacity="0.06" filter="url(#softGlow)" />
+
+  <!-- Code Bracket Architectural Accent (Subtle watermark) -->
+  <path
+    d="M 120 220 L 88 256 L 120 292"
+    stroke="#334155"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.35"
+  />
+  <path
+    d="M 392 220 L 424 256 L 392 292"
+    stroke="#334155"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.35"
+  />
+
+  <!-- The "S" Architectural Monogram for SHAHID -->
+  <g>
+    <!-- Top Flowing Segment of "S" -->
+    <path
+      d="M 172 176
+         L 320 176
+         C 356 176, 368 202, 350 230
+         L 326 264
+         C 316 278, 298 288, 276 288
+         L 236 288
+         C 214 288, 196 298, 186 312
+         L 162 346"
+      stroke="url(#brandGrad1)"
+      stroke-width="50"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+
+    <!-- Bottom Flowing Segment of "S" -->
+    <path
+      d="M 340 336
+         L 192 336
+         C 156 336, 144 310, 162 282
+         L 186 248
+         C 196 234, 214 224, 236 224
+         L 276 224
+         C 298 224, 316 214, 326 200
+         L 350 166"
+      stroke="url(#brandGrad2)"
+      stroke-width="50"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+
+    <!-- Signature Cyan Pulse Node (Top-Right Accent) -->
+    <circle cx="396" cy="116" r="20" fill="#38BDF8" filter="url(#softGlow)" />
+    <circle cx="396" cy="116" r="10" fill="#FFFFFF" />
+  </g>
+</svg>

@@ -8,6 +8,7 @@ import { AdminService, AdminContactMessage } from '../../../core/services/admin.
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { ProjectCard } from '../../../core/models/project.model';
+import { BlogPostCard } from '../../../core/models/blog.model';
 import { SkillCategoryGroup, SkillCategory } from '../../../core/models/skill.model';
 import { PublicSettings } from '../../../core/models/settings.model';
 import { Testimonial } from '../../../core/models/testimonial.model';
@@ -34,11 +35,12 @@ export class AdminDashboardComponent implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly fb = inject(FormBuilder);
 
-  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'testimonials' | 'certificates' | 'settings'>('overview');
+  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'>('overview');
 
   // Data signals
   readonly messages = signal<AdminContactMessage[]>([]);
   readonly projects = signal<ProjectCard[]>([]);
+  readonly blogPosts = signal<BlogPostCard[]>([]);
   readonly skillGroups = signal<SkillCategoryGroup[]>([]);
   readonly testimonials = signal<Testimonial[]>([]);
   readonly certificates = signal<Certificate[]>([]);
@@ -46,6 +48,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Modals & Action states
   readonly isProjectModalOpen = signal(false);
+  readonly isBlogModalOpen = signal(false);
   readonly isSkillModalOpen = signal(false);
   readonly isTestimonialModalOpen = signal(false);
   readonly isCertificateModalOpen = signal(false);
@@ -77,11 +80,16 @@ export class AdminDashboardComponent implements OnInit {
     action: () => {},
   });
 
-  // Selected CV file
+  // Selected CV & Photo files
   selectedCvFile: File | null = null;
+  selectedPhotoFile: File | null = null;
+  readonly isUploadingPhoto = signal(false);
+  readonly photoSuccessMessage = signal<string | null>(null);
+  readonly hasProfileImageError = signal(false);
 
   // Forms
   projectForm!: FormGroup;
+  blogForm!: FormGroup;
   skillForm!: FormGroup;
   testimonialForm!: FormGroup;
   certificateForm!: FormGroup;
@@ -93,11 +101,23 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private initForms(): void {
+    this.blogForm = this.fb.group({
+      id: [''],
+      title: ['', [Validators.required, Validators.maxLength(250)]],
+      slug: ['', [Validators.required, Validators.maxLength(250)]],
+      summary: ['', [Validators.required, Validators.maxLength(2000)]],
+      contentMarkdown: ['', [Validators.required]],
+      coverImageUrl: [''],
+      tags: ['Clean Architecture, .NET 10', Validators.required],
+      readTimeMinutes: [5, [Validators.required, Validators.min(1)]],
+      status: [2, Validators.required],
+    });
+
     this.projectForm = this.fb.group({
       id: [''],
-      title: ['', [Validators.required, Validators.maxLength(150)]],
-      slug: ['', [Validators.required, Validators.maxLength(160)]],
-      summary: ['', [Validators.required, Validators.maxLength(500)]],
+      title: ['', [Validators.required, Validators.maxLength(250)]],
+      slug: ['', [Validators.required, Validators.maxLength(250)]],
+      summary: ['', [Validators.required, Validators.maxLength(2000)]],
       problemStatement: [''],
       solutionStatement: [''],
       architectureOverview: [''],
@@ -161,6 +181,7 @@ export class AdminDashboardComponent implements OnInit {
       heroCodeTitle: ['ShahidPortfolio.sln - Clean Architecture', Validators.required],
       heroCodeSnippet: ['', Validators.required],
       heroBadges: ['Clean Architecture, CQRS / MediatR, Angular 22 Signals', Validators.required],
+      heroHeadlines: ['Building Enterprise-Grade .NET & Angular Solutions\nArchitecting Scalable Clean Architecture & CQRS Systems\nEngineering Resilient Cloud-Ready Microservices'],
     });
   }
 
@@ -172,14 +193,21 @@ export class AdminDashboardComponent implements OnInit {
       },
     });
 
-    // 2. Skills
+    // 2. Blog Posts
+    this.apiService.getBlogPosts().subscribe({
+      next: (res) => {
+        if (res.data) this.blogPosts.set(res.data);
+      },
+    });
+
+    // 3. Skills
     this.apiService.getSkills().subscribe({
       next: (res) => {
         if (res.data) this.skillGroups.set(res.data);
       },
     });
 
-    // 3. Settings
+    // 4. Settings
     this.apiService.getPublicSettings().subscribe({
       next: (res) => {
         if (res.data) {
@@ -189,6 +217,14 @@ export class AdminDashboardComponent implements OnInit {
             if (res.data.heroBadgesJson) {
               const parsed = JSON.parse(res.data.heroBadgesJson);
               if (Array.isArray(parsed)) badgesStr = parsed.join(', ');
+            }
+          } catch {}
+
+          let headlinesStr = 'Building Enterprise-Grade .NET & Angular Solutions\nArchitecting Scalable Clean Architecture & CQRS Systems\nEngineering Resilient Cloud-Ready Microservices';
+          try {
+            if (res.data.heroHeadlinesJson) {
+              const parsed = JSON.parse(res.data.heroHeadlinesJson);
+              if (Array.isArray(parsed) && parsed.length > 0) headlinesStr = parsed.join('\n');
             }
           } catch {}
 
@@ -204,26 +240,27 @@ export class AdminDashboardComponent implements OnInit {
             heroCodeTitle: res.data.heroCodeTitle || 'ShahidPortfolio.sln - Clean Architecture',
             heroCodeSnippet: res.data.heroCodeSnippet || '',
             heroBadges: badgesStr,
+            heroHeadlines: headlinesStr,
           });
         }
       },
     });
 
-    // 4. Messages
+    // 5. Messages
     this.adminService.getMessages().subscribe({
       next: (res) => {
         if (res.data) this.messages.set(res.data);
       },
     });
 
-    // 5. Testimonials
+    // 6. Testimonials
     this.adminService.getAllTestimonials().subscribe({
       next: (res) => {
         if (res.data) this.testimonials.set(res.data as Testimonial[]);
       },
     });
 
-    // 6. Certificates
+    // 7. Certificates
     this.adminService.getAllCertificates().subscribe({
       next: (res) => {
         if (res.data) this.certificates.set(res.data as Certificate[]);
@@ -231,7 +268,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'testimonials' | 'certificates' | 'settings'): void {
+  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'): void {
     this.activeTab.set(tab);
     this.actionMessage.set(null);
     this.errorMessage.set(null);
@@ -380,6 +417,130 @@ export class AdminDashboardComponent implements OnInit {
           error: (err) => {
             this.closeConfirmModal();
             this.showError(err?.error?.message || 'Failed to delete project.');
+          },
+        });
+      }
+    );
+  }
+
+  // ==========================================
+  // BLOG MANAGEMENT
+  // ==========================================
+  openNewBlogModal(): void {
+    this.blogForm.reset({
+      id: '',
+      title: '',
+      slug: '',
+      summary: '',
+      contentMarkdown: '',
+      coverImageUrl: '',
+      tags: 'Clean Architecture, .NET 10',
+      readTimeMinutes: 5,
+      status: 2,
+    });
+    this.isBlogModalOpen.set(true);
+  }
+
+  openEditBlogModal(post: BlogPostCard): void {
+    this.apiService.getBlogPostBySlug(post.slug).subscribe({
+      next: (res) => {
+        const detail = res.data;
+        const tagsStr = detail?.tags ? detail.tags.join(', ') : '';
+        this.blogForm.patchValue({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          summary: post.summary,
+          contentMarkdown: detail?.contentMarkdown || post.summary,
+          coverImageUrl: post.coverImageUrl || '',
+          tags: tagsStr,
+          readTimeMinutes: post.readTimeMinutes || 5,
+          status: 2,
+        });
+        this.isBlogModalOpen.set(true);
+      },
+      error: () => {
+        const tagsStr = post.tags ? post.tags.join(', ') : '';
+        this.blogForm.patchValue({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          summary: post.summary,
+          contentMarkdown: post.summary,
+          coverImageUrl: post.coverImageUrl || '',
+          tags: tagsStr,
+          readTimeMinutes: post.readTimeMinutes || 5,
+          status: 2,
+        });
+        this.isBlogModalOpen.set(true);
+      },
+    });
+  }
+
+  closeBlogModal(): void {
+    this.isBlogModalOpen.set(false);
+  }
+
+  saveBlogPost(): void {
+    if (this.blogForm.invalid) {
+      this.blogForm.markAllAsTouched();
+      return;
+    }
+    this.isSaving.set(true);
+    const formVal = this.blogForm.value;
+    const tagsArray = formVal.tags
+      ? formVal.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+      : [];
+
+    const payload = {
+      ...formVal,
+      tagsJson: JSON.stringify(tagsArray),
+      status: Number(formVal.status) || 2,
+    };
+
+    if (formVal.id) {
+      this.adminService.updateBlogPost(formVal.id, payload).subscribe({
+        next: () => {
+          this.isSaving.set(false);
+          this.isBlogModalOpen.set(false);
+          this.showNotice('Article updated successfully.');
+          this.loadAllData();
+        },
+        error: (err) => {
+          this.isSaving.set(false);
+          this.showError(err?.error?.message || 'Failed to update article.');
+        },
+      });
+    } else {
+      this.adminService.createBlogPost(payload).subscribe({
+        next: () => {
+          this.isSaving.set(false);
+          this.isBlogModalOpen.set(false);
+          this.showNotice('Article created successfully.');
+          this.loadAllData();
+        },
+        error: (err) => {
+          this.isSaving.set(false);
+          this.showError(err?.error?.message || 'Failed to create article.');
+        },
+      });
+    }
+  }
+
+  confirmDeleteBlog(post: BlogPostCard): void {
+    this.triggerConfirm(
+      'Delete Article',
+      `Are you sure you want to permanently delete "${post.title}"?`,
+      () => {
+        this.adminService.deleteBlogPost(post.id).subscribe({
+          next: () => {
+            this.closeConfirmModal();
+            this.showNotice('Article deleted.');
+            this.loadAllData();
+          },
+          error: (err) => {
+            this.closeConfirmModal();
+            this.showError(err?.error?.message || 'Failed to delete article.');
           },
         });
       }
@@ -723,10 +884,130 @@ export class AdminDashboardComponent implements OnInit {
     );
   }
 
+  readonly photoCacheBuster = signal<number>(Date.now());
+  readonly heroCacheBuster = signal<number>(Date.now());
+
+  selectedHeroFile: File | null = null;
+  readonly isUploadingHero = signal<boolean>(false);
+  readonly heroSuccessMessage = signal<string | null>(null);
+
+  get profilePhotoUrl(): string {
+    const raw = this.settings()?.profilePhotoUrl || '/uploads/Shahid_Profile.jpg';
+    const base = this.apiService.resolveMediaUrl(raw);
+    return `${base}?t=${this.photoCacheBuster()}`;
+  }
+
+  get heroImageUrl(): string {
+    const raw = this.settings()?.heroImageUrl;
+    if (!raw) return '';
+    return `${this.apiService.resolveMediaUrl(raw)}?t=${this.heroCacheBuster()}`;
+  }
+
+  get previewTerminalSnippet(): string {
+    return this.settingsForm?.get('heroCodeSnippet')?.value || '';
+  }
+
+  get previewTerminalTitle(): string {
+    return this.settingsForm?.get('heroCodeTitle')?.value || 'ShahidPortfolio.sln - Clean Architecture';
+  }
+
+  get previewHeroBadges(): string[] {
+    const raw = this.settingsForm?.get('heroBadges')?.value || '';
+    return raw.split(',').map((b: string) => b.trim()).filter(Boolean);
+  }
+
   // ==========================================
-  // SITE SETTINGS & CV UPLOAD
+  // SITE SETTINGS, TERMINAL & CV UPLOAD
   // ==========================================
-  saveSettings(): void {
+  saveIdentitySettings(): void {
+    if (
+      this.settingsForm.get('fullName')?.invalid ||
+      this.settingsForm.get('professionalTitle')?.invalid ||
+      this.settingsForm.get('currentLocation')?.invalid
+    ) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please complete Full Name, Professional Title, and Location.');
+      return;
+    }
+    this.saveSettings('Personal & Professional identity updated successfully!');
+  }
+
+  saveAvailabilitySettings(): void {
+    if (
+      this.settingsForm.get('availabilityStatus')?.invalid ||
+      this.settingsForm.get('whatsAppNumber')?.invalid
+    ) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please complete Availability Status and WhatsApp Number.');
+      return;
+    }
+    this.saveSettings('Career availability and WhatsApp contact updated successfully!');
+  }
+
+  saveNarrativeSettings(): void {
+    if (this.settingsForm.get('oneLineBio')?.invalid) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please provide a One-Line Bio.');
+      return;
+    }
+    this.saveSettings('Public bio and narrative updated successfully!');
+  }
+
+  saveHeadlinesSettings(): void {
+    this.saveSettings('Hero typewriter headlines updated successfully!');
+  }
+
+  saveCodeSnippetSettings(): void {
+    if (
+      this.settingsForm.get('heroCodeTitle')?.invalid ||
+      this.settingsForm.get('heroCodeSnippet')?.invalid
+    ) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please complete Terminal Window Title and C# Code Snippet.');
+      return;
+    }
+    this.saveSettings('Hero C# code snippet updated successfully!');
+  }
+
+  saveBadgesSettings(): void {
+    if (this.settingsForm.get('heroBadges')?.invalid) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please provide at least one badge.');
+      return;
+    }
+    this.saveSettings('Hero architecture badges updated successfully!');
+  }
+
+  saveProfileSettings(): void {
+    if (
+      this.settingsForm.get('fullName')?.invalid ||
+      this.settingsForm.get('professionalTitle')?.invalid ||
+      this.settingsForm.get('currentLocation')?.invalid ||
+      this.settingsForm.get('availabilityStatus')?.invalid ||
+      this.settingsForm.get('whatsAppNumber')?.invalid ||
+      this.settingsForm.get('oneLineBio')?.invalid
+    ) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please complete all required personal profile fields marked with *');
+      return;
+    }
+    this.saveSettings('Personal profile information saved successfully!');
+  }
+
+  saveTerminalSettings(): void {
+    if (
+      this.settingsForm.get('heroCodeTitle')?.invalid ||
+      this.settingsForm.get('heroCodeSnippet')?.invalid ||
+      this.settingsForm.get('heroBadges')?.invalid
+    ) {
+      this.settingsForm.markAllAsTouched();
+      this.showError('Please complete all required hero terminal code fields marked with *');
+      return;
+    }
+    this.saveSettings('Hero terminal code snippet & badges updated successfully!');
+  }
+
+  saveSettings(successToast = 'Site settings updated successfully!'): void {
     if (this.settingsForm.invalid) {
       this.settingsForm.markAllAsTouched();
       return;
@@ -736,6 +1017,10 @@ export class AdminDashboardComponent implements OnInit {
     const formVal = this.settingsForm.value;
     const badgesArray = formVal.heroBadges
       ? formVal.heroBadges.split(',').map((b: string) => b.trim()).filter(Boolean)
+      : [];
+
+    const headlinesArray = formVal.heroHeadlines
+      ? formVal.heroHeadlines.split('\n').map((h: string) => h.trim()).filter(Boolean)
       : [];
 
     const payload = {
@@ -750,6 +1035,9 @@ export class AdminDashboardComponent implements OnInit {
       heroCodeTitle: formVal.heroCodeTitle || 'ShahidPortfolio.sln - Clean Architecture',
       heroCodeSnippet: formVal.heroCodeSnippet || '',
       heroBadgesJson: JSON.stringify(badgesArray),
+      profilePhotoUrl: this.settings()?.profilePhotoUrl || '/uploads/Shahid_Profile.jpg',
+      heroImageUrl: this.settings()?.heroImageUrl || null,
+      heroHeadlinesJson: JSON.stringify(headlinesArray),
       socialLinks: (this.settings()?.socialLinks || []).map((s, idx) => ({
         platform: s.platform,
         url: s.url,
@@ -761,7 +1049,7 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.updateSettings(payload).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.showNotice('Site settings & Hero terminal updated successfully!');
+        this.showNotice(successToast);
         this.loadAllData();
       },
       error: (err) => {
@@ -798,9 +1086,12 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => {
         this.isUploadingCv.set(false);
         this.selectedCvFile = null;
-        const resolvedUrl = this.getCvUrl(res.data || '/uploads/Shahid_Hussain_CV.pdf');
-        this.cvSuccessMessage.set('File uploaded and verified! Link: ' + resolvedUrl);
-        this.showNotice('CV uploaded successfully! Public link updated.');
+        const relativeUrl = res.data || '/uploads/Shahid_Hussain_CV.pdf';
+        const resolvedUrl = this.getCvUrl(relativeUrl);
+        // update local reactive signal immediately
+        this.settings.update((s) => (s ? { ...s, cvUrl: relativeUrl } : null));
+        this.cvSuccessMessage.set('File uploaded and verified! Link is live: ' + resolvedUrl);
+        this.showNotice('CV uploaded successfully! Public download link verified.');
         this.loadAllData();
       },
       error: (err) => {
@@ -818,12 +1109,78 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  downloadCvDirectly(): void {
+    const url = this.getCvUrl(this.settings()?.cvUrl);
+    window.open(url, '_blank');
+  }
+
+  onPhotoFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedPhotoFile = input.files[0];
+    }
+  }
+
+  uploadSelectedPhoto(): void {
+    if (!this.selectedPhotoFile) return;
+
+    this.isUploadingPhoto.set(true);
+    this.adminService.uploadProfilePhoto(this.selectedPhotoFile).subscribe({
+      next: (res) => {
+        this.isUploadingPhoto.set(false);
+        this.selectedPhotoFile = null;
+        this.photoCacheBuster.set(Date.now());
+        this.hasProfileImageError.set(false);
+        const relativeUrl = res.data || '/uploads/Shahid_Profile.jpg';
+        this.settings.update((s) => (s ? { ...s, profilePhotoUrl: relativeUrl } : null));
+        this.photoSuccessMessage.set('Profile photo updated and live on public portfolio!');
+        this.showNotice('Profile photo uploaded and active on public portfolio!');
+        this.loadAllData();
+      },
+      error: (err) => {
+        this.isUploadingPhoto.set(false);
+        this.showError(err?.error?.message || 'Failed to upload photo.');
+      },
+    });
+  }
+
+  onHeroFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedHeroFile = input.files[0];
+    }
+  }
+
+  uploadSelectedHero(): void {
+    if (!this.selectedHeroFile) return;
+
+    this.isUploadingHero.set(true);
+    this.adminService.uploadHeroImage(this.selectedHeroFile).subscribe({
+      next: (res) => {
+        this.isUploadingHero.set(false);
+        this.selectedHeroFile = null;
+        this.heroCacheBuster.set(Date.now());
+        const relativeUrl = res.data;
+        this.settings.update((s) => (s ? { ...s, heroImageUrl: relativeUrl } : null));
+        this.heroSuccessMessage.set('Hero card showcase image uploaded and active on public portfolio!');
+        this.showNotice('Hero showcase image uploaded and live on home page!');
+        this.loadAllData();
+      },
+      error: (err) => {
+        this.isUploadingHero.set(false);
+        this.showError(err?.error?.message || 'Failed to upload hero image.');
+      },
+    });
+  }
+
   // ==========================================
   // HELPERS
   // ==========================================
   getCvUrl(url: string | undefined | null): string {
+    const fallback = `${environment.apiUrl}/media/cv`;
+    if (!url) return fallback;
     const resolved = this.apiService.resolveMediaUrl(url);
-    return resolved || `${environment.apiUrl}/media/cv`;
+    return resolved || fallback;
   }
   getCategoryName(cat: number): string {
     switch (cat) {

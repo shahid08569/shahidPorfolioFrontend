@@ -3,6 +3,7 @@
 
 .case-study-page {
   padding-top: 3rem;
+  background: var(--bg);
 }
 
 .back-nav {
@@ -13,17 +14,18 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.925rem;
-    color: var(--text-secondary);
+    color: var(--text-heading);
+    font-weight: 500;
     transition: color $transition-fast;
 
     &:hover {
-      color: var(--accent-primary);
+      color: var(--bronze-dark);
     }
   }
 }
 
 .case-header {
-  margin-bottom: 4rem;
+  margin-bottom: 3.5rem;
   max-width: 850px;
 
   .header-badges {
@@ -31,11 +33,12 @@
   }
 
   .case-title {
+    font-family: $font-headings;
     font-size: 2.25rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.03em;
-    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    color: var(--text-heading);
     margin-bottom: 1rem;
 
     @include md {
@@ -45,8 +48,8 @@
 
   .case-summary {
     font-size: 1.15rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
+    color: var(--text);
+    line-height: 1.65;
     margin-bottom: 2rem;
   }
 
@@ -84,6 +87,17 @@
 
 .case-card {
   padding: 2.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: $radius-card;
+  box-shadow: var(--card-shadow);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-lg);
+    border-color: var(--bronze-dark);
+  }
 
   .card-icon {
     width: 44px;
@@ -93,45 +107,34 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 1.25rem;
+    background: var(--beige);
+    border: 1px solid var(--border);
+    color: var(--text-heading);
 
-    &.problem {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-    }
-    &.solution {
-      background: rgba(16, 185, 129, 0.1);
-      color: #10b981;
-    }
-    &.architecture {
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--accent-primary);
-    }
-    &.metrics {
-      background: rgba(245, 158, 11, 0.1);
-      color: #f59e0b;
-    }
-    &.lessons {
-      background: rgba(129, 140, 248, 0.1);
-      color: var(--accent-secondary);
+    &.problem, &.solution, &.architecture, &.metrics, &.lessons {
+      background: var(--beige);
+      color: var(--text-heading);
     }
   }
 
   .card-title {
+    font-family: $font-headings;
     font-size: 1.35rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-heading);
     margin-bottom: 1rem;
   }
 
   .card-text {
     font-size: 1rem;
-    color: var(--text-secondary);
+    color: var(--text);
     line-height: 1.7;
 
     &.highlight-metrics {
+      font-family: $font-mono;
       font-size: 1.15rem;
       font-weight: 600;
-      color: var(--accent-primary);
+      color: var(--text-heading);
     }
   }
 }
@@ -149,23 +152,24 @@
     max-width: 600px;
     padding: 1rem 1.5rem;
     border-radius: $radius-md;
-    border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    background: var(--cornsilk);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    transition: all $transition-fast;
+    transition: all 150ms ease;
 
     &:hover {
-      border-color: var(--accent-primary);
+      border-color: var(--bronze-dark);
       transform: scale(1.02);
     }
 
     .layer-title {
+      font-family: $font-mono;
       font-weight: 700;
       font-size: 0.95rem;
-      color: var(--text-primary);
+      color: var(--text-heading);
       margin-bottom: 0.25rem;
     }
 
@@ -174,18 +178,14 @@
       color: var(--text-muted);
     }
 
-    &.domain {
-      border-color: rgba(56, 189, 248, 0.3);
-      background: rgba(56, 189, 248, 0.05);
-    }
-    &.application {
-      border-color: rgba(129, 140, 248, 0.3);
-      background: rgba(129, 140, 248, 0.05);
+    &.domain, &.application {
+      border-color: var(--border);
+      background: var(--beige);
     }
   }
 
   .arch-arrow {
-    color: var(--accent-primary);
+    color: var(--bronze-dark);
     font-size: 1.25rem;
     font-weight: bold;
   }
