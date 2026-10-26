@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { ApiService } from '../../core/services/api.service';
@@ -14,6 +14,7 @@ import { PublicSettings } from '../../core/models/settings.model';
 })
 export class FooterComponent implements OnInit {
   private readonly api = inject(ApiService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly currentYear = new Date().getFullYear();
   readonly settings = signal<PublicSettings | null>(null);
@@ -49,6 +50,15 @@ export class FooterComponent implements OnInit {
   get availability() { return this.settings()?.availabilityStatus || 'Open to Work'; }
 
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const cached = sessionStorage.getItem('shahid_cached_settings');
+        if (cached) {
+          this.settings.set(JSON.parse(cached));
+        }
+      } catch {}
+    }
+
     this.api.getPublicSettings().subscribe({
       next: (res) => { if (res.data) this.settings.set(res.data); },
     });

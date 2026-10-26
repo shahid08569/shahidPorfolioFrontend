@@ -41,6 +41,17 @@ export class HeaderComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const cached = sessionStorage.getItem('shahid_cached_settings');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.availabilityStatus) this.availability.set(parsed.availabilityStatus);
+          if (parsed.fullName) this.fullName.set(parsed.fullName);
+        }
+      } catch {}
+    }
+
     this.api.getPublicSettings().subscribe({
       next: (res) => {
         if (res.data) {

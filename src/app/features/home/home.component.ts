@@ -78,40 +78,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     ],
   });
 
-  readonly featuredProjects = signal<ProjectCard[]>([
-    {
-      id: '1',
-      title: 'Enterprise E-Commerce API & Management Portal',
-      slug: 'enterprise-ecommerce-portal',
-      summary:
-        'Scalable multi-tenant e-commerce system built with .NET Clean Architecture, EF Core, SQL Server, and an Angular admin dashboard.',
-      problemStatement:
-        'Traditional monolith e-commerce backends suffer from high database contention and coupled business logic during peak promotional flash sales.',
-      solutionStatement:
-        'Engineered a decoupled Clean Architecture backend using CQRS and MediatR to isolate read and write workloads, integrated with Redis cache and optimistic concurrency in EF Core.',
-      architectureOverview:
-        'Layered Clean Architecture: Domain Core -> Application CQRS Commands/Queries -> Infrastructure SQL Server Persistence -> Web API with JWT Auth and Rate Limiting.',
-      keyMetrics:
-        'Maintained sub-90ms response times under 5,000 concurrent product catalog queries; achieved 99.9% uptime during load testing.',
-      thumbnailUrl: '',
-      liveUrl: 'https://github.com/shahid08569/shahidPorfolioBackend',
-      githubUrl: 'https://github.com/shahid08569/shahidPorfolioBackend',
-      techStackJson: '[]',
-      techStack: ['.NET 10', 'ASP.NET Core', 'Angular 22', 'SQL Server', 'MediatR', 'Redis'],
-      isFeatured: true,
-      isCaseStudy: true,
-      displayOrder: 1,
-    },
-  ]);
+  readonly featuredProjects = signal<ProjectCard[]>([]);
+  readonly isLoadingProjects = signal(true);
 
-  readonly topSkills = signal<{ name: string; category: string; icon: string }[]>([
-    { name: '.NET 10 / C#', category: 'Backend', icon: 'server' },
-    { name: 'ASP.NET Core Web API', category: 'Backend', icon: 'server' },
-    { name: 'Clean Architecture & CQRS', category: 'Architecture', icon: 'code' },
-    { name: 'Angular 22 & TypeScript', category: 'Frontend', icon: 'code' },
-    { name: 'SQL Server & EF Core', category: 'Database', icon: 'database' },
-    { name: 'Docker & Microservices', category: 'DevOps', icon: 'terminal' },
-  ]);
+  readonly topSkills = signal<{ name: string; category: string; icon: string }[]>([]);
+  readonly isLoadingSkills = signal(true);
 
   readonly testimonials = signal<Testimonial[]>([]);
   readonly certificates = signal<Certificate[]>([]);
@@ -212,6 +183,31 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       description:
         'Portfolio of Shahid Hussain - Senior Full-Stack .NET & Angular Developer specializing in Clean Architecture, CQRS, and enterprise web solutions.',
     });
+
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const cachedSettings = sessionStorage.getItem('shahid_cached_settings');
+        if (cachedSettings) {
+          this.settings.set(JSON.parse(cachedSettings));
+        }
+        const cachedProjects = sessionStorage.getItem('shahid_cached_projects');
+        if (cachedProjects) {
+          const parsed = JSON.parse(cachedProjects);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.featuredProjects.set(parsed);
+            this.isLoadingProjects.set(false);
+          }
+        }
+        const cachedSkills = sessionStorage.getItem('shahid_cached_skills');
+        if (cachedSkills) {
+          const parsed = JSON.parse(cachedSkills);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.topSkills.set(parsed);
+            this.isLoadingSkills.set(false);
+          }
+        }
+      } catch {}
+    }
 
     this.startTypewriter();
     this.loadData();
@@ -815,6 +811,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.settings.set(res.data);
           this.hasProfileImageError.set(false);
           this.hasHeroImageError.set(false);
+          if (isPlatformBrowser(this.platformId)) {
+            try { sessionStorage.setItem('shahid_cached_settings', JSON.stringify(res.data)); } catch {}
+          }
           if (res.data.heroHeadlinesJson && res.data.heroHeadlinesJson !== oldHeadlines) {
             this.startTypewriter();
           }
@@ -825,16 +824,50 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.apiService.getProjects({ isFeatured: true }).subscribe({
       next: (res) => {
-        if (res.data && res.data.length > 0) {
+        this.isLoadingProjects.set(false);
+        if (res.data) {
           this.featuredProjects.set(res.data);
+          if (isPlatformBrowser(this.platformId)) {
+            try { sessionStorage.setItem('shahid_cached_projects', JSON.stringify(res.data)); } catch {}
+          }
         }
       },
-      error: () => {},
+      error: () => this.isLoadingProjects.set(false),
+    });
+
+    this.apiService.getSkills().subscribe({
+      next: (res) => {
+        this.isLoadingSkills.set(false);
+        if (res.data && res.data.length > 0) {
+          const mapped: { name: string; category: string; icon: string }[] = [];
+          const categoryIconMap: Record<string, string> = {
+            'Backend & Cloud Architecture': 'server',
+            'Frontend & Web Architecture': 'code',
+            'Databases & Persistence': 'database',
+            'DevOps, Testing & Tooling': 'terminal',
+            'Architecture & Clean Code': 'layers',
+          };
+          for (const group of res.data) {
+            const icon = categoryIconMap[group.categoryName] || 'server';
+            const topInGroup = group.skills.filter((s) => s.isTopSkill).slice(0, 2);
+            for (const s of topInGroup) {
+              mapped.push({ name: s.name, category: group.categoryName.split('&')[0].trim(), icon });
+            }
+          }
+          if (mapped.length > 0) {
+            this.topSkills.set(mapped.slice(0, 8));
+            if (isPlatformBrowser(this.platformId)) {
+              try { sessionStorage.setItem('shahid_cached_skills', JSON.stringify(mapped.slice(0, 8))); } catch {}
+            }
+          }
+        }
+      },
+      error: () => this.isLoadingSkills.set(false),
     });
 
     this.apiService.getTestimonials().subscribe({
       next: (res) => {
-        if (res.data && res.data.length > 0) {
+        if (res.data) {
           this.testimonials.set(res.data);
         }
       },
@@ -843,7 +876,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.apiService.getCertificates().subscribe({
       next: (res) => {
-        if (res.data && res.data.length > 0) {
+        if (res.data) {
           this.certificates.set(res.data as Certificate[]);
         }
       },

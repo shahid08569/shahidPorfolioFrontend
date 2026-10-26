@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SeoService } from '../../../core/services/seo.service';
@@ -16,33 +16,10 @@ import { BlogPostCard } from '../../../core/models/blog.model';
 export class BlogListComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly seoService = inject(SeoService);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  readonly posts = signal<BlogPostCard[]>([
-    {
-      id: '1',
-      title: 'Architecting Clean Microservices in .NET 10 with MediatR & CQRS',
-      slug: 'architecting-clean-microservices-dotnet-10',
-      summary:
-        'A practical guide to structuring enterprise .NET solutions with strict layer boundaries, FluentValidation pipelines, and zero-leakage domain models.',
-      coverImageUrl: '',
-      tagsJson: '[]',
-      tags: ['.NET 10', 'Clean Architecture', 'CQRS', 'MediatR'],
-      readTimeMinutes: 6,
-      publishedAtUtc: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      title: 'Mastering Angular 22 Signals & Modern SSR Hydration',
-      slug: 'mastering-angular-22-signals-ssr',
-      summary:
-        'Why Angular signals eliminate unnecessary change detection cycles and how event replay + hydration transform Core Web Vitals in 2026.',
-      coverImageUrl: '',
-      tagsJson: '[]',
-      tags: ['Angular 22', 'Signals', 'SSR', 'Web Performance'],
-      readTimeMinutes: 5,
-      publishedAtUtc: new Date(Date.now() - 86400000 * 5).toISOString(),
-    },
-  ]);
+  readonly posts = signal<BlogPostCard[]>([]);
+  readonly isLoading = signal(true);
 
   ngOnInit(): void {
     this.seoService.updateMeta({
@@ -51,17 +28,34 @@ export class BlogListComponent implements OnInit {
         'In-depth technical guides on .NET Clean Architecture, CQRS, MediatR, and modern Angular standalone performance by Shahid Hussain.',
     });
 
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const cached = sessionStorage.getItem('shahid_cached_blog_posts');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.posts.set(parsed);
+            this.isLoading.set(false);
+          }
+        }
+      } catch {}
+    }
+
     this.loadPosts();
   }
 
   private loadPosts(): void {
     this.apiService.getBlogPosts().subscribe({
       next: (res) => {
-        if (res.data && res.data.length > 0) {
+        this.isLoading.set(false);
+        if (res.data) {
           this.posts.set(res.data);
+          if (isPlatformBrowser(this.platformId)) {
+            try { sessionStorage.setItem('shahid_cached_blog_posts', JSON.stringify(res.data)); } catch {}
+          }
         }
       },
-      error: () => {},
+      error: () => this.isLoading.set(false),
     });
   }
 }

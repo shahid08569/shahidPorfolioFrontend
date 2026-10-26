@@ -1,18 +1,18 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-// Host element must be pinned and block for guaranteed sticky behavior
+// Host element reserves exact height in document flow for fixed header
 :host {
   display: block;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  position: relative;
+  height: 68px;
   width: 100%;
+  z-index: 1000;
 }
 
-// ── Header Shell (Navbar: background --tea-green) ────────────
+// ── Header Shell (Navbar: background --tea-green, 100% fixed at top) ────────────
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -22,7 +22,7 @@
   background: var(--tea-green) !important;
   border-bottom: 1px solid rgba(59, 47, 35, 0.12);
   box-shadow: 0 2px 10px rgba(59, 47, 35, 0.05);
-  transition: all $transition-base;
+  transition: height $transition-base, box-shadow $transition-base;
 
   &.scrolled {
     height: 62px;

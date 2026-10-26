@@ -39,7 +39,7 @@
     </div>
 
     <!-- Projects Grid -->
-    <div class="projects-grid" *ngIf="filteredProjects().length > 0; else noResults">
+    <div class="projects-grid" *ngIf="filteredProjects().length > 0">
       <div class="project-card card" *ngFor="let project of filteredProjects()">
         <div class="project-header">
           <span class="case-study-badge" *ngIf="project.isCaseStudy">
@@ -94,15 +94,14 @@
       </div>
     </div>
 
-    <ng-template #noResults>
-      <div class="no-results card">
-        <app-icon name="code" [size]="40" class="no-results-icon"></app-icon>
-        <h3>No projects match your filter</h3>
-        <p>Try clearing your search query or selecting "All" categories.</p>
-        <button class="btn btn-outline" (click)="searchQuery.set(''); selectedCategory.set('All')">
-          Reset Filters
-        </button>
-      </div>
-    </ng-template>
+    <!-- Empty Results -->
+    <div class="no-results card" *ngIf="!isLoading() && filteredProjects().length === 0">
+      <app-icon name="code" [size]="40" class="no-results-icon"></app-icon>
+      <h3>No projects match your filter</h3>
+      <p>Try clearing your search query or selecting "All" categories.</p>
+      <button class="btn btn-outline" (click)="searchQuery.set(''); selectedCategory.set('All')">
+        Reset Filters
+      </button>
+    </div>
   </div>
 </div>

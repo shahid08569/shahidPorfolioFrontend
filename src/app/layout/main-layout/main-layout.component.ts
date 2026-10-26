@@ -47,7 +47,7 @@ import { FooterComponent } from '../footer/footer.component';
         display: flex;
         flex-direction: column;
         position: relative;
-        overflow-x: hidden;
+        overflow-x: clip;
         width: 100%;
         max-width: 100vw;
       }

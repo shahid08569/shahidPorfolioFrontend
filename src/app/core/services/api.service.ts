@@ -37,7 +37,7 @@ export class ApiService {
   }
 
   getProjects(filters?: { isFeatured?: boolean; tag?: string }): Observable<ApiResponse<ProjectCard[]>> {
-    let params = new HttpParams();
+    let params = new HttpParams().set('_t', Date.now().toString());
     if (filters?.isFeatured !== undefined) {
       params = params.set('isFeatured', filters.isFeatured.toString());
     }
@@ -59,7 +59,8 @@ export class ApiService {
   }
 
   getProjectBySlug(slug: string): Observable<ApiResponse<ProjectDetail>> {
-    return this.http.get<ApiResponse<ProjectDetail>>(`${this.baseUrl}/projects/${slug}`).pipe(
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<ProjectDetail>>(`${this.baseUrl}/projects/${slug}`, { params }).pipe(
       map((response) => {
         if (response.data) {
           response.data = {
@@ -73,11 +74,13 @@ export class ApiService {
   }
 
   getSkills(): Observable<ApiResponse<SkillCategoryGroup[]>> {
-    return this.http.get<ApiResponse<SkillCategoryGroup[]>>(`${this.baseUrl}/skills`);
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<SkillCategoryGroup[]>>(`${this.baseUrl}/skills`, { params });
   }
 
   getTimeline(): Observable<ApiResponse<Timeline>> {
-    return this.http.get<ApiResponse<Timeline>>(`${this.baseUrl}/experiences/timeline`).pipe(
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<Timeline>>(`${this.baseUrl}/experiences/timeline`, { params }).pipe(
       map((response) => {
         if (response.data) {
           response.data.experiences = response.data.experiences.map((exp) => ({
@@ -92,7 +95,8 @@ export class ApiService {
   }
 
   getTestimonials(): Observable<ApiResponse<Testimonial[]>> {
-    return this.http.get<ApiResponse<Testimonial[]>>(`${this.baseUrl}/testimonials`);
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<Testimonial[]>>(`${this.baseUrl}/testimonials`, { params });
   }
 
   submitTestimonial(payload: any): Observable<ApiResponse<boolean>> {
@@ -100,11 +104,13 @@ export class ApiService {
   }
 
   getCertificates(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/certificates`);
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/certificates`, { params });
   }
 
   getBlogPosts(): Observable<ApiResponse<BlogPostCard[]>> {
-    return this.http.get<ApiResponse<BlogPostCard[]>>(`${this.baseUrl}/blog`).pipe(
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<BlogPostCard[]>>(`${this.baseUrl}/blog`, { params }).pipe(
       map((response) => {
         if (response.data) {
           response.data = response.data.map((post) => ({
@@ -118,7 +124,8 @@ export class ApiService {
   }
 
   getBlogPostBySlug(slug: string): Observable<ApiResponse<BlogPostDetail>> {
-    return this.http.get<ApiResponse<BlogPostDetail>>(`${this.baseUrl}/blog/${slug}`).pipe(
+    const params = new HttpParams().set('_t', Date.now().toString());
+    return this.http.get<ApiResponse<BlogPostDetail>>(`${this.baseUrl}/blog/${slug}`, { params }).pipe(
       map((response) => {
         if (response.data) {
           response.data = {

@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -34,6 +34,7 @@ export class AdminDashboardComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly adminService = inject(AdminService);
   private readonly fb = inject(FormBuilder);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'>('overview');
 
@@ -1302,6 +1303,17 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private showNotice(msg: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        sessionStorage.removeItem('shahid_cached_settings');
+        sessionStorage.removeItem('shahid_cached_projects');
+        sessionStorage.removeItem('shahid_cached_all_projects');
+        sessionStorage.removeItem('shahid_cached_skills');
+        sessionStorage.removeItem('shahid_cached_all_skills');
+        sessionStorage.removeItem('shahid_cached_timeline');
+        sessionStorage.removeItem('shahid_cached_blog_posts');
+      } catch {}
+    }
     this.actionMessage.set(msg);
     this.errorMessage.set(null);
     setTimeout(() => this.actionMessage.set(null), 5000);
