@@ -267,14 +267,15 @@
       @for (project of featuredProjects(); track project.id) {
         <div class="project-card card">
           <!-- Thumbnail / placeholder -->
-          <div class="project-thumbnail" [class.no-thumb]="!project.thumbnailUrl">
+          <div class="project-thumbnail" [class.no-thumb]="!isProjectThumbVisible(project)">
             <img
-              *ngIf="project.thumbnailUrl"
-              [src]="project.thumbnailUrl"
+              *ngIf="isProjectThumbVisible(project)"
+              [src]="getProjectThumbnailUrl(project.thumbnailUrl)"
               [alt]="project.title"
+              (error)="onProjectImageError(project.id)"
               loading="lazy"
             />
-            <div *ngIf="!project.thumbnailUrl" class="thumb-placeholder">
+            <div *ngIf="!isProjectThumbVisible(project)" class="thumb-placeholder">
               <app-icon name="code" [size]="40"></app-icon>
             </div>
 

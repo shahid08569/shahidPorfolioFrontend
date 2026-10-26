@@ -1187,6 +1187,76 @@
             </div>
           </div>
 
+          <!-- PROJECT THUMBNAIL / SHOWCASE IMAGE (DUAL: UPLOAD FILE & DIRECT URL) -->
+          <div class="project-media-section">
+            <div class="media-section-header">
+              <label class="form-label mb-0">Project Thumbnail / Showcase Image</label>
+              <span class="media-hint">Direct File Upload from PC OR Web Image URL</span>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="project-thumb-preview-card" *ngIf="projectThumbnailPreview; else noProjectThumb">
+              <div class="preview-img-wrapper">
+                <img [src]="projectThumbnailPreview" alt="Project Thumbnail Preview" class="preview-img" />
+              </div>
+              <div class="preview-info">
+                <span class="preview-path" [title]="projectForm.get('thumbnailUrl')?.value">
+                  {{ projectForm.get('thumbnailUrl')?.value }}
+                </span>
+                <button type="button" class="btn btn-outline btn-xs btn-remove-thumb" (click)="clearProjectThumbnail()">
+                  <app-icon name="trash" [size]="14"></app-icon>
+                  Remove Image
+                </button>
+              </div>
+            </div>
+            <ng-template #noProjectThumb>
+              <div class="project-thumb-placeholder-box">
+                <app-icon name="image" [size]="24"></app-icon>
+                <span>No thumbnail chosen. Select an image file from your device or paste a URL below.</span>
+              </div>
+            </ng-template>
+
+            <!-- Dual Upload Controls -->
+            <div class="project-media-inputs">
+              <!-- Option A: File Upload -->
+              <div class="media-input-col upload-col">
+                <label class="input-sublabel">Option 1: Upload from Computer</label>
+                <input
+                  type="file"
+                  #projectFileInput
+                  (change)="onProjectImageFileSelected($event)"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  class="d-none"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline btn-file-picker"
+                  (click)="projectFileInput.click()"
+                  [disabled]="isUploadingProjectImage()"
+                >
+                  <span class="spinner-border spinner-border-sm" *ngIf="isUploadingProjectImage()"></span>
+                  <app-icon name="upload" [size]="16" *ngIf="!isUploadingProjectImage()"></app-icon>
+                  <span>{{ isUploadingProjectImage() ? 'Uploading Image...' : 'Choose Image File' }}</span>
+                </button>
+              </div>
+
+              <div class="media-input-divider">
+                <span>OR</span>
+              </div>
+
+              <!-- Option B: Direct Image URL -->
+              <div class="media-input-col url-col">
+                <label class="input-sublabel">Option 2: Direct Image URL</label>
+                <input
+                  type="url"
+                  formControlName="thumbnailUrl"
+                  class="form-control"
+                  placeholder="https://images.unsplash.com/... or /uploads/..."
+                />
+              </div>
+            </div>
+          </div>
+
           <div class="form-row-checkboxes">
             <label class="checkbox-label">
               <input type="checkbox" formControlName="isFeatured" />
@@ -1471,18 +1541,82 @@
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Cover Image URL (Optional)</label>
-              <input type="text" formControlName="coverImageUrl" class="form-control" placeholder="https://... or /uploads/..." />
+          <!-- BLOG COVER IMAGE (DUAL: UPLOAD FILE & DIRECT URL) -->
+          <div class="project-media-section">
+            <div class="media-section-header">
+              <label class="form-label mb-0">Article Cover Image</label>
+              <span class="media-hint">Upload from PC OR Web Image URL</span>
             </div>
-            <div class="form-group">
-              <label class="form-label">Publication Status *</label>
-              <select formControlName="status" class="form-control">
-                <option [ngValue]="2">Published (Live on Public Site)</option>
-                <option [ngValue]="1">Draft (Hidden)</option>
-              </select>
+
+            <!-- Preview Card -->
+            <div class="project-thumb-preview-card" *ngIf="blogCoverPreview; else noBlogThumb">
+              <div class="preview-img-wrapper">
+                <img [src]="blogCoverPreview" alt="Blog Cover Preview" class="preview-img" />
+              </div>
+              <div class="preview-info">
+                <span class="preview-path" [title]="blogForm.get('coverImageUrl')?.value">
+                  {{ blogForm.get('coverImageUrl')?.value }}
+                </span>
+                <button type="button" class="btn btn-outline btn-xs btn-remove-thumb" (click)="clearBlogCover()">
+                  <app-icon name="trash" [size]="14"></app-icon>
+                  Remove Image
+                </button>
+              </div>
             </div>
+            <ng-template #noBlogThumb>
+              <div class="project-thumb-placeholder-box">
+                <app-icon name="image" [size]="24"></app-icon>
+                <span>No cover image chosen. Select a file or paste an image URL below.</span>
+              </div>
+            </ng-template>
+
+            <!-- Dual Upload Controls -->
+            <div class="project-media-inputs">
+              <!-- Option A: File Upload -->
+              <div class="media-input-col upload-col">
+                <label class="input-sublabel">Option 1: Upload from Computer</label>
+                <input
+                  type="file"
+                  #blogFileInput
+                  (change)="onBlogCoverFileSelected($event)"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  class="d-none"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline btn-file-picker"
+                  (click)="blogFileInput.click()"
+                  [disabled]="isUploadingBlogImage()"
+                >
+                  <span class="spinner-border spinner-border-sm" *ngIf="isUploadingBlogImage()"></span>
+                  <app-icon name="upload" [size]="16" *ngIf="!isUploadingBlogImage()"></app-icon>
+                  <span>{{ isUploadingBlogImage() ? 'Uploading Image...' : 'Choose Image File' }}</span>
+                </button>
+              </div>
+
+              <div class="media-input-divider">
+                <span>OR</span>
+              </div>
+
+              <!-- Option B: Direct Image URL -->
+              <div class="media-input-col url-col">
+                <label class="input-sublabel">Option 2: Direct Image URL</label>
+                <input
+                  type="url"
+                  formControlName="coverImageUrl"
+                  class="form-control"
+                  placeholder="https://images.unsplash.com/... or /uploads/..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Publication Status *</label>
+            <select formControlName="status" class="form-control">
+              <option [ngValue]="2">Published (Live on Public Site)</option>
+              <option [ngValue]="1">Draft (Hidden)</option>
+            </select>
           </div>
         </div>
 

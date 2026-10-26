@@ -163,6 +163,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly hasProfileImageError = signal(false);
   readonly hasHeroImageError = signal(false);
+  readonly brokenProjectImages = signal<Record<string, boolean>>({});
+
+  onProjectImageError(projectId: string): void {
+    this.brokenProjectImages.update((map) => ({ ...map, [projectId]: true }));
+  }
+
+  getProjectThumbnailUrl(url: string | undefined | null): string {
+    if (!url) return '';
+    return this.apiService.resolveMediaUrl(url);
+  }
+
+  isProjectThumbVisible(project: ProjectCard): boolean {
+    return !!project.thumbnailUrl && !this.brokenProjectImages()[project.id];
+  }
 
   get profilePhotoUrl(): string {
     const raw = this.settings()?.profilePhotoUrl || '/uploads/Shahid_Profile.jpg';

@@ -403,6 +403,44 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
+  readonly isUploadingProjectImage = signal<boolean>(false);
+
+  onProjectImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (!file.type.startsWith('image/')) {
+        this.showError('Please select a valid image file (PNG, JPG, WEBP, SVG).');
+        return;
+      }
+      this.isUploadingProjectImage.set(true);
+      this.adminService.uploadFile(file).subscribe({
+        next: (res) => {
+          this.isUploadingProjectImage.set(false);
+          const relativeUrl = res.data;
+          this.projectForm.patchValue({ thumbnailUrl: relativeUrl });
+          this.showNotice('Project image uploaded successfully!');
+          input.value = '';
+        },
+        error: (err) => {
+          this.isUploadingProjectImage.set(false);
+          input.value = '';
+          this.showError(err?.error?.message || 'Failed to upload project image.');
+        },
+      });
+    }
+  }
+
+  get projectThumbnailPreview(): string {
+    const raw = this.projectForm.get('thumbnailUrl')?.value;
+    if (!raw) return '';
+    return this.apiService.resolveMediaUrl(raw);
+  }
+
+  clearProjectThumbnail(): void {
+    this.projectForm.patchValue({ thumbnailUrl: '' });
+  }
+
   confirmDeleteProject(project: ProjectCard): void {
     this.triggerConfirm(
       'Delete Project',
@@ -479,6 +517,44 @@ export class AdminDashboardComponent implements OnInit {
 
   closeBlogModal(): void {
     this.isBlogModalOpen.set(false);
+  }
+
+  readonly isUploadingBlogImage = signal<boolean>(false);
+
+  onBlogCoverFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (!file.type.startsWith('image/')) {
+        this.showError('Please select a valid image file (PNG, JPG, WEBP, SVG).');
+        return;
+      }
+      this.isUploadingBlogImage.set(true);
+      this.adminService.uploadFile(file).subscribe({
+        next: (res) => {
+          this.isUploadingBlogImage.set(false);
+          const relativeUrl = res.data;
+          this.blogForm.patchValue({ coverImageUrl: relativeUrl });
+          this.showNotice('Cover image uploaded successfully!');
+          input.value = '';
+        },
+        error: (err) => {
+          this.isUploadingBlogImage.set(false);
+          input.value = '';
+          this.showError(err?.error?.message || 'Failed to upload cover image.');
+        },
+      });
+    }
+  }
+
+  get blogCoverPreview(): string {
+    const raw = this.blogForm.get('coverImageUrl')?.value;
+    if (!raw) return '';
+    return this.apiService.resolveMediaUrl(raw);
+  }
+
+  clearBlogCover(): void {
+    this.blogForm.patchValue({ coverImageUrl: '' });
   }
 
   saveBlogPost(): void {
