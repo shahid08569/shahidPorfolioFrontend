@@ -174,14 +174,14 @@
 // ── Mobile Horizontal Tabs Navigation (Responsive < lg) ───────
 .admin-mobile-nav {
   display: flex;
-  background: #0F172A;
-  border-bottom: 1px solid #1E293B;
+  background: #F4F6EA;
+  border-bottom: 1px solid rgba(59, 47, 35, 0.12);
   padding: 0.6rem 1rem;
   overflow-x: auto;
   position: sticky;
   top: 64px;
   z-index: 40;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(59, 47, 35, 0.05);
 
   @include lg {
     display: none;
@@ -192,7 +192,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #CCD5AE;
     border-radius: 9999px;
   }
 }
@@ -212,43 +212,43 @@
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: #94A3B8;
+  color: #4A3F33;
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
 
   app-icon {
-    color: #64748B;
+    color: #7D6E5D;
   }
 
   &:hover {
-    color: #F8FAFC;
-    background: #1E293B;
+    color: #3B2F23;
+    background: #E9EDC9;
 
     app-icon {
-      color: #10B981;
+      color: #C08D5C;
     }
   }
 
   &.active {
-    color: #10B981;
-    background: rgba(16, 185, 129, 0.12);
-    border-color: rgba(16, 185, 129, 0.25);
-    font-weight: 600;
+    color: #3B2F23;
+    background: #CCD5AE;
+    border-color: rgba(59, 47, 35, 0.18);
+    font-weight: 700;
 
     app-icon {
-      color: #10B981;
+      color: #3B2F23;
     }
   }
 }
 
-// ── Sidebar Navigation (Dark Slate Corporate) ─────────────────
+// ── Sidebar Navigation (Warm Earthy Theme Matching Topbar) ────
 .admin-sidebar {
   width: 256px;
   flex-shrink: 0;
-  background: #0F172A;
-  border-right: 1px solid #1E293B;
+  background: #F4F6EA;
+  border-right: 1px solid rgba(59, 47, 35, 0.12);
   padding: 1.5rem 0.85rem;
   display: none;
 
@@ -273,7 +273,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #94A3B8;
+  color: #4A3F33;
   background: transparent;
   border: 1px solid transparent;
   text-align: left;
@@ -281,27 +281,28 @@
   transition: all 0.2s ease;
 
   app-icon {
-    color: #64748B;
+    color: #7D6E5D;
     transition: color 0.2s ease;
   }
 
   &:hover {
-    color: #F8FAFC;
-    background: #1E293B;
+    color: #3B2F23;
+    background: #E9EDC9;
 
     app-icon {
-      color: #10B981;
+      color: #C08D5C;
     }
   }
 
   &.active {
-    color: #10B981;
-    background: rgba(16, 185, 129, 0.12);
-    border-color: rgba(16, 185, 129, 0.25);
-    font-weight: 600;
+    color: #3B2F23;
+    background: #CCD5AE;
+    border-color: rgba(59, 47, 35, 0.18);
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(59, 47, 35, 0.08);
 
     app-icon {
-      color: #10B981;
+      color: #3B2F23;
     }
   }
 }

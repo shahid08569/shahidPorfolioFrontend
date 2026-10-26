@@ -355,6 +355,32 @@ export class AdminDashboardComponent implements OnInit {
       displayOrder: project.displayOrder,
     });
     this.isProjectModalOpen.set(true);
+
+    // Fetch full case-study details by slug to guarantee Problem, Solution, Architecture & Metrics are loaded
+    this.apiService.getProjectBySlug(project.slug).subscribe({
+      next: (res) => {
+        const detail = res.data;
+        if (detail) {
+          const detailStack = detail.techStack && detail.techStack.length > 0
+            ? detail.techStack.join(', ')
+            : (detail.techStackJson ? JSON.parse(detail.techStackJson).join(', ') : stackStr);
+
+          this.projectForm.patchValue({
+            problemStatement: detail.problemStatement || '',
+            solutionStatement: detail.solutionStatement || '',
+            architectureOverview: detail.architectureOverview || '',
+            keyMetrics: detail.keyMetrics || '',
+            lessonsLearned: detail.lessonsLearned || '',
+            thumbnailUrl: detail.thumbnailUrl || project.thumbnailUrl || '',
+            liveUrl: detail.liveUrl || project.liveUrl || '',
+            githubUrl: detail.githubUrl || project.githubUrl || '',
+            techStack: detailStack,
+            isCaseStudy: detail.isCaseStudy ?? project.isCaseStudy,
+          });
+        }
+      },
+      error: () => {},
+    });
   }
 
   saveProject(): void {
