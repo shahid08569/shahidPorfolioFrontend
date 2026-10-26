@@ -108,8 +108,71 @@
   }
 }
 
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-control {
+    padding-right: 2.75rem;
+  }
+
+  .btn-toggle-password {
+    position: absolute;
+    right: 0.65rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    border-radius: $radius-sm;
+    transition: color $transition-fast, transform $transition-fast;
+
+    &:hover {
+      color: var(--text-heading);
+      transform: scale(1.08);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+    }
+  }
+}
+
+.form-options {
+  margin-top: -0.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+
+  .remember-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+
+    .remember-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    &:hover {
+      color: var(--text-heading);
+    }
+  }
+}
+
 .form-actions {
-  margin-top: 1.75rem;
+  margin-top: 1.5rem;
 
   .submit-btn {
     width: 100%;
@@ -130,34 +193,8 @@
   }
 }
 
-.credential-hint {
-  margin-top: 2rem;
-  padding: 0.85rem;
-  background: var(--beige);
-  border-radius: $radius-sm;
-  border: 1px dashed var(--border);
-  font-size: 0.775rem;
-  color: var(--text-muted);
-  text-align: center;
-
-  .hint-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: var(--text-heading);
-  }
-
-  code {
-    background: var(--cornsilk);
-    padding: 0.15rem 0.35rem;
-    border-radius: $radius-sm;
-    color: var(--text-heading);
-    font-family: $font-mono;
-  }
-}
-
 .back-home {
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
   text-align: center;
 
   .home-link {

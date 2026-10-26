@@ -24,6 +24,7 @@
           placeholder="admin@example.com"
           class="form-control"
           [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          autocomplete="email"
         />
         <span class="field-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
           Valid email required.
@@ -32,17 +33,37 @@
 
       <div class="form-group">
         <label for="password" class="form-label">Password</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="••••••••••••"
-          class="form-control"
-          [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-        />
+        <div class="password-input-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••••••"
+            class="form-control"
+            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="btn-toggle-password"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            [title]="showPassword() ? 'Hide password' : 'Show password'"
+            tabindex="-1"
+          >
+            <app-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="18"></app-icon>
+          </button>
+        </div>
         <span class="field-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
           Password is required.
         </span>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-label">
+          <input type="checkbox" formControlName="rememberMe" class="remember-checkbox" />
+          <span>Remember me on this device</span>
+        </label>
       </div>
 
       <div class="form-actions">
@@ -55,12 +76,6 @@
         </button>
       </div>
     </form>
-
-    <!-- Seed Credential Helper Notice -->
-    <div class="credential-hint">
-      <span class="hint-label">Default Local Admin:</span>
-      <code>shahidhussaain08569@gmail.com</code> / <code>Admin&#64;Portfolio2026!</code>
-    </div>
 
     <div class="back-home">
       <a routerLink="/" class="home-link">← Return to Public Portfolio</a>
