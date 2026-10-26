@@ -194,8 +194,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.hasProfileImageError.set(true);
   }
 
+  onProfileImageLoad(): void {
+    this.hasProfileImageError.set(false);
+  }
+
   onHeroImageError(): void {
     this.hasHeroImageError.set(true);
+  }
+
+  onHeroImageLoad(): void {
+    this.hasHeroImageError.set(false);
   }
 
   ngOnInit(): void {

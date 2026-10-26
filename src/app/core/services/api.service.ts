@@ -21,9 +21,14 @@ export class ApiService {
   resolveMediaUrl(path: string | undefined | null): string {
     if (!path) return '';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const backendBase = environment.apiUrl.replace('/api/v1', '');
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    return `${backendBase}${cleanPath}`;
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ) {
+      return `http://localhost:5272${cleanPath}`;
+    }
+    return cleanPath;
   }
 
   getPublicSettings(): Observable<ApiResponse<PublicSettings>> {

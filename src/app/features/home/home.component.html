@@ -50,6 +50,7 @@
             [alt]="settings().fullName"
             class="profile-avatar-img"
             [class.hidden]="hasProfileImageError()"
+            (load)="onProfileImageLoad()"
             (error)="onProfileImageError()"
           />
           <div class="profile-avatar-fallback" *ngIf="hasProfileImageError()">
@@ -170,6 +171,7 @@
                 [alt]="settings().fullName + ' - Architecture Showcase'"
                 class="showcase-hero-img"
                 [class.hidden]="hasHeroImageError()"
+                (load)="onHeroImageLoad()"
                 (error)="onHeroImageError()"
               />
 

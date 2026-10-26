@@ -6,5 +6,5 @@ export const environment = {
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
           ? 'http://localhost:5272/api/v1'
           : '/api/v1')
-      : 'http://localhost:5272/api/v1',
+      : 'http://shahid-api.runasp.net/api/v1',
 };
