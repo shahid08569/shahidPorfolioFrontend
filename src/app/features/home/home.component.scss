@@ -11,6 +11,11 @@
   overflow: hidden;
   background: linear-gradient(180deg, var(--tea-green) 0%, var(--cornsilk) 100%);
   padding: 4rem 0 5rem;
+
+  @include max-sm {
+    padding: 2rem 0 3rem;
+    min-height: auto;
+  }
 }
 
 .hero-bg {
@@ -156,6 +161,10 @@
   z-index: 1;
   overflow: hidden;
 
+  @include max-md {
+    display: none;
+  }
+
   .symbol-token {
     position: absolute;
     font-family: $font-mono;
@@ -201,6 +210,10 @@
   pointer-events: none;
   z-index: 1;
   opacity: 0.42;
+
+  @include max-md {
+    display: none;
+  }
 
   .radar-ring {
     position: absolute;
@@ -255,7 +268,7 @@
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 2rem;
   align-items: center;
 
   @include lg {
@@ -280,6 +293,10 @@
   @include flex-col;
   gap: 1.75rem;
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @include max-sm {
+    gap: 1.25rem;
+  }
 }
 
 // Developer Profile Header with Avatar
@@ -288,6 +305,10 @@
   align-items: center;
   gap: 1.25rem;
   flex-wrap: wrap;
+
+  @include max-sm {
+    gap: 0.75rem;
+  }
 }
 
 .profile-avatar-wrapper {
@@ -300,6 +321,11 @@
   flex-shrink: 0;
   box-shadow: 0 2px 10px rgba(59, 47, 35, 0.12);
   transition: transform 200ms ease;
+
+  @include max-sm {
+    width: 60px;
+    height: 60px;
+  }
 
   &:hover {
     transform: scale(1.04);
@@ -391,6 +417,12 @@
   border: 1px solid var(--border);
   color: var(--text-heading);
 
+  @include max-sm {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.75rem;
+    gap: 0.35rem;
+  }
+
   .pulse-dot {
     width: 8px;
     height: 8px;
@@ -413,7 +445,7 @@
 
 .pill-sep { opacity: 0.4; }
 
-// Headline with Typewriter animation (STRICTLY ONE LINE & COMPACT FONT)
+// Headline with Typewriter animation
 .hero-headline {
   font-family: $font-headings;
   font-size: clamp(1.2rem, 2.3vw, 1.7rem);
@@ -446,8 +478,17 @@
   }
 
   @include max-sm {
-    font-size: 1.1rem;
-    min-height: 2rem;
+    font-size: clamp(1.15rem, 5vw, 1.4rem);
+    line-height: 1.35;
+    min-height: 3.6rem;
+    white-space: normal !important;
+    display: block;
+    overflow: visible;
+
+    .typewriter-text {
+      white-space: normal !important;
+      word-break: break-word;
+    }
   }
 }
 
@@ -461,6 +502,11 @@
   color: var(--text);
   line-height: 1.7;
   max-width: 520px;
+
+  @include max-sm {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
 }
 
 .name-highlight {
@@ -470,10 +516,44 @@
 
 // CTA buttons
 .hero-cta {
-  @include flex-center;
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 0.85rem;
+
+  .hero-cta-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  @include max-sm {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+
+    .hero-cta-whatsapp {
+      width: 100%;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .hero-cta-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      gap: 0.5rem;
+
+      .hero-cta-btn {
+        width: 100%;
+        padding: 0.75rem 0.45rem;
+        font-size: 0.825rem;
+        justify-content: center;
+      }
+    }
+  }
 
   .btn-whatsapp {
     position: relative;
@@ -601,7 +681,10 @@
   position: relative;
   animation: fadeInUp 0.6s 0.15s ease both;
 
-  @include max-lg { order: -1; }
+  @include max-lg {
+    order: 2;
+    margin-top: 0.5rem;
+  }
 }
 
 .terminal-wrap {
@@ -641,12 +724,21 @@
   padding: 0.75rem 1.25rem;
   background: var(--beige);
   border-bottom: 1px solid var(--border);
+
+  @include max-sm {
+    padding: 0.5rem 0.75rem;
+    gap: 0.4rem;
+  }
 }
 
 .traffic-lights {
   @include flex-center;
   gap: 6px;
   flex-shrink: 0;
+
+  @media (max-width: 440px) {
+    display: none;
+  }
 }
 
 .tl {
@@ -757,6 +849,10 @@
   .pill-title {
     white-space: nowrap !important;
   }
+
+  @media (max-width: 400px) {
+    display: none;
+  }
 }
 
 // Visual showcase body
@@ -769,6 +865,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  @include max-sm {
+    padding: 1.25rem 0.75rem;
+    min-height: 270px;
+  }
 }
 
 .showcase-ambient-glow {
@@ -827,6 +928,12 @@
   }
 
   &.hidden { display: none; }
+
+  @include max-sm {
+    width: 210px;
+    height: 230px;
+    border-radius: 14px;
+  }
 }
 
 .showcase-hero-fallback {
@@ -844,6 +951,13 @@
   justify-content: center;
   text-align: center;
   padding: 1.5rem;
+
+  @include max-sm {
+    width: 210px;
+    height: 230px;
+    padding: 1rem;
+    border-radius: 14px;
+  }
 
   .fallback-monogram {
     width: 68px;
@@ -979,6 +1093,10 @@
   padding: 1.5rem 1.75rem;
   background: var(--cornsilk);
   overflow-x: auto;
+
+  @include max-sm {
+    padding: 1rem 0.85rem;
+  }
 }
 
 .code-block {
@@ -989,6 +1107,11 @@
   color: var(--text-heading);
   white-space: pre;
   tab-size: 4;
+
+  @include max-sm {
+    font-size: 0.74rem;
+    line-height: 1.6;
+  }
 }
 
 .terminal-footer-bar {
@@ -1000,6 +1123,11 @@
   padding: 0.75rem 1.25rem;
   background: var(--beige);
   border-top: 1px solid var(--border);
+
+  @include max-sm {
+    padding: 0.6rem 0.85rem;
+    gap: 0.5rem;
+  }
 }
 
 .footer-status-label {
@@ -1077,6 +1205,10 @@
   overflow: hidden;
   transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease;
 
+  @include max-sm {
+    padding: 1.35rem 0.75rem;
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -1114,6 +1246,10 @@
   color: var(--text-heading);
   transition: transform 250ms ease;
   animation: stat-shimmer 4s ease-in-out infinite alternate;
+
+  @include max-sm {
+    font-size: 1.65rem;
+  }
 }
 
 @keyframes stat-shimmer {
@@ -1226,6 +1362,11 @@
   gap: 1rem;
   padding: 1.5rem;
   flex: 1;
+
+  @include max-sm {
+    padding: 1.15rem 1rem;
+    gap: 0.75rem;
+  }
 }
 
 .project-badges {
@@ -1256,6 +1397,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 .ps-card {
@@ -1322,6 +1468,17 @@
   flex-wrap: wrap;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
+
+  @include max-sm {
+    gap: 0.5rem;
+
+    .btn {
+      flex: 1 1 120px;
+      justify-content: center;
+      padding: 0.55rem 0.65rem;
+      font-size: 0.825rem;
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1339,6 +1496,10 @@
   gap: 1.25rem;
   @include md { grid-template-columns: repeat(3, 1fr); }
   @include lg { grid-template-columns: repeat(6, 1fr); }
+
+  @include max-sm {
+    gap: 0.65rem;
+  }
 }
 
 .skill-card {
@@ -1354,6 +1515,11 @@
   position: relative;
   overflow: hidden;
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease, border-color 300ms ease;
+
+  @include max-sm {
+    padding: 1.15rem 0.65rem;
+    gap: 0.5rem;
+  }
 
   &::before {
     content: '';
@@ -1449,6 +1615,11 @@
   position: relative;
   overflow: hidden;
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease, border-color 300ms ease;
+
+  @include max-sm {
+    padding: 1.15rem 1rem;
+    gap: 0.75rem;
+  }
 
   &::after {
     content: '';
@@ -1566,6 +1737,16 @@
   gap: 1.5rem;
   margin-bottom: 3rem;
 
+  @include max-sm {
+    margin-bottom: 2rem;
+    gap: 1rem;
+
+    .leave-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
   .section-eyebrow { margin-bottom: 0.75rem; }
   .section-title { margin-bottom: 0.5rem; }
   .section-subtitle { max-width: 500px; }
@@ -1590,6 +1771,11 @@
   border-radius: $radius-card;
   box-shadow: var(--card-shadow);
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease, border-color 300ms ease;
+
+  @include max-sm {
+    padding: 1.25rem 1rem;
+    gap: 1rem;
+  }
 
   &:hover {
     transform: translateY(-6px);
@@ -1731,6 +1917,10 @@
   box-shadow: 0 8px 30px rgba(59, 47, 35, 0.1);
   animation: cta-float-pulse 8s ease-in-out infinite alternate;
 
+  @include max-sm {
+    padding: 2.25rem 1.25rem;
+  }
+
   @include md { padding: 4.5rem 3rem; }
 }
 
@@ -1773,12 +1963,28 @@
   max-width: 540px;
   margin: 0 auto 2rem;
   line-height: 1.7;
+
+  @include max-sm {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .cta-actions {
   @include flex-center;
   flex-wrap: wrap;
   gap: 1rem;
+
+  @include max-sm {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 
   .btn-whatsapp {
     animation: whatsapp-beacon-pulse 3.2s ease-in-out infinite;
@@ -1788,4 +1994,13 @@
 .section-cta {
   @include flex-center;
   margin-top: 3rem;
+
+  @include max-sm {
+    margin-top: 2rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 }

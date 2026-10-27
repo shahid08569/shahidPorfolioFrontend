@@ -82,20 +82,22 @@
 
       <!-- CTA Row -->
       <div class="hero-cta">
-        <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
+        <a [href]="whatsAppUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg hero-cta-whatsapp">
           <app-icon name="whatsapp" [size]="18"></app-icon>
           Start a Conversation
         </a>
 
-        <a routerLink="/projects" class="btn btn-primary btn-lg">
-          View Projects
-          <app-icon name="arrow-right" [size]="16"></app-icon>
-        </a>
+        <div class="hero-cta-group">
+          <a routerLink="/projects" class="btn btn-primary btn-lg hero-cta-btn">
+            View Projects
+            <app-icon name="arrow-right" [size]="16"></app-icon>
+          </a>
 
-        <a [href]="cvDownloadUrl" target="_blank" class="btn btn-secondary btn-lg" download="Shahid_Hussain_CV.pdf">
-          <app-icon name="download" [size]="16"></app-icon>
-          Download CV
-        </a>
+          <a [href]="cvDownloadUrl" target="_blank" class="btn btn-secondary btn-lg hero-cta-btn" download="Shahid_Hussain_CV.pdf">
+            <app-icon name="download" [size]="16"></app-icon>
+            Download CV
+          </a>
+        </div>
       </div>
 
       <!-- Social quick-links -->
