@@ -63,6 +63,11 @@
           <span>Skills Matrix</span>
         </button>
 
+        <button (click)="setTab('experience')" [class.active]="activeTab() === 'experience'" class="nav-item-btn">
+          <app-icon name="briefcase" [size]="18"></app-icon>
+          <span>Experience &amp; Edu ({{ experiences().length + educations().length }})</span>
+        </button>
+
         <button (click)="setTab('testimonials')" [class.active]="activeTab() === 'testimonials'" class="nav-item-btn">
           <app-icon name="quote" [size]="18"></app-icon>
           <span>Endorsements ({{ testimonials().length }})</span>
@@ -112,6 +117,10 @@
         <button (click)="setTab('skills')" [class.active]="activeTab() === 'skills'" class="mobile-nav-btn">
           <app-icon name="server" [size]="15"></app-icon>
           <span>Skills Matrix</span>
+        </button>
+        <button (click)="setTab('experience')" [class.active]="activeTab() === 'experience'" class="mobile-nav-btn">
+          <app-icon name="briefcase" [size]="15"></app-icon>
+          <span>Experience &amp; Edu</span>
         </button>
         <button (click)="setTab('testimonials')" [class.active]="activeTab() === 'testimonials'" class="mobile-nav-btn">
           <app-icon name="quote" [size]="15"></app-icon>
@@ -469,6 +478,157 @@
             <p>No skills recorded yet. Click "+ Add New Skill" to add your core competencies.</p>
           </div>
         </ng-template>
+      </section>
+
+      <!-- 4B. EXPERIENCE & EDUCATION TAB -->
+      <section *ngIf="activeTab() === 'experience'" class="tab-pane">
+        <div class="pane-header">
+          <div>
+            <h2>Experience &amp; Academic Qualifications</h2>
+            <p>Manage your professional career milestones, enterprise roles, achievements, and educational qualifications displayed on your portfolio timeline.</p>
+          </div>
+        </div>
+
+        <!-- 1. Professional Experience Section -->
+        <div class="experience-mgmt-block">
+          <div class="sub-header-row">
+            <div>
+              <h3>
+                <app-icon name="briefcase" [size]="18"></app-icon>
+                Professional Work Experience ({{ experiences().length }})
+              </h3>
+              <p class="sub-desc">Companies, roles, key achievements, and technology stacks.</p>
+            </div>
+            <button (click)="openNewExperienceModal()" class="btn btn-primary btn-sm">
+              <app-icon name="plus" [size]="15"></app-icon>
+              + Add Experience
+            </button>
+          </div>
+
+          <div class="experience-admin-grid" *ngIf="experiences().length > 0; else noExperiences">
+            <div class="experience-admin-card card" *ngFor="let exp of experiences()">
+              <div class="card-top">
+                <div class="role-details">
+                  <div class="role-title-row">
+                    <h4>{{ exp.role }}</h4>
+                    <span class="badge badge-primary" *ngIf="exp.isCurrent">Current Role</span>
+                  </div>
+                  <span class="company-name">
+                    <strong>{{ exp.company }}</strong>
+                    <span class="location-text" *ngIf="exp.location">· {{ exp.location }}</span>
+                  </span>
+                </div>
+                <div class="date-tag">
+                  <span class="badge">
+                    <app-icon name="calendar" [size]="12"></app-icon>
+                    {{ exp.startDate }} — {{ exp.isCurrent ? 'Present' : (exp.endDate || 'Present') }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Achievements preview -->
+              <div class="achievements-preview" *ngIf="exp.achievements?.length">
+                <span class="preview-label">Key Achievements:</span>
+                <ul>
+                  <li *ngFor="let ach of exp.achievements">
+                    <app-icon name="check" [size]="13"></app-icon>
+                    <span>{{ ach }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Tech stack -->
+              <div class="tech-tags-preview" *ngIf="exp.techStack?.length">
+                <span class="badge badge-sm" *ngFor="let tech of exp.techStack">{{ tech }}</span>
+              </div>
+
+              <div class="card-footer-actions">
+                <span class="order-badge">Order: #{{ exp.displayOrder }}</span>
+                <div class="btn-group">
+                  <button (click)="openEditExperienceModal(exp)" class="btn btn-outline btn-sm">
+                    <app-icon name="edit" [size]="13"></app-icon>
+                    Edit
+                  </button>
+                  <button (click)="confirmDeleteExperience(exp)" class="btn btn-danger btn-sm">
+                    <app-icon name="trash" [size]="13"></app-icon>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noExperiences>
+            <div class="empty-card">
+              <app-icon name="briefcase" [size]="32"></app-icon>
+              <p>No work experience recorded yet. Click <strong>"+ Add Experience"</strong> to list your first company role.</p>
+              <button (click)="openNewExperienceModal()" class="btn btn-primary btn-sm mt-2">
+                + Add Work Experience
+              </button>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="section-divider-hr"></div>
+
+        <!-- 2. Academic Background Section -->
+        <div class="education-mgmt-block">
+          <div class="sub-header-row">
+            <div>
+              <h3>
+                <app-icon name="graduation" [size]="18"></app-icon>
+                Academic Background &amp; Degrees ({{ educations().length }})
+              </h3>
+              <p class="sub-desc">University degrees, certifications, and educational qualifications.</p>
+            </div>
+            <button (click)="openNewEducationModal()" class="btn btn-primary btn-sm">
+              <app-icon name="plus" [size]="15"></app-icon>
+              + Add Education
+            </button>
+          </div>
+
+          <div class="education-admin-grid" *ngIf="educations().length > 0; else noEducations">
+            <div class="education-admin-card card" *ngFor="let edu of educations()">
+              <div class="card-top">
+                <div class="edu-details">
+                  <h4>{{ edu.degree }} in {{ edu.fieldOfStudy }}</h4>
+                  <span class="institution-name">{{ edu.institution }}</span>
+                  <span class="honors-tag" *ngIf="edu.gradeOrHonors">{{ edu.gradeOrHonors }}</span>
+                </div>
+                <div class="date-tag">
+                  <span class="badge">
+                    <app-icon name="calendar" [size]="12"></app-icon>
+                    {{ edu.startDate }} — {{ edu.endDate || 'Present' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-footer-actions">
+                <span class="order-badge">Order: #{{ edu.displayOrder }}</span>
+                <div class="btn-group">
+                  <button (click)="openEditEducationModal(edu)" class="btn btn-outline btn-sm">
+                    <app-icon name="edit" [size]="13"></app-icon>
+                    Edit
+                  </button>
+                  <button (click)="confirmDeleteEducation(edu)" class="btn btn-danger btn-sm">
+                    <app-icon name="trash" [size]="13"></app-icon>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noEducations>
+            <div class="empty-card">
+              <app-icon name="graduation" [size]="32"></app-icon>
+              <p>No education records added yet. Click <strong>"+ Add Education"</strong> to list your university or degree.</p>
+              <button (click)="openNewEducationModal()" class="btn btn-primary btn-sm mt-2">
+                + Add Academic Qualification
+              </button>
+            </div>
+          </ng-template>
+        </div>
       </section>
 
       <!-- 5. TESTIMONIALS / ENDORSEMENTS TAB -->
@@ -1630,6 +1790,154 @@
           <button type="submit" class="btn btn-primary" [disabled]="blogForm.invalid || isSaving()">
             <span class="spinner-border" *ngIf="isSaving()"></span>
             <span>{{ isSaving() ? 'Saving Article...' : 'Save & Publish Article' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. EXPERIENCE MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isExperienceModalOpen()" (click)="isExperienceModalOpen.set(false)">
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingExperienceId() ? 'Edit Work Experience' : 'Add Work Experience' }}</h3>
+        <button class="modal-close" (click)="isExperienceModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="experienceForm" (ngSubmit)="saveExperience()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Company Name *</label>
+              <input type="text" formControlName="company" class="form-control" placeholder="e.g. CloudScale Systems" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role / Job Title *</label>
+              <input type="text" formControlName="role" class="form-control" placeholder="e.g. Senior Full-Stack .NET Developer" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" formControlName="location" class="form-control" placeholder="e.g. Remote / Islamabad, Pakistan" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Employment Type *</label>
+              <select formControlName="employmentType" class="form-control">
+                <option [ngValue]="1">Full Time</option>
+                <option [ngValue]="2">Part Time</option>
+                <option [ngValue]="3">Contract</option>
+                <option [ngValue]="4">Freelance</option>
+                <option [ngValue]="5">Internship</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Date *</label>
+              <input type="date" formControlName="startDate" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" formControlName="endDate" class="form-control" [disabled]="experienceForm.get('isCurrent')?.value" />
+            </div>
+          </div>
+
+          <div class="form-group form-check-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isCurrent" />
+              <span>Currently working in this role (Present)</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Technologies Used (Comma-separated)</label>
+            <input type="text" formControlName="techStack" class="form-control" placeholder=".NET 10, C#, ASP.NET Core, Angular, SQL Server, Clean Architecture" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Key Achievements (One per line)</label>
+            <textarea rows="4" formControlName="achievements" class="form-control" placeholder="Spearheaded migration of core microservices to .NET 10, cutting latency by 35%&#10;Architected clean CQRS MediatR pipelines for 5,000+ daily concurrent orders"></textarea>
+            <span class="field-hint">Press Enter to separate individual achievement bullet points.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Display Order *</label>
+            <input type="number" formControlName="displayOrder" class="form-control" min="1" max="100" />
+            <span class="field-hint">Lower numbers display first on the timeline (e.g. 1 for most recent).</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="isExperienceModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="experienceForm.invalid || isSaving()">
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Experience...' : 'Save Experience' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. EDUCATION MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isEducationModalOpen()" (click)="isEducationModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingEducationId() ? 'Edit Academic Qualification' : 'Add Academic Qualification' }}</h3>
+        <button class="modal-close" (click)="isEducationModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="educationForm" (ngSubmit)="saveEducation()" novalidate>
+        <div class="modal-body-scroll">
+          <div class="form-group">
+            <label class="form-label">Institution / University Name *</label>
+            <input type="text" formControlName="institution" class="form-control" placeholder="e.g. University of Engineering and Technology" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Degree *</label>
+              <input type="text" formControlName="degree" class="form-control" placeholder="e.g. Bachelor of Science" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Field of Study *</label>
+              <input type="text" formControlName="fieldOfStudy" class="form-control" placeholder="e.g. Computer Science / Software Engineering" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Year / Date *</label>
+              <input type="text" formControlName="startDate" class="form-control" placeholder="e.g. 2020 or 2020-09-01" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Year / Date</label>
+              <input type="text" formControlName="endDate" class="form-control" placeholder="e.g. 2024 (leave blank for Present)" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Grade / Honors / CGPA</label>
+            <input type="text" formControlName="gradeOrHonors" class="form-control" placeholder="e.g. CGPA 3.8 / First Class with Distinction" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Display Order *</label>
+            <input type="number" formControlName="displayOrder" class="form-control" min="1" max="100" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="isEducationModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="educationForm.invalid || isSaving()">
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Qualification...' : 'Save Qualification' }}</span>
           </button>
         </div>
       </form>

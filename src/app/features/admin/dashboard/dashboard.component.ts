@@ -13,6 +13,7 @@ import { SkillCategoryGroup, SkillCategory } from '../../../core/models/skill.mo
 import { PublicSettings } from '../../../core/models/settings.model';
 import { Testimonial } from '../../../core/models/testimonial.model';
 import { Certificate } from '../../../core/models/certificate.model';
+import { ExperienceItem, EducationItem } from '../../../core/models/timeline.model';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -36,13 +37,15 @@ export class AdminDashboardComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly platformId = inject(PLATFORM_ID);
 
-  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'>('overview');
+  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'>('overview');
 
   // Data signals
   readonly messages = signal<AdminContactMessage[]>([]);
   readonly projects = signal<ProjectCard[]>([]);
   readonly blogPosts = signal<BlogPostCard[]>([]);
   readonly skillGroups = signal<SkillCategoryGroup[]>([]);
+  readonly experiences = signal<ExperienceItem[]>([]);
+  readonly educations = signal<EducationItem[]>([]);
   readonly testimonials = signal<Testimonial[]>([]);
   readonly certificates = signal<Certificate[]>([]);
   readonly settings = signal<PublicSettings | null>(null);
@@ -51,6 +54,10 @@ export class AdminDashboardComponent implements OnInit {
   readonly isProjectModalOpen = signal(false);
   readonly isBlogModalOpen = signal(false);
   readonly isSkillModalOpen = signal(false);
+  readonly isExperienceModalOpen = signal(false);
+  readonly editingExperienceId = signal<string | null>(null);
+  readonly isEducationModalOpen = signal(false);
+  readonly editingEducationId = signal<string | null>(null);
   readonly isTestimonialModalOpen = signal(false);
   readonly isCertificateModalOpen = signal(false);
   readonly isMessageViewModalOpen = signal(false);
@@ -92,6 +99,8 @@ export class AdminDashboardComponent implements OnInit {
   projectForm!: FormGroup;
   blogForm!: FormGroup;
   skillForm!: FormGroup;
+  experienceForm!: FormGroup;
+  educationForm!: FormGroup;
   testimonialForm!: FormGroup;
   certificateForm!: FormGroup;
   settingsForm!: FormGroup;
@@ -168,6 +177,29 @@ export class AdminDashboardComponent implements OnInit {
       imageUrl: [''],
       displayOrder: [0],
       isActive: [true],
+    });
+
+    this.experienceForm = this.fb.group({
+      company: ['', [Validators.required, Validators.maxLength(100)]],
+      role: ['', [Validators.required, Validators.maxLength(100)]],
+      location: [''],
+      employmentType: [1, Validators.required],
+      startDate: ['', Validators.required],
+      endDate: [''],
+      isCurrent: [false],
+      achievements: [''],
+      techStack: [''],
+      displayOrder: [1, [Validators.required, Validators.min(1)]],
+    });
+
+    this.educationForm = this.fb.group({
+      institution: ['', [Validators.required, Validators.maxLength(150)]],
+      degree: ['', [Validators.required, Validators.maxLength(100)]],
+      fieldOfStudy: ['', [Validators.required, Validators.maxLength(100)]],
+      startDate: ['', Validators.required],
+      endDate: [''],
+      gradeOrHonors: [''],
+      displayOrder: [1, [Validators.required, Validators.min(1)]],
     });
 
     this.settingsForm = this.fb.group({
@@ -267,9 +299,24 @@ export class AdminDashboardComponent implements OnInit {
         if (res.data) this.certificates.set(res.data as Certificate[]);
       },
     });
+
+    // 8. Timeline (Experience & Education)
+    this.loadTimeline();
   }
 
-  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'): void {
+  loadTimeline(): void {
+    this.apiService.getTimeline().subscribe({
+      next: (res) => {
+        if (res.data) {
+          if (res.data.experiences) this.experiences.set(res.data.experiences);
+          if (res.data.educations) this.educations.set(res.data.educations);
+        }
+      },
+      error: (err) => console.error('Failed to load timeline', err),
+    });
+  }
+
+  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'): void {
     this.activeTab.set(tab);
     this.actionMessage.set(null);
     this.errorMessage.set(null);
@@ -937,6 +984,308 @@ export class AdminDashboardComponent implements OnInit {
           error: (err) => {
             this.closeConfirmModal();
             this.showError(err?.error?.message || 'Failed to delete certificate.');
+          },
+        });
+      }
+    );
+  }
+
+  // ==========================================
+  // EXPERIENCE & EDUCATION MANAGEMENT
+  // ==========================================
+  openNewExperienceModal(): void {
+    this.editingExperienceId.set(null);
+    this.experienceForm.reset({
+      company: '',
+      role: '',
+      location: '',
+      employmentType: 1,
+      startDate: new Date().toISOString().substring(0, 10),
+      endDate: '',
+      isCurrent: false,
+      achievements: '',
+      techStack: '',
+      displayOrder: this.experiences().length + 1,
+    });
+    this.isExperienceModalOpen.set(true);
+  }
+
+  openEditExperienceModal(exp: ExperienceItem): void {
+    this.editingExperienceId.set(exp.id);
+
+    const parseToDateInput = (d?: string): string => {
+      if (!d || d.toLowerCase() === 'present') return '';
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+      return d;
+    };
+
+    let achievementsStr = '';
+    if (exp.achievements && exp.achievements.length > 0) {
+      achievementsStr = exp.achievements.join('\n');
+    } else if (exp.achievementsJson) {
+      try {
+        const arr = JSON.parse(exp.achievementsJson);
+        if (Array.isArray(arr)) achievementsStr = arr.join('\n');
+      } catch {}
+    }
+
+    let techStackStr = '';
+    if (exp.techStack && exp.techStack.length > 0) {
+      techStackStr = exp.techStack.join(', ');
+    } else if (exp.techStackJson) {
+      try {
+        const arr = JSON.parse(exp.techStackJson);
+        if (Array.isArray(arr)) techStackStr = arr.join(', ');
+      } catch {}
+    }
+
+    const empTypeMap: Record<string, number> = {
+      FullTime: 1, '1': 1,
+      PartTime: 2, '2': 2,
+      Contract: 3, '3': 3,
+      Freelance: 4, '4': 4,
+      Internship: 5, '5': 5,
+    };
+    const empVal = empTypeMap[exp.employmentType] || 1;
+
+    this.experienceForm.patchValue({
+      company: exp.company,
+      role: exp.role,
+      location: exp.location || '',
+      employmentType: empVal,
+      startDate: parseToDateInput(exp.startDate),
+      endDate: parseToDateInput(exp.endDate),
+      isCurrent: exp.isCurrent,
+      achievements: achievementsStr,
+      techStack: techStackStr,
+      displayOrder: exp.displayOrder || 1,
+    });
+    this.isExperienceModalOpen.set(true);
+  }
+
+  saveExperience(): void {
+    if (this.experienceForm.invalid) {
+      this.experienceForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSaving.set(true);
+    const val = this.experienceForm.value;
+
+    const achievementsArr = val.achievements
+      ? val.achievements.split('\n').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+      : [];
+
+    const techStackArr = val.techStack
+      ? val.techStack.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+      : [];
+
+    const toIsoDate = (d: string): string => {
+      if (!d) return '';
+      if (d.includes('T')) return d.split('T')[0];
+      return d;
+    };
+
+    const command = {
+      id: this.editingExperienceId() || undefined,
+      company: val.company,
+      role: val.role,
+      location: val.location || null,
+      employmentType: Number(val.employmentType) || 1,
+      startDate: toIsoDate(val.startDate),
+      endDate: val.isCurrent ? null : (val.endDate ? toIsoDate(val.endDate) : null),
+      isCurrent: !!val.isCurrent,
+      achievementsJson: JSON.stringify(achievementsArr),
+      techStackJson: JSON.stringify(techStackArr),
+      displayOrder: Number(val.displayOrder) || 1,
+    };
+
+    const handleSuccess = (message: string) => {
+      this.isSaving.set(false);
+      this.isExperienceModalOpen.set(false);
+      this.showNotice(message);
+      this.loadTimeline();
+      try { sessionStorage.removeItem('shahid_cached_timeline'); } catch {}
+    };
+
+    const handleError = (err: any) => {
+      this.isSaving.set(false);
+      this.showError(err?.error?.message || 'Server error while saving experience.');
+    };
+
+    if (this.editingExperienceId()) {
+      this.adminService.updateExperience(this.editingExperienceId()!, command).subscribe({
+        next: (res) => {
+          if (res.success) {
+            handleSuccess('Experience updated successfully.');
+          } else {
+            this.isSaving.set(false);
+            this.showError(res.message || 'Operation failed.');
+          }
+        },
+        error: handleError,
+      });
+    } else {
+      this.adminService.createExperience(command).subscribe({
+        next: (res) => {
+          if (res.success) {
+            handleSuccess('Experience added successfully.');
+          } else {
+            this.isSaving.set(false);
+            this.showError(res.message || 'Operation failed.');
+          }
+        },
+        error: handleError,
+      });
+    }
+  }
+
+  confirmDeleteExperience(exp: ExperienceItem): void {
+    this.triggerConfirm(
+      'Delete Experience',
+      `Delete "${exp.role} at ${exp.company}" from your career timeline?`,
+      () => {
+        this.adminService.deleteExperience(exp.id).subscribe({
+          next: () => {
+            this.closeConfirmModal();
+            this.showNotice('Experience deleted successfully.');
+            this.loadTimeline();
+            try { sessionStorage.removeItem('shahid_cached_timeline'); } catch {}
+          },
+          error: (err) => {
+            this.closeConfirmModal();
+            this.showError(err?.error?.message || 'Failed to delete experience.');
+          },
+        });
+      }
+    );
+  }
+
+  openNewEducationModal(): void {
+    this.editingEducationId.set(null);
+    this.educationForm.reset({
+      institution: '',
+      degree: '',
+      fieldOfStudy: '',
+      startDate: new Date().getFullYear().toString(),
+      endDate: '',
+      gradeOrHonors: '',
+      displayOrder: this.educations().length + 1,
+    });
+    this.isEducationModalOpen.set(true);
+  }
+
+  openEditEducationModal(edu: EducationItem): void {
+    this.editingEducationId.set(edu.id);
+
+    const parseToDateInput = (d?: string): string => {
+      if (!d || d.toLowerCase() === 'present') return '';
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+      return d;
+    };
+
+    this.educationForm.patchValue({
+      institution: edu.institution,
+      degree: edu.degree,
+      fieldOfStudy: edu.fieldOfStudy,
+      startDate: parseToDateInput(edu.startDate),
+      endDate: parseToDateInput(edu.endDate),
+      gradeOrHonors: edu.gradeOrHonors || '',
+      displayOrder: edu.displayOrder || 1,
+    });
+    this.isEducationModalOpen.set(true);
+  }
+
+  saveEducation(): void {
+    if (this.educationForm.invalid) {
+      this.educationForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSaving.set(true);
+    const val = this.educationForm.value;
+
+    const toIsoDate = (d: string): string => {
+      if (!d) return '';
+      if (d.includes('T')) return d.split('T')[0];
+      if (/^\d{4}$/.test(d.trim())) {
+        return `${d.trim()}-01-01`;
+      }
+      return d;
+    };
+
+    const command = {
+      id: this.editingEducationId() || undefined,
+      institution: val.institution,
+      degree: val.degree,
+      fieldOfStudy: val.fieldOfStudy,
+      startDate: toIsoDate(val.startDate),
+      endDate: val.endDate ? toIsoDate(val.endDate) : null,
+      gradeOrHonors: val.gradeOrHonors || null,
+      displayOrder: Number(val.displayOrder) || 1,
+    };
+
+    const handleEduSuccess = (message: string) => {
+      this.isSaving.set(false);
+      this.isEducationModalOpen.set(false);
+      this.showNotice(message);
+      this.loadTimeline();
+      try { sessionStorage.removeItem('shahid_cached_timeline'); } catch {}
+    };
+
+    const handleEduError = (err: any) => {
+      this.isSaving.set(false);
+      this.showError(err?.error?.message || 'Server error while saving education.');
+    };
+
+    if (this.editingEducationId()) {
+      this.adminService.updateEducation(this.editingEducationId()!, command).subscribe({
+        next: (res) => {
+          if (res.success) {
+            handleEduSuccess('Education updated successfully.');
+          } else {
+            this.isSaving.set(false);
+            this.showError(res.message || 'Operation failed.');
+          }
+        },
+        error: handleEduError,
+      });
+    } else {
+      this.adminService.createEducation(command).subscribe({
+        next: (res) => {
+          if (res.success) {
+            handleEduSuccess('Education added successfully.');
+          } else {
+            this.isSaving.set(false);
+            this.showError(res.message || 'Operation failed.');
+          }
+        },
+        error: handleEduError,
+      });
+    }
+  }
+
+  confirmDeleteEducation(edu: EducationItem): void {
+    this.triggerConfirm(
+      'Delete Education',
+      `Delete "${edu.degree} from ${edu.institution}"?`,
+      () => {
+        this.adminService.deleteEducation(edu.id).subscribe({
+          next: () => {
+            this.closeConfirmModal();
+            this.showNotice('Education deleted successfully.');
+            this.loadTimeline();
+            try { sessionStorage.removeItem('shahid_cached_timeline'); } catch {}
+          },
+          error: (err) => {
+            this.closeConfirmModal();
+            this.showError(err?.error?.message || 'Failed to delete education.');
           },
         });
       }

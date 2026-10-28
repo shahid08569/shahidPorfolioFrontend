@@ -255,6 +255,19 @@
   @include lg {
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(59, 47, 35, 0.2);
+    border-radius: 9999px;
   }
 }
 
@@ -2108,4 +2121,230 @@ textarea.form-control {
 
 .d-none {
   display: none !important;
+}
+
+// ── Experience & Education Management ─────────────────────────
+.experience-mgmt-block,
+.education-mgmt-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sub-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1E293B;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+
+    app-icon {
+      color: #3B2F23;
+    }
+  }
+
+  .sub-desc {
+    font-size: 0.85rem;
+    color: #64748B;
+    margin: 0.25rem 0 0;
+  }
+}
+
+.section-divider-hr {
+  height: 1px;
+  background: rgba(59, 47, 35, 0.12);
+  margin: 2.5rem 0;
+}
+
+.experience-admin-grid,
+.education-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.experience-admin-card,
+.education-admin-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #CCD5AE;
+    box-shadow: 0 4px 14px rgba(59, 47, 35, 0.08);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .role-details,
+  .edu-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1E293B;
+      margin: 0;
+    }
+
+    .role-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .company-name,
+    .institution-name {
+      font-size: 0.875rem;
+      color: #475569;
+
+      .location-text {
+        color: #94A3B8;
+      }
+    }
+
+    .honors-tag {
+      font-size: 0.8rem;
+      color: #B45309;
+      font-weight: 600;
+    }
+  }
+
+  .date-tag {
+    flex-shrink: 0;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #F1F5F9;
+      color: #475569;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+  }
+
+  .achievements-preview {
+    font-size: 0.825rem;
+    color: #475569;
+
+    .preview-label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94A3B8;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.4rem;
+
+        app-icon {
+          color: #10B981;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+      }
+    }
+  }
+
+  .tech-tags-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+
+    .badge-sm {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: #E9EDC9;
+      color: #3B2F23;
+      font-weight: 500;
+    }
+  }
+
+  .card-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid #F1F5F9;
+    margin-top: auto;
+
+    .order-badge {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      font-family: $font-mono;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: #FFFFFF;
+  border: 1px dashed #CBD5E1;
+  border-radius: 12px;
+  text-align: center;
+  color: #64748B;
+  gap: 0.75rem;
+
+  app-icon {
+    color: #94A3B8;
+  }
+
+  p {
+    margin: 0;
+    max-width: 400px;
+    font-size: 0.9rem;
+  }
 }

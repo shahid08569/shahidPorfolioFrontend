@@ -60,6 +60,19 @@ export class AdminService {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/admin/experiences/${id}`);
   }
 
+  // Educations
+  createEducation(command: any): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/admin/educations`, command);
+  }
+
+  updateEducation(id: string, command: any): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/admin/educations/${id}`, command);
+  }
+
+  deleteEducation(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/admin/educations/${id}`);
+  }
+
   // Blog
   createBlogPost(command: any): Observable<ApiResponse<string>> {
     return this.http.post<ApiResponse<string>>(`${this.baseUrl}/admin/blog`, command);
