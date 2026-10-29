@@ -320,30 +320,6 @@
             <h3 class="project-title">{{ project.title }}</h3>
             <p class="project-summary">{{ project.summary }}</p>
 
-            <!-- Problem / Solution cards -->
-            <div class="ps-grid" *ngIf="project.problemStatement || project.solutionStatement">
-              <div class="ps-card problem" *ngIf="project.problemStatement">
-                <div class="ps-label">
-                  <app-icon name="terminal" [size]="14"></app-icon>
-                  Challenge
-                </div>
-                <p>{{ project.problemStatement }}</p>
-              </div>
-              <div class="ps-card solution" *ngIf="project.solutionStatement">
-                <div class="ps-label">
-                  <app-icon name="code" [size]="14"></app-icon>
-                  Solution
-                </div>
-                <p>{{ project.solutionStatement }}</p>
-              </div>
-            </div>
-
-            <!-- Metrics bar -->
-            <div class="metrics-bar" *ngIf="project.keyMetrics">
-              <app-icon name="chart" [size]="15"></app-icon>
-              <span>{{ project.keyMetrics }}</span>
-            </div>
-
             <!-- Tech tags -->
             <div class="tech-tags" *ngIf="project.techStack?.length">
               @for (t of project.techStack!.slice(0, 6); track t) {
