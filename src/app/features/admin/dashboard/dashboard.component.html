@@ -1334,31 +1334,34 @@
           </div>
         </div>
 
-        <!-- Links List Grid -->
-        <div class="links-admin-grid" *ngIf="socialLinksList().length > 0">
-          <div class="link-admin-card" *ngFor="let link of socialLinksList(); let i = index">
-            <div class="card-top">
-              <div class="platform-group">
-                <div class="link-icon-circle">
-                  <app-icon [name]="link.iconKey || link.platform.toLowerCase()" [size]="22"></app-icon>
-                </div>
-                <div class="platform-info">
-                  <h4>{{ link.platform }}</h4>
-                  <span class="icon-badge">icon: {{ link.iconKey }}</span>
-                </div>
+        <!-- Links List (Stacked Vertically Downwards - Clean Rows, Zero Horizontal Overflow) -->
+        <div class="links-admin-list" *ngIf="socialLinksList().length > 0">
+          <div class="link-admin-row-card" *ngFor="let link of socialLinksList(); let i = index">
+            <!-- Left: Platform Info -->
+            <div class="row-platform-col">
+              <div class="link-icon-circle">
+                <app-icon [name]="link.iconKey || link.platform.toLowerCase()" [size]="22"></app-icon>
               </div>
-              <span class="order-pill">Order #{{ link.displayOrder || (i + 1) }}</span>
+              <div class="platform-meta">
+                <div class="platform-title-row">
+                  <h4>{{ link.platform }}</h4>
+                  <span class="order-pill">Order #{{ link.displayOrder || (i + 1) }}</span>
+                </div>
+                <span class="icon-subtext">icon: {{ link.iconKey }}</span>
+              </div>
             </div>
 
-            <div class="card-url-section">
+            <!-- Middle: URL Section -->
+            <div class="row-url-col">
               <span class="url-text" [title]="link.url">{{ link.url }}</span>
-              <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="test-url-btn" title="Open Link in New Tab">
+              <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="test-url-btn" title="Open Link to Test in New Tab">
                 <app-icon name="external-link" [size]="15"></app-icon>
               </a>
             </div>
 
-            <div class="card-footer-actions">
-              <div class="order-actions">
+            <!-- Right: Order & Actions -->
+            <div class="row-actions-col">
+              <div class="order-buttons">
                 <button
                   type="button"
                   class="btn-order"
@@ -1379,16 +1382,14 @@
                 </button>
               </div>
 
-              <div class="crud-actions">
-                <button type="button" class="btn btn-sm btn-outline" (click)="openEditSocialLinkModal(i)">
-                  <app-icon name="edit" [size]="14"></app-icon>
-                  Edit
-                </button>
-                <button type="button" class="btn btn-sm btn-danger-soft" (click)="deleteSocialLink(i)">
-                  <app-icon name="trash" [size]="14"></app-icon>
-                  Delete
-                </button>
-              </div>
+              <button type="button" class="btn btn-sm btn-outline" (click)="openEditSocialLinkModal(i)">
+                <app-icon name="edit" [size]="14"></app-icon>
+                <span>Edit</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-danger-soft" (click)="deleteSocialLink(i)">
+                <app-icon name="trash" [size]="14"></app-icon>
+                <span>Delete</span>
+              </button>
             </div>
           </div>
         </div>
