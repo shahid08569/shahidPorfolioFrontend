@@ -1269,7 +1269,11 @@ export class AdminDashboardComponent implements OnInit {
 
     const handleEduError = (err: any) => {
       this.isSaving.set(false);
-      this.showError(err?.error?.message || 'Server error while saving education.');
+      if (err?.status === 404) {
+        this.showError('Backend endpoint not found (404). MonsterASP par latest publish.zip extract karein.');
+      } else {
+        this.showError(err?.error?.message || err?.message || 'Server error while saving education.');
+      }
     };
 
     if (this.editingEducationId()) {
