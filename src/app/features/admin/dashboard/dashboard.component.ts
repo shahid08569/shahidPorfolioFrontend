@@ -37,7 +37,7 @@ export class AdminDashboardComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly platformId = inject(PLATFORM_ID);
 
-  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'>('overview');
+  readonly activeTab = signal<'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'links' | 'media' | 'settings'>('overview');
 
   // Data signals
   readonly messages = signal<AdminContactMessage[]>([]);
@@ -49,6 +49,7 @@ export class AdminDashboardComponent implements OnInit {
   readonly testimonials = signal<Testimonial[]>([]);
   readonly certificates = signal<Certificate[]>([]);
   readonly settings = signal<PublicSettings | null>(null);
+  readonly socialLinksList = signal<Array<{ platform: string; url: string; iconKey: string; displayOrder: number }>>([]);
 
   // Modals & Action states
   readonly isProjectModalOpen = signal(false);
@@ -60,6 +61,8 @@ export class AdminDashboardComponent implements OnInit {
   readonly editingEducationId = signal<string | null>(null);
   readonly isTestimonialModalOpen = signal(false);
   readonly isCertificateModalOpen = signal(false);
+  readonly isSocialLinkModalOpen = signal(false);
+  readonly editingSocialLinkIndex = signal<number | null>(null);
   readonly isMessageViewModalOpen = signal(false);
   readonly selectedMessage = signal<AdminContactMessage | null>(null);
 
@@ -104,6 +107,7 @@ export class AdminDashboardComponent implements OnInit {
   testimonialForm!: FormGroup;
   certificateForm!: FormGroup;
   settingsForm!: FormGroup;
+  socialLinkForm!: FormGroup;
 
   ngOnInit(): void {
     this.initForms();
@@ -216,6 +220,13 @@ export class AdminDashboardComponent implements OnInit {
       heroBadges: ['Clean Architecture, CQRS / MediatR, Angular 22 Signals', Validators.required],
       heroHeadlines: ['Building Enterprise-Grade .NET & Angular Solutions\nArchitecting Scalable Clean Architecture & CQRS Systems\nEngineering Resilient Cloud-Ready Microservices'],
     });
+
+    this.socialLinkForm = this.fb.group({
+      platform: ['', [Validators.required, Validators.maxLength(50)]],
+      url: ['', [Validators.required, Validators.maxLength(500)]],
+      iconKey: ['link', Validators.required],
+      displayOrder: [1, [Validators.required, Validators.min(1)]],
+    });
   }
 
   loadAllData(): void {
@@ -275,6 +286,23 @@ export class AdminDashboardComponent implements OnInit {
             heroBadges: badgesStr,
             heroHeadlines: headlinesStr,
           });
+
+          if (res.data.socialLinks && res.data.socialLinks.length > 0) {
+            this.socialLinksList.set(
+              res.data.socialLinks.map((s: any, idx: number) => ({
+                platform: s.platform || '',
+                url: s.url || '',
+                iconKey: s.iconKey || s.platform?.toLowerCase() || 'link',
+                displayOrder: s.displayOrder || idx + 1,
+              }))
+            );
+          } else {
+            this.socialLinksList.set([
+              { platform: 'GitHub', url: 'https://github.com/shahid08569', iconKey: 'github', displayOrder: 1 },
+              { platform: 'LinkedIn', url: 'https://linkedin.com/in/shahidhussain', iconKey: 'linkedin', displayOrder: 2 },
+              { platform: 'Email', url: 'mailto:shahidhussaain08569@gmail.com', iconKey: 'email', displayOrder: 3 },
+            ]);
+          }
         }
       },
     });
@@ -316,7 +344,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'media' | 'settings'): void {
+  setTab(tab: 'overview' | 'messages' | 'projects' | 'skills' | 'experience' | 'blog' | 'testimonials' | 'certificates' | 'profile' | 'terminal' | 'links' | 'media' | 'settings'): void {
     this.activeTab.set(tab);
     this.actionMessage.set(null);
     this.errorMessage.set(null);
@@ -1490,17 +1518,20 @@ export class AdminDashboardComponent implements OnInit {
       profilePhotoUrl: this.settings()?.profilePhotoUrl || '/uploads/Shahid_Profile.jpg',
       heroImageUrl: this.settings()?.heroImageUrl || null,
       heroHeadlinesJson: JSON.stringify(headlinesArray),
-      socialLinks: (this.settings()?.socialLinks || []).map((s, idx) => ({
+      socialLinks: this.socialLinksList().map((s, idx) => ({
         platform: s.platform,
         url: s.url,
         iconKey: s.iconKey,
-        displayOrder: idx + 1,
+        displayOrder: s.displayOrder || idx + 1,
       })),
     };
 
     this.adminService.updateSettings(payload).subscribe({
       next: () => {
         this.isSaving.set(false);
+        try {
+          sessionStorage.removeItem('shahid_cached_settings');
+        } catch {}
         this.showNotice(successToast);
         this.loadAllData();
       },
@@ -1514,6 +1545,185 @@ export class AdminDashboardComponent implements OnInit {
         } else {
           this.showError(err?.error?.message || err?.message || 'Failed to save settings.');
         }
+      },
+    });
+  }
+
+  // ==========================================
+  // SOCIAL & FOOTER LINKS MANAGEMENT
+  // ==========================================
+  readonly availableIcons: Array<{ key: string; label: string }> = [
+    { key: 'github', label: 'GitHub' },
+    { key: 'linkedin', label: 'LinkedIn' },
+    { key: 'twitter', label: 'Twitter / X' },
+    { key: 'youtube', label: 'YouTube' },
+    { key: 'facebook', label: 'Facebook' },
+    { key: 'instagram', label: 'Instagram' },
+    { key: 'email', label: 'Email' },
+    { key: 'whatsapp', label: 'WhatsApp' },
+    { key: 'link', label: 'Custom Link' },
+    { key: 'code', label: 'Repository' },
+    { key: 'external-link', label: 'Website' },
+  ];
+
+  readonly linkPresets: Array<{ platform: string; iconKey: string; prefix: string }> = [
+    { platform: 'GitHub', iconKey: 'github', prefix: 'https://github.com/' },
+    { platform: 'LinkedIn', iconKey: 'linkedin', prefix: 'https://linkedin.com/in/' },
+    { platform: 'Twitter', iconKey: 'twitter', prefix: 'https://x.com/' },
+    { platform: 'YouTube', iconKey: 'youtube', prefix: 'https://youtube.com/@' },
+    { platform: 'Facebook', iconKey: 'facebook', prefix: 'https://facebook.com/' },
+    { platform: 'Instagram', iconKey: 'instagram', prefix: 'https://instagram.com/' },
+    { platform: 'Email', iconKey: 'email', prefix: 'mailto:' },
+    { platform: 'WhatsApp', iconKey: 'whatsapp', prefix: 'https://wa.me/' },
+    { platform: 'Website', iconKey: 'external-link', prefix: 'https://' },
+  ];
+
+  openNewSocialLinkModal(): void {
+    this.editingSocialLinkIndex.set(null);
+    this.socialLinkForm.reset({
+      platform: '',
+      url: '',
+      iconKey: 'link',
+      displayOrder: this.socialLinksList().length + 1,
+    });
+    this.isSocialLinkModalOpen.set(true);
+  }
+
+  openEditSocialLinkModal(index: number): void {
+    const link = this.socialLinksList()[index];
+    if (!link) return;
+    this.editingSocialLinkIndex.set(index);
+    this.socialLinkForm.patchValue({
+      platform: link.platform,
+      url: link.url,
+      iconKey: link.iconKey,
+      displayOrder: link.displayOrder || index + 1,
+    });
+    this.isSocialLinkModalOpen.set(true);
+  }
+
+  applyLinkPreset(preset: { platform: string; iconKey: string; prefix: string }): void {
+    const currentUrl = this.socialLinkForm.get('url')?.value;
+    this.socialLinkForm.patchValue({
+      platform: preset.platform,
+      iconKey: preset.iconKey,
+      url: !currentUrl || currentUrl.startsWith('http') || currentUrl.startsWith('mailto') ? preset.prefix : currentUrl,
+    });
+  }
+
+  selectLinkIcon(iconKey: string): void {
+    this.socialLinkForm.patchValue({ iconKey });
+  }
+
+  saveSocialLink(): void {
+    if (this.socialLinkForm.invalid) {
+      this.socialLinkForm.markAllAsTouched();
+      this.showError('Please complete Platform name and valid URL.');
+      return;
+    }
+
+    const formVal = this.socialLinkForm.value;
+    const currentList = [...this.socialLinksList()];
+    const editIdx = this.editingSocialLinkIndex();
+
+    const linkItem = {
+      platform: (formVal.platform || '').trim(),
+      url: (formVal.url || '').trim(),
+      iconKey: (formVal.iconKey || 'link').trim(),
+      displayOrder: Number(formVal.displayOrder) || 1,
+    };
+
+    if (editIdx !== null && editIdx >= 0 && editIdx < currentList.length) {
+      currentList[editIdx] = linkItem;
+    } else {
+      currentList.push(linkItem);
+    }
+
+    currentList.sort((a, b) => a.displayOrder - b.displayOrder);
+    this.socialLinksList.set(currentList);
+    this.isSocialLinkModalOpen.set(false);
+
+    this.persistSocialLinks(
+      editIdx !== null
+        ? `Link "${linkItem.platform}" updated! Live in Hero & Footer.`
+        : `Link "${linkItem.platform}" added! Live in Hero & Footer.`
+    );
+  }
+
+  deleteSocialLink(index: number): void {
+    const link = this.socialLinksList()[index];
+    if (!link) return;
+    if (!confirm(`Are you sure you want to remove "${link.platform}" from Hero & Footer?`)) {
+      return;
+    }
+
+    const currentList = this.socialLinksList().filter((_, i) => i !== index);
+    const reordered = currentList.map((item, idx) => ({ ...item, displayOrder: idx + 1 }));
+    this.socialLinksList.set(reordered);
+
+    this.persistSocialLinks(`Link "${link.platform}" removed successfully.`);
+  }
+
+  moveSocialLink(index: number, direction: 'up' | 'down'): void {
+    const list = [...this.socialLinksList()];
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    const temp = list[index];
+    list[index] = list[targetIdx];
+    list[targetIdx] = temp;
+
+    const updated = list.map((item, idx) => ({ ...item, displayOrder: idx + 1 }));
+    this.socialLinksList.set(updated);
+
+    this.persistSocialLinks('Links order updated and saved!');
+  }
+
+  persistSocialLinks(successMsg: string): void {
+    this.isSaving.set(true);
+    const formVal = this.settingsForm.value;
+    const badgesArray = formVal.heroBadges
+      ? formVal.heroBadges.split(',').map((b: string) => b.trim()).filter(Boolean)
+      : [];
+    const headlinesArray = formVal.heroHeadlines
+      ? formVal.heroHeadlines.split('\n').map((h: string) => h.trim()).filter(Boolean)
+      : [];
+
+    const payload = {
+      fullName: formVal.fullName || this.settings()?.fullName || 'Shahid Hussain',
+      professionalTitle: formVal.professionalTitle || this.settings()?.professionalTitle || 'Full-Stack Developer',
+      oneLineBio: formVal.oneLineBio || this.settings()?.oneLineBio || '',
+      aboutSummary: formVal.aboutSummary || this.settings()?.aboutSummary || '',
+      availabilityStatus: formVal.availabilityStatus || this.settings()?.availabilityStatus || 'Open to Work',
+      currentLocation: formVal.currentLocation || this.settings()?.currentLocation || 'Pakistan',
+      cvUrl: formVal.cvUrl || this.settings()?.cvUrl || '/uploads/Shahid_Hussain_CV.pdf',
+      whatsAppNumber: formVal.whatsAppNumber || this.settings()?.whatsAppNumber || '923000000000',
+      heroCodeTitle: formVal.heroCodeTitle || this.settings()?.heroCodeTitle || 'ShahidPortfolio.sln - Clean Architecture',
+      heroCodeSnippet: formVal.heroCodeSnippet || this.settings()?.heroCodeSnippet || '',
+      heroBadgesJson: JSON.stringify(badgesArray),
+      profilePhotoUrl: this.settings()?.profilePhotoUrl || '/uploads/Shahid_Profile.jpg',
+      heroImageUrl: this.settings()?.heroImageUrl || null,
+      heroHeadlinesJson: JSON.stringify(headlinesArray),
+      socialLinks: this.socialLinksList().map((s, idx) => ({
+        platform: s.platform,
+        url: s.url,
+        iconKey: s.iconKey,
+        displayOrder: s.displayOrder || idx + 1,
+      })),
+    };
+
+    this.adminService.updateSettings(payload).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        try {
+          sessionStorage.removeItem('shahid_cached_settings');
+        } catch {}
+        this.showNotice(successMsg);
+        this.loadAllData();
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        this.showError(err?.error?.message || err?.message || 'Failed to save links.');
       },
     });
   }

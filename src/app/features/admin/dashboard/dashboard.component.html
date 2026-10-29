@@ -83,6 +83,11 @@
           <span>Site Profile &amp; Bio</span>
         </button>
 
+        <button (click)="setTab('links')" [class.active]="activeTab() === 'links'" class="nav-item-btn">
+          <app-icon name="link" [size]="18"></app-icon>
+          <span>Social &amp; Footer Links ({{ socialLinksList().length }})</span>
+        </button>
+
         <button (click)="setTab('terminal')" [class.active]="activeTab() === 'terminal'" class="nav-item-btn">
           <app-icon name="terminal" [size]="18"></app-icon>
           <span>Hero Terminal Code</span>
@@ -133,6 +138,10 @@
         <button (click)="setTab('profile')" [class.active]="activeTab() === 'profile'" class="mobile-nav-btn">
           <app-icon name="user" [size]="15"></app-icon>
           <span>Profile</span>
+        </button>
+        <button (click)="setTab('links')" [class.active]="activeTab() === 'links'" class="mobile-nav-btn">
+          <app-icon name="link" [size]="15"></app-icon>
+          <span>Links ({{ socialLinksList().length }})</span>
         </button>
         <button (click)="setTab('terminal')" [class.active]="activeTab() === 'terminal'" class="mobile-nav-btn">
           <app-icon name="terminal" [size]="15"></app-icon>
@@ -877,6 +886,31 @@
               </div>
             </form>
           </div>
+
+          <!-- Card 4: Social & Footer Links Quick Access -->
+          <div class="admin-modular-card card">
+            <div class="card-section-header">
+              <div class="header-icon-wrap">
+                <app-icon name="link" [size]="20"></app-icon>
+              </div>
+              <div class="header-text">
+                <h3>4. Social Profiles &amp; Footer Links</h3>
+                <p>Manage external links connected to your Landing Page Hero section and the site-wide Footer.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+              <div>
+                <p style="margin: 0; color: #64748B; font-size: 0.875rem;">
+                  Currently configured: <strong>{{ socialLinksList().length }} active links</strong> (GitHub, LinkedIn, Email, etc.).
+                </p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" (click)="setTab('links')">
+                <app-icon name="external-link" [size]="14"></app-icon>
+                Manage Social &amp; Footer Links &rarr;
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1260,6 +1294,114 @@
               <span>{{ heroSuccessMessage() }}</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- 12. SOCIAL & FOOTER LINKS TAB -->
+      <section *ngIf="activeTab() === 'links'" class="tab-pane">
+        <div class="pane-header with-action">
+          <div>
+            <h2>Social &amp; Footer Links Management</h2>
+            <p>Manage external profiles and custom portfolio links. Synchronized automatically across 2 live locations on your website.</p>
+          </div>
+          <button class="btn btn-primary" (click)="openNewSocialLinkModal()">
+            <app-icon name="plus" [size]="16"></app-icon>
+            Add New Link
+          </button>
+        </div>
+
+        <!-- Location Highlight Banner -->
+        <div class="links-highlight-banner">
+          <div class="banner-head">
+            <app-icon name="sparkles" [size]="20"></app-icon>
+            <span>Live Sync Architecture — 2 Public Locations</span>
+          </div>
+          <div class="banner-locations">
+            <div class="location-badge-box">
+              <div class="loc-icon">🌟</div>
+              <div class="loc-text">
+                <strong>1. Landing Page Hero Quick-Actions</strong>
+                <span>Interactive pill buttons with brand icon and platform label, rendered directly below hero CTA buttons.</span>
+              </div>
+            </div>
+            <div class="location-badge-box">
+              <div class="loc-icon">⚓</div>
+              <div class="loc-text">
+                <strong>2. Site-Wide Footer Network Row</strong>
+                <span>Round branded icon buttons rendered in the brand identity column across every page of your site.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Links List Grid -->
+        <div class="links-admin-grid" *ngIf="socialLinksList().length > 0">
+          <div class="link-admin-card" *ngFor="let link of socialLinksList(); let i = index">
+            <div class="card-top">
+              <div class="platform-group">
+                <div class="link-icon-circle">
+                  <app-icon [name]="link.iconKey || link.platform.toLowerCase()" [size]="22"></app-icon>
+                </div>
+                <div class="platform-info">
+                  <h4>{{ link.platform }}</h4>
+                  <span class="icon-badge">icon: {{ link.iconKey }}</span>
+                </div>
+              </div>
+              <span class="order-pill">Order #{{ link.displayOrder || (i + 1) }}</span>
+            </div>
+
+            <div class="card-url-section">
+              <span class="url-text" [title]="link.url">{{ link.url }}</span>
+              <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="test-url-btn" title="Open Link in New Tab">
+                <app-icon name="external-link" [size]="15"></app-icon>
+              </a>
+            </div>
+
+            <div class="card-footer-actions">
+              <div class="order-actions">
+                <button
+                  type="button"
+                  class="btn-order"
+                  title="Move Up"
+                  [disabled]="i === 0"
+                  (click)="moveSocialLink(i, 'up')"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  class="btn-order"
+                  title="Move Down"
+                  [disabled]="i === socialLinksList().length - 1"
+                  (click)="moveSocialLink(i, 'down')"
+                >
+                  ▼
+                </button>
+              </div>
+
+              <div class="crud-actions">
+                <button type="button" class="btn btn-sm btn-outline" (click)="openEditSocialLinkModal(i)">
+                  <app-icon name="edit" [size]="14"></app-icon>
+                  Edit
+                </button>
+                <button type="button" class="btn btn-sm btn-danger-soft" (click)="deleteSocialLink(i)">
+                  <app-icon name="trash" [size]="14"></app-icon>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-card" *ngIf="socialLinksList().length === 0">
+          <app-icon name="link" [size]="48"></app-icon>
+          <h3>No Links Configured</h3>
+          <p>Add your first social media or portfolio link. It will automatically show up in the Hero Section and Footer.</p>
+          <button class="btn btn-primary" (click)="openNewSocialLinkModal()">
+            <app-icon name="plus" [size]="16"></app-icon>
+            Add New Link
+          </button>
         </div>
       </section>
     </main>
@@ -1938,6 +2080,118 @@
           <button type="submit" class="btn btn-primary" [disabled]="educationForm.invalid || isSaving()">
             <span class="spinner-border" *ngIf="isSaving()"></span>
             <span>{{ isSaving() ? 'Saving Qualification...' : 'Save Qualification' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. SOCIAL & FOOTER LINK MODAL (Add / Edit) -->
+  <div class="modal-backdrop" *ngIf="isSocialLinkModalOpen()" (click)="isSocialLinkModalOpen.set(false)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingSocialLinkIndex() !== null ? 'Edit Link' : 'Add New Link' }}</h3>
+        <button class="modal-close" (click)="isSocialLinkModalOpen.set(false)">
+          <app-icon name="close" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="socialLinkForm" (ngSubmit)="saveSocialLink()" novalidate>
+        <div class="modal-body-scroll">
+
+          <!-- Presets -->
+          <div class="preset-chips-container">
+            <span class="preset-label">Quick Platform Presets (Click to autofill):</span>
+            <div class="preset-chips">
+              <button
+                type="button"
+                *ngFor="let p of linkPresets"
+                class="preset-chip"
+                (click)="applyLinkPreset(p)"
+              >
+                <app-icon [name]="p.iconKey" [size]="14"></app-icon>
+                <span>{{ p.platform }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Platform Name & Display Order -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Platform / Link Label *</label>
+              <input
+                type="text"
+                formControlName="platform"
+                class="form-control"
+                placeholder="e.g. GitHub, LinkedIn, YouTube"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Order *</label>
+              <input
+                type="number"
+                formControlName="displayOrder"
+                class="form-control"
+                min="1"
+                max="100"
+              />
+            </div>
+          </div>
+
+          <!-- URL -->
+          <div class="form-group">
+            <label class="form-label">Target URL *</label>
+            <input
+              type="text"
+              formControlName="url"
+              class="form-control"
+              placeholder="https://github.com/your-username or mailto:you@domain.com"
+            />
+            <span class="form-hint">Supports web URLs (https://...), email (mailto:...), and WhatsApp (https://wa.me/...)</span>
+          </div>
+
+          <!-- Icon Selector -->
+          <div class="icon-picker-box">
+            <label class="form-label">Select Icon Symbol *</label>
+            <div class="icon-grid">
+              <div
+                *ngFor="let icon of availableIcons"
+                class="icon-tile"
+                [class.selected]="socialLinkForm.get('iconKey')?.value === icon.key"
+                (click)="selectLinkIcon(icon.key)"
+              >
+                <app-icon [name]="icon.key" [size]="20"></app-icon>
+                <span>{{ icon.label }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Preview Showcase -->
+          <div class="preview-showcase-box">
+            <span class="preview-title">Live Visual Preview (Where it will appear):</span>
+            <div class="preview-demos">
+              <div class="preview-item">
+                <span class="label-tag">Hero Section:</span>
+                <div class="hero-pill-sample">
+                  <app-icon [name]="socialLinkForm.get('iconKey')?.value || 'link'" [size]="16"></app-icon>
+                  <span>{{ socialLinkForm.get('platform')?.value || 'Platform' }}</span>
+                </div>
+              </div>
+              <div class="preview-item">
+                <span class="label-tag">Footer:</span>
+                <div class="footer-circle-sample" [title]="socialLinkForm.get('platform')?.value || 'Platform'">
+                  <app-icon [name]="socialLinkForm.get('iconKey')?.value || 'link'" [size]="16"></app-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="isSocialLinkModalOpen.set(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="socialLinkForm.invalid || isSaving()">
+            <span class="spinner-border" *ngIf="isSaving()"></span>
+            <span>{{ isSaving() ? 'Saving Link...' : (editingSocialLinkIndex() !== null ? 'Update Link' : 'Save Link') }}</span>
           </button>
         </div>
       </form>
