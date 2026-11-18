@@ -264,7 +264,7 @@ export class AdminDashboardComponent implements OnInit {
             }
           } catch {}
 
-          let headlinesStr = 'Building Enterprise-Grade .NET & Angular Solutions\nArchitecting Scalable Clean Architecture & CQRS Systems\nEngineering Resilient Cloud-Ready Microservices';
+          let headlinesStr = 'Building Scalable .NET & Angular Solutions\nClean Architecture & CQRS Systems\nEngineering Cloud-Ready Microservices\nFull-Stack Engineer Specializing in APIs';
           try {
             if (res.data.heroHeadlinesJson) {
               const parsed = JSON.parse(res.data.heroHeadlinesJson);
@@ -1535,6 +1535,7 @@ export class AdminDashboardComponent implements OnInit {
         this.isSaving.set(false);
         try {
           sessionStorage.removeItem('shahid_cached_settings');
+          localStorage.removeItem('shahid_cached_settings');
         } catch {}
         this.showNotice(successToast);
         this.loadAllData();
@@ -1721,6 +1722,7 @@ export class AdminDashboardComponent implements OnInit {
         this.isSaving.set(false);
         try {
           sessionStorage.removeItem('shahid_cached_settings');
+          localStorage.removeItem('shahid_cached_settings');
         } catch {}
         this.showNotice(successMsg);
         this.loadAllData();
@@ -1869,12 +1871,19 @@ export class AdminDashboardComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       try {
         sessionStorage.removeItem('shahid_cached_settings');
+        localStorage.removeItem('shahid_cached_settings');
         sessionStorage.removeItem('shahid_cached_projects');
+        localStorage.removeItem('shahid_cached_projects');
         sessionStorage.removeItem('shahid_cached_all_projects');
+        localStorage.removeItem('shahid_cached_all_projects');
         sessionStorage.removeItem('shahid_cached_skills');
+        localStorage.removeItem('shahid_cached_skills');
         sessionStorage.removeItem('shahid_cached_all_skills');
+        localStorage.removeItem('shahid_cached_all_skills');
         sessionStorage.removeItem('shahid_cached_timeline');
+        localStorage.removeItem('shahid_cached_timeline');
         sessionStorage.removeItem('shahid_cached_blog_posts');
+        localStorage.removeItem('shahid_cached_blog_posts');
       } catch {}
     }
     this.actionMessage.set(msg);

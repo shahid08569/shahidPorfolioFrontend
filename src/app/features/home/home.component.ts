@@ -37,23 +37,24 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private recheckCanvasDimensions?: () => void;
 
   // Typewriter dynamic headline signal
-  readonly displayedHeadline = signal<string>('Building Enterprise-Grade .NET & Angular Solutions');
+  readonly displayedHeadline = signal<string>('Building Scalable .NET & Angular Solutions');
   private typewriterTimeout: any = null;
   private currentPhraseIndex = 0;
   private currentCharIndex = 0;
   private isDeleting = false;
+  private isTypewriterStarted = false;
 
   // Settings signal
   readonly settings = signal<PublicSettings>({
     fullName: 'Shahid Hussain',
-    professionalTitle: 'Senior Full-Stack .NET & Angular Developer',
-    oneLineBio: 'Architecting resilient enterprise microservices, clean CQRS backends, and responsive modern web apps.',
+    professionalTitle: 'Full-Stack .NET & Angular Developer',
+    oneLineBio: 'Architecting robust enterprise solutions with ASP.NET Core Clean Architecture and reactive Angular applications.',
     aboutSummary:
-      'Senior software engineer with deep expertise in .NET 10, ASP.NET Core Web API, Clean Architecture, MediatR CQRS, EF Core, and Angular 22. Passionate about domain-driven design, high-throughput microservices, sub-second page performance, and clean code that scales.',
-    availabilityStatus: 'Open to Work',
+      'I am a dedicated full-stack software engineer with deep expertise in .NET, C#, EF Core, and Angular. I build fast, secure, scalable distributed systems and fluid, responsive user interfaces that deliver business results.',
+    availabilityStatus: 'Open to full-time engineering roles',
     currentLocation: 'Pakistan',
     cvUrl: '/uploads/Shahid_Hussain_CV.pdf',
-    whatsAppNumber: '923000000000',
+    whatsAppNumber: '923448851926',
     heroCodeTitle: 'ShahidPortfolio.sln - Clean Architecture',
     heroCodeSnippet: `public class SolutionArchitect
 {
@@ -70,11 +71,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 }`,
     heroBadgesJson: '["Clean Architecture", "CQRS / MediatR", "Angular 22 Signals"]',
     profilePhotoUrl: '/uploads/Shahid_Profile.jpg',
-    heroImageUrl: '',
-    heroHeadlinesJson: '["Building Enterprise-Grade .NET & Angular Solutions", "Architecting Scalable Clean Architecture & CQRS Systems", "Engineering Resilient Cloud-Ready Microservices"]',
+    heroImageUrl: '/uploads/hero_20261026064901.jpg',
+    heroHeadlinesJson: '["Building Scalable .NET & Angular Solutions", "Clean Architecture & CQRS Systems", "Engineering Cloud-Ready Microservices", "Full-Stack Engineer Specializing in APIs"]',
     socialLinks: [
       { platform: 'GitHub', url: 'https://github.com/shahid08569', iconKey: 'github' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/shahidhussain', iconKey: 'linkedin' },
+      { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/shahid-hussain-712bb4378', iconKey: 'linkedin' },
+      { platform: 'Email', url: 'mailto:shahidhussaain08569@gmail.com', iconKey: 'mail' },
     ],
   });
 
@@ -102,10 +104,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } catch {}
     return [
-      'Building Enterprise-Grade .NET & Angular Solutions',
-      'Architecting Scalable Clean Architecture & CQRS Systems',
-      'Engineering Resilient Cloud-Ready Microservices',
-      'Delivering Mission-Critical Web Platforms',
+      'Building Scalable .NET & Angular Solutions',
+      'Clean Architecture & CQRS Systems',
+      'Engineering Cloud-Ready Microservices',
+      'Full-Stack Engineer Specializing in APIs',
     ];
   }
 
@@ -186,11 +188,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const cachedSettings = sessionStorage.getItem('shahid_cached_settings');
+        const cachedSettings = localStorage.getItem('shahid_cached_settings') || sessionStorage.getItem('shahid_cached_settings');
         if (cachedSettings) {
-          this.settings.set(JSON.parse(cachedSettings));
+          const parsed = JSON.parse(cachedSettings);
+          this.settings.set(parsed);
+          try {
+            if (parsed.heroHeadlinesJson) {
+              const headlines = JSON.parse(parsed.heroHeadlinesJson);
+              if (Array.isArray(headlines) && headlines.length > 0) {
+                this.displayedHeadline.set(headlines[0]);
+              }
+            }
+          } catch {}
         }
-        const cachedProjects = sessionStorage.getItem('shahid_cached_projects');
+        const cachedProjects = localStorage.getItem('shahid_cached_projects') || sessionStorage.getItem('shahid_cached_projects');
         if (cachedProjects) {
           const parsed = JSON.parse(cachedProjects);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -198,7 +209,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isLoadingProjects.set(false);
           }
         }
-        const cachedSkills = sessionStorage.getItem('shahid_cached_skills');
+        const cachedSkills = localStorage.getItem('shahid_cached_skills') || sessionStorage.getItem('shahid_cached_skills');
         if (cachedSkills) {
           const parsed = JSON.parse(cachedSkills);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -231,7 +242,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.typewriterTimeout) {
       clearTimeout(this.typewriterTimeout);
+      this.typewriterTimeout = null;
     }
+    this.isTypewriterStarted = false;
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
@@ -758,48 +771,74 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private startTypewriter(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     if (this.typewriterTimeout) {
       clearTimeout(this.typewriterTimeout);
+      this.typewriterTimeout = null;
     }
-    this.currentCharIndex = 0;
-    this.isDeleting = false;
-    this.tickTypewriter();
-  }
 
-  private tickTypewriter(): void {
     const phrases = this.heroHeadlines;
     if (!phrases || phrases.length === 0) return;
 
-    const currentPhrase = phrases[this.currentPhraseIndex % phrases.length];
+    // Start with the first phrase fully displayed so there's zero initial blank or jump
+    this.currentPhraseIndex = 0;
+    const initialPhrase = phrases[0];
+    this.currentCharIndex = initialPhrase.length;
+    this.displayedHeadline.set(initialPhrase);
+    this.isDeleting = true;
+    this.isTypewriterStarted = true;
+
+    // Generous 2.6s reading pause before starting the first erase animation
+    this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 2600);
+  }
+
+  private tickTypewriter(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const phrases = this.heroHeadlines;
+    if (!phrases || phrases.length === 0) return;
+
+    const phraseIndex = this.currentPhraseIndex % phrases.length;
+    const currentPhrase = phrases[phraseIndex];
 
     if (!this.isDeleting) {
       // Forward typing
       this.currentCharIndex++;
+      if (this.currentCharIndex > currentPhrase.length) {
+        this.currentCharIndex = currentPhrase.length;
+      }
+
       this.displayedHeadline.set(currentPhrase.substring(0, this.currentCharIndex));
 
       if (this.currentCharIndex >= currentPhrase.length) {
-        // Full phrase displayed, wait before erasing
+        // Full phrase displayed, wait 2.4s before erasing
         this.isDeleting = true;
         this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 2400);
         return;
       }
 
-      const speed = 40 + Math.random() * 35;
+      const speed = 40 + Math.random() * 30;
       this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), speed);
     } else {
       // Deleting / erasing
       this.currentCharIndex--;
+      if (this.currentCharIndex < 0) {
+        this.currentCharIndex = 0;
+      }
+
       this.displayedHeadline.set(currentPhrase.substring(0, this.currentCharIndex));
 
       if (this.currentCharIndex <= 0) {
-        // Erased completely, brief pause then next phrase
+        // Erased completely, brief pause then proceed to next phrase
         this.isDeleting = false;
-        this.currentPhraseIndex = (this.currentPhraseIndex + 1) % phrases.length;
-        this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 450);
+        this.currentPhraseIndex = (phraseIndex + 1) % phrases.length;
+        this.currentCharIndex = 0;
+        this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 380);
         return;
       }
 
-      this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 22);
+      this.typewriterTimeout = setTimeout(() => this.tickTypewriter(), 20);
     }
   }
 
@@ -807,14 +846,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.apiService.getPublicSettings().subscribe({
       next: (res) => {
         if (res.data) {
-          const oldHeadlines = this.settings()?.heroHeadlinesJson;
           this.settings.set(res.data);
           this.hasProfileImageError.set(false);
           this.hasHeroImageError.set(false);
           if (isPlatformBrowser(this.platformId)) {
-            try { sessionStorage.setItem('shahid_cached_settings', JSON.stringify(res.data)); } catch {}
+            try {
+              const str = JSON.stringify(res.data);
+              sessionStorage.setItem('shahid_cached_settings', str);
+              localStorage.setItem('shahid_cached_settings', str);
+            } catch {}
           }
-          if (res.data.heroHeadlinesJson && res.data.heroHeadlinesJson !== oldHeadlines) {
+          if (!this.isTypewriterStarted) {
             this.startTypewriter();
           }
         }
